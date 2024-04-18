@@ -1,17 +1,8 @@
 import { ReactElement } from 'react'
-import { AppLayout, Button } from './components'
+import { MainPage } from './pages'
 
 function App(): ReactElement {
-  return (
-    <AppLayout>
-      <AppLayout.Header>
-        <h1 className="text-4xl">App Name</h1>
-      </AppLayout.Header>
-      <AppLayout.Menu>
-        <Button>fs</Button>
-      </AppLayout.Menu>
-    </AppLayout>
-  )
+  return <MainPage />
 }
 
 export default App

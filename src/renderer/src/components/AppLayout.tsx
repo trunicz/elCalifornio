@@ -1,5 +1,14 @@
 import { cn } from '@renderer/utils'
 import { ComponentProps, ReactElement } from 'react'
+import { Button } from './button'
+import {
+  LuUsers,
+  LuUserCog,
+  LuShapes,
+  LuHeartHandshake,
+  LuFileEdit,
+  LuChevronRight
+} from 'react-icons/lu'
 
 export const AppLayout = ({
   className,
@@ -7,33 +16,50 @@ export const AppLayout = ({
   ...props
 }: ComponentProps<'div'>): ReactElement => {
   return (
-    <div className={cn('bg-blue-200 h-full', className)} {...props}>
+    <main className={cn('bg-blue-200 theme-light h-full flex flex-col', className)} {...props}>
       {children}
-    </div>
+    </main>
   )
 }
 
 const AppHeader = ({ className, children, ...props }: ComponentProps<'div'>): ReactElement => {
   return (
-    <div
-      className={cn(
-        'bg-zinc-800 p-6  border-b-2 border-zinc-400 flex justify-center items-center',
-        className
-      )}
+    <header
+      className={cn('bg-main text-stroke p-6 flex justify-center items-center', className)}
       {...props}
     >
       {children}
-    </div>
+    </header>
   )
 }
 
 const AppMenu = ({ className, children, ...props }: ComponentProps<'div'>): ReactElement => {
   return (
-    <div className={cn('bg-zinc-900 h-full p-6', className)} {...props}>
+    <section
+      className={cn(
+        'bg-main flex-1 p-6 overflow-hidden grid grid-rows-2 font-bold text-xl grid-cols-3 gap-6',
+        className
+      )}
+      {...props}
+    >
       {children}
-    </div>
+    </section>
   )
 }
 
-AppLayout.Menu = AppMenu
+export const AppMenuButtons = (): ReactElement => {
+  return (
+    <>
+      <Button icon={<LuUsers />} text="Usuarios" />
+      <Button icon={<LuUserCog />} text="Clientes" />
+      <Button icon={<LuShapes />} text="Inventario" />
+      <Button icon={<LuHeartHandshake />} text="Rentar" />
+      <Button icon={<LuFileEdit />} text="Contratos" />
+      <Button icon={<LuChevronRight />} text="Mas Opciones" />
+    </>
+  )
+}
+
 AppLayout.Header = AppHeader
+AppLayout.Menu = AppMenu
+AppLayout.MenuButtons = AppMenuButtons

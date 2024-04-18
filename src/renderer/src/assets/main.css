@@ -20,3 +20,11 @@
     @apply overflow-hidden;
   }
 }
+.theme-light {
+  --color-primary: #6246ea;
+  --color-secondary: #d1d1e9;
+  --color-accent: #e45858;
+  --color-stroke: #2b2c34;
+  --color-btn: #fffffe;
+  --color-main: #fffffe;
+}
