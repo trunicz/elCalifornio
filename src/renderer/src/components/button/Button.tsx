@@ -4,7 +4,7 @@ import { useLocation } from 'wouter'
 
 interface ButtonProps extends ComponentProps<'button'> {
   icon?: ReactElement
-  text?: string
+  text: string
   to?: string
 }
 

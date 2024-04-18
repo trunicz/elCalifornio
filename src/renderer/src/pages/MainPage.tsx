@@ -12,9 +12,7 @@ import {
 export const MainPage = (): ReactElement => {
   return (
     <AppLayout>
-      <AppLayout.Header>
-        <h1 className="text-4xl col-span-full text-center">App Name</h1>
-      </AppLayout.Header>
+      <AppLayout.Header />
       <AppLayout.Menu>
         <Button icon={<LuUsers />} text="Usuarios" />
         <Button icon={<LuUserCog />} text="Clientes" />

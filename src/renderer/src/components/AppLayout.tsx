@@ -1,5 +1,6 @@
 import { cn } from '@renderer/utils'
 import { ComponentProps, ReactElement } from 'react'
+import { Button } from './button'
 
 export const AppLayout = ({
   className,
@@ -17,6 +18,9 @@ const AppHeader = ({ className, children, ...props }: ComponentProps<'div'>): Re
   return (
     <header className={cn('bg-main text-stroke p-6 grid grid-cols-6', className)} {...props}>
       {children}
+      <Button text="Perfil" />
+      <h1 className="text-4xl col-span-4 text-center ">App Name</h1>
+      <Button text="settings" />
     </header>
   )
 }
