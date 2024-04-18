@@ -1,14 +1,5 @@
 import { cn } from '@renderer/utils'
 import { ComponentProps, ReactElement } from 'react'
-import { Button } from './button'
-import {
-  LuUsers,
-  LuUserCog,
-  LuShapes,
-  LuHeartHandshake,
-  LuFileEdit,
-  LuChevronRight
-} from 'react-icons/lu'
 
 export const AppLayout = ({
   className,
@@ -24,10 +15,7 @@ export const AppLayout = ({
 
 const AppHeader = ({ className, children, ...props }: ComponentProps<'div'>): ReactElement => {
   return (
-    <header
-      className={cn('bg-main text-stroke p-6 flex justify-center items-center', className)}
-      {...props}
-    >
+    <header className={cn('bg-main text-stroke p-6 grid grid-cols-6', className)} {...props}>
       {children}
     </header>
   )
@@ -47,19 +35,5 @@ const AppMenu = ({ className, children, ...props }: ComponentProps<'div'>): Reac
   )
 }
 
-export const AppMenuButtons = (): ReactElement => {
-  return (
-    <>
-      <Button icon={<LuUsers />} text="Usuarios" />
-      <Button icon={<LuUserCog />} text="Clientes" />
-      <Button icon={<LuShapes />} text="Inventario" />
-      <Button icon={<LuHeartHandshake />} text="Rentar" />
-      <Button icon={<LuFileEdit />} text="Contratos" />
-      <Button icon={<LuChevronRight />} text="Mas Opciones" />
-    </>
-  )
-}
-
 AppLayout.Header = AppHeader
 AppLayout.Menu = AppMenu
-AppLayout.MenuButtons = AppMenuButtons

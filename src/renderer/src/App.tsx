@@ -1,8 +1,16 @@
 import { ReactElement } from 'react'
-import { MainPage } from './pages'
+import { Route, Switch } from 'wouter'
+import { MainPage, SecondPage } from './pages'
 
 function App(): ReactElement {
-  return <MainPage />
+  return (
+    <>
+      <Switch>
+        <Route path="/" component={MainPage} />
+        <Route path="/second" component={SecondPage} />
+      </Switch>
+    </>
+  )
 }
 
 export default App
