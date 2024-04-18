@@ -1,6 +1,6 @@
 import { ReactElement } from 'react'
 import { Route, Switch } from 'wouter'
-import { MainPage, SecondPage } from './pages'
+import { MainPage, SecondPage, UserPage } from './pages'
 
 function App(): ReactElement {
   return (
@@ -8,6 +8,7 @@ function App(): ReactElement {
       <Switch>
         <Route path="/" component={MainPage} />
         <Route path="/second" component={SecondPage} />
+        <Route path="/users" component={UserPage} />
       </Switch>
     </>
   )

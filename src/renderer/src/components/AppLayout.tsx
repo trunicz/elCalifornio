@@ -1,6 +1,6 @@
 import { cn } from '@renderer/utils'
 import { ComponentProps, ReactElement } from 'react'
-import { Button } from './button'
+import { Button, DropDownButton } from './button'
 
 export const AppLayout = ({
   className,
@@ -14,18 +14,25 @@ export const AppLayout = ({
   )
 }
 
+interface AppHeaderButton extends ComponentProps<'header'> {
+  leftButton?: ReactElement
+  rightButton?: ReactElement
+}
+
 const AppHeader = ({
   className,
+  leftButton,
+  rightButton,
   title,
   children,
   ...props
-}: ComponentProps<'header'>): ReactElement => {
+}: AppHeaderButton): ReactElement => {
   return (
     <header className={cn('bg-main text-stroke p-6 grid grid-cols-6', className)} {...props}>
       {children}
-      <Button text="Perfil" />
+      {leftButton ? leftButton : <DropDownButton />}
       <h1 className="text-4xl col-span-4 text-center ">{title}</h1>
-      <Button text="Ajustes" />
+      {rightButton ? rightButton : <Button text="Ajustes" />}
     </header>
   )
 }
@@ -44,5 +51,14 @@ const AppMenu = ({ className, children, ...props }: ComponentProps<'section'>): 
   )
 }
 
+const AppContent = ({ className, children, ...props }: ComponentProps<'section'>): ReactElement => {
+  return (
+    <section className={cn('bg-main text-stroke flex-1 p-6 text-xl ', className)} {...props}>
+      {children}
+    </section>
+  )
+}
+
 AppLayout.Header = AppHeader
 AppLayout.Menu = AppMenu
+AppLayout.Content = AppContent

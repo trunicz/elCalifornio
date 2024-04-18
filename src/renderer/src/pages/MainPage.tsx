@@ -12,9 +12,9 @@ import {
 export const MainPage = (): ReactElement => {
   return (
     <AppLayout>
-      <AppLayout.Header />
+      <AppLayout.Header title="App Name" />
       <AppLayout.Menu>
-        <MenuButton icon={<LuUsers />} text="Usuarios" />
+        <MenuButton icon={<LuUsers />} to="/users" text="Usuarios" />
         <MenuButton icon={<LuUserCog />} text="Clientes" />
         <MenuButton icon={<LuShapes />} text="Inventario" />
         <MenuButton icon={<LuHeartHandshake />} text="Rentar" />

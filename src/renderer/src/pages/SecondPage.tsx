@@ -5,7 +5,7 @@ import { LuSticker, LuFileSearch, LuChevronLeft } from 'react-icons/lu'
 export const SecondPage = (): ReactElement => {
   return (
     <AppLayout>
-      <AppLayout.Header />
+      <AppLayout.Header title="App Name" />
       <AppLayout.Menu>
         <MenuButton icon={<LuChevronLeft />} to="/" text="Regresar" />
         <MenuButton icon={<LuSticker />} text="Recibos" />
