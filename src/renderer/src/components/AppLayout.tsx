@@ -6,7 +6,7 @@ export const AppLayout = ({
   className,
   children,
   ...props
-}: ComponentProps<'div'>): ReactElement => {
+}: ComponentProps<'main'>): ReactElement => {
   return (
     <main className={cn('bg-blue-200 theme-light h-full flex flex-col', className)} {...props}>
       {children}
@@ -14,18 +14,23 @@ export const AppLayout = ({
   )
 }
 
-const AppHeader = ({ className, children, ...props }: ComponentProps<'div'>): ReactElement => {
+const AppHeader = ({
+  className,
+  title,
+  children,
+  ...props
+}: ComponentProps<'header'>): ReactElement => {
   return (
     <header className={cn('bg-main text-stroke p-6 grid grid-cols-6', className)} {...props}>
       {children}
       <Button text="Perfil" />
-      <h1 className="text-4xl col-span-4 text-center ">App Name</h1>
-      <Button text="settings" />
+      <h1 className="text-4xl col-span-4 text-center ">{title}</h1>
+      <Button text="Ajustes" />
     </header>
   )
 }
 
-const AppMenu = ({ className, children, ...props }: ComponentProps<'div'>): ReactElement => {
+const AppMenu = ({ className, children, ...props }: ComponentProps<'section'>): ReactElement => {
   return (
     <section
       className={cn(

@@ -1,4 +1,4 @@
-import { AppLayout, Button } from '@renderer/components'
+import { AppLayout, MenuButton } from '@renderer/components'
 import { ReactElement } from 'react'
 import { LuSticker, LuFileSearch, LuChevronLeft } from 'react-icons/lu'
 
@@ -7,9 +7,9 @@ export const SecondPage = (): ReactElement => {
     <AppLayout>
       <AppLayout.Header />
       <AppLayout.Menu>
-        <Button icon={<LuChevronLeft />} to="/" text="Regresar" />
-        <Button icon={<LuSticker />} text="Recibos" />
-        <Button icon={<LuFileSearch />} text="Auditoria" />
+        <MenuButton icon={<LuChevronLeft />} to="/" text="Regresar" />
+        <MenuButton icon={<LuSticker />} text="Recibos" />
+        <MenuButton icon={<LuFileSearch />} text="Auditoria" />
       </AppLayout.Menu>
     </AppLayout>
   )

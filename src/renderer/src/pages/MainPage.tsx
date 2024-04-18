@@ -1,4 +1,4 @@
-import { AppLayout, Button } from '@renderer/components'
+import { AppLayout, MenuButton } from '@renderer/components'
 import { ReactElement } from 'react'
 import {
   LuUsers,
@@ -14,12 +14,12 @@ export const MainPage = (): ReactElement => {
     <AppLayout>
       <AppLayout.Header />
       <AppLayout.Menu>
-        <Button icon={<LuUsers />} text="Usuarios" />
-        <Button icon={<LuUserCog />} text="Clientes" />
-        <Button icon={<LuShapes />} text="Inventario" />
-        <Button icon={<LuHeartHandshake />} text="Rentar" />
-        <Button icon={<LuFileEdit />} text="Contratos" />
-        <Button icon={<LuChevronRight />} to="/second" text="Mas Opciones" />
+        <MenuButton icon={<LuUsers />} text="Usuarios" />
+        <MenuButton icon={<LuUserCog />} text="Clientes" />
+        <MenuButton icon={<LuShapes />} text="Inventario" />
+        <MenuButton icon={<LuHeartHandshake />} text="Rentar" />
+        <MenuButton icon={<LuFileEdit />} text="Contratos" />
+        <MenuButton icon={<LuChevronRight />} to="/second" text="Mas Opciones" />
       </AppLayout.Menu>
     </AppLayout>
   )

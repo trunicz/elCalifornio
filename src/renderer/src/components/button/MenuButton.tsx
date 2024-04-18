@@ -1,14 +1,9 @@
 import { cn } from '@renderer/utils'
-import { ComponentProps, ReactElement } from 'react'
+import { ReactElement } from 'react'
 import { useLocation } from 'wouter'
+import { ButtonProps } from './Button'
 
-export interface ButtonProps extends ComponentProps<'button'> {
-  icon?: ReactElement
-  text: string
-  to?: string
-}
-
-export const Button = ({
+export const MenuButton = ({
   className,
   children,
   text,
@@ -35,8 +30,8 @@ export const Button = ({
         }
       }}
     >
-      {icon && <span className="">{icon}</span>}
-      {!icon && text}
+      {icon && <span className="text-5xl text-primary bg-main rounded-full p-3">{icon}</span>}
+      {text}
       {children}
     </button>
   )
