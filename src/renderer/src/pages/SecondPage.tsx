@@ -8,8 +8,8 @@ export const SecondPage = (): ReactElement => {
       <AppLayout.Header title="App Name" />
       <AppLayout.Menu>
         <MenuButton icon={<LuChevronLeft />} to="/" text="Regresar" />
-        <MenuButton icon={<LuSticker />} text="Recibos" />
-        <MenuButton icon={<LuFileSearch />} text="Auditoria" />
+        <MenuButton icon={<LuSticker />} to="/bills" text="Recibos" />
+        <MenuButton icon={<LuFileSearch />} to="/audit" text="Auditoria" />
       </AppLayout.Menu>
     </AppLayout>
   )

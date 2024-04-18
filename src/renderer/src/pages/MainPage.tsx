@@ -15,10 +15,10 @@ export const MainPage = (): ReactElement => {
       <AppLayout.Header title="App Name" />
       <AppLayout.Menu>
         <MenuButton icon={<LuUsers />} to="/users" text="Usuarios" />
-        <MenuButton icon={<LuUserCog />} text="Clientes" />
-        <MenuButton icon={<LuShapes />} text="Inventario" />
-        <MenuButton icon={<LuHeartHandshake />} text="Rentar" />
-        <MenuButton icon={<LuFileEdit />} text="Contratos" />
+        <MenuButton icon={<LuUserCog />} to="/clients" text="Clientes" />
+        <MenuButton icon={<LuShapes />} to="/inventory" text="Inventario" />
+        <MenuButton icon={<LuHeartHandshake />} to="/rent" text="Rentar" />
+        <MenuButton icon={<LuFileEdit />} to="/contracts" text="Contratos" />
         <MenuButton icon={<LuChevronRight />} to="/second" text="Mas Opciones" />
       </AppLayout.Menu>
     </AppLayout>
