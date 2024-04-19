@@ -12,21 +12,22 @@ export const Table = ({ className, data, ...props }: TableProps): ReactElement =
 
   return (
     <TableContext.Provider value={{ data }}>
-      <table className={cn(``, className)} {...props}>
-        <thead>
-          <tr className="flex justify-between">
-            {headers.map((header, index) => (
-              <th className="border-2" key={`header+${index}`}>
-                {header + ''}
-              </th>
-            ))}
-          </tr>
+      <table className={cn(`w-full`, className)} {...props}>
+        <thead className="w-full bg-primary text-white">
+          {headers.map((header, index) => (
+            <th className="border-2 border-stroke p-1 " key={`header+${index}`}>
+              {header + ''}
+            </th>
+          ))}
         </thead>
         <tbody>
           {data.map((row: TableType) => (
-            <tr className="border-2" key={row.id}>
+            <tr
+              className="hover:bg-secondary transition-colors duration-150 active:bg-accent"
+              key={row.id}
+            >
               {Object.keys(row).map((key) => (
-                <td className="border-2" key={key}>
+                <td className="border-2 border-stroke text-center" key={key}>
                   {row[key]}
                 </td>
               ))}
