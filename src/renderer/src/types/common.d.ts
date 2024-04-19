@@ -1,10 +1,4 @@
-export type TableType = array<{
-  ID: number
-  username: string
-  password: string
-  email: string
-  Rol_ID: number
-}>
+export type TableType = array<object>
 
 /*
 

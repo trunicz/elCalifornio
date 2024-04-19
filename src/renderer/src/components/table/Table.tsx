@@ -14,11 +14,13 @@ export const Table = ({ className, data, ...props }: TableProps): ReactElement =
     <TableContext.Provider value={{ data }}>
       <table className={cn(`w-full`, className)} {...props}>
         <thead className="w-full bg-primary text-white">
-          {headers.map((header, index) => (
-            <th className="border-2 border-stroke p-1" key={`header+${index}`}>
-              {header + ''}
-            </th>
-          ))}
+          <tr>
+            {headers.map((header, index) => (
+              <th id={`h-${index}`} className="border-2 border-stroke p-1" key={`header+${index}`}>
+                {header + ''}
+              </th>
+            ))}
+          </tr>
         </thead>
         <tbody>
           {data.map((row: TableType) => (

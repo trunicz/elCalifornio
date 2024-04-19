@@ -12,7 +12,7 @@ export const MenuButton = ({
   ...props
 }: ButtonProps): ReactElement => {
   const [_, setLocation] = useLocation()
-  console.log(_)
+  if (!_) console.log(_)
 
   return (
     <button

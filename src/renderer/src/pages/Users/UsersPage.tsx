@@ -1,13 +1,15 @@
-import { AppLayout, Button, Table } from '@renderer/components'
-import { ReactElement } from 'react'
+import { AppLayout, Button, SearchBar, Table } from '@renderer/components'
+import { ReactElement, useState } from 'react'
 import { _userData } from '@renderer/stores/mocks'
 
 export const UsersPage = (): ReactElement => {
+  const [userData, setUserData] = useState(_userData)
   return (
     <AppLayout>
       <AppLayout.Header title="App Name" leftButton={<Button text="Volver" to="/" />} />
       <AppLayout.Content>
-        <Table data={_userData} />
+        <SearchBar searchFunction={setUserData} data={userData} />
+        <Table data={userData} />
       </AppLayout.Content>
     </AppLayout>
   )
