@@ -15,7 +15,7 @@ export const Table = ({ className, data, ...props }: TableProps): ReactElement =
       <table className={cn(`w-full`, className)} {...props}>
         <thead className="w-full bg-primary text-white">
           {headers.map((header, index) => (
-            <th className="border-2 border-stroke p-1 " key={`header+${index}`}>
+            <th className="border-2 border-stroke p-1" key={`header+${index}`}>
               {header + ''}
             </th>
           ))}
