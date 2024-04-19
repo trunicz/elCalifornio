@@ -15,7 +15,7 @@
 
     @apply bg-black;
 
-    @apply font-mono antialiased text-white;
+    @apply font-sans antialiased text-white;
 
     @apply overflow-hidden;
   }

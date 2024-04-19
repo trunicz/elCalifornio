@@ -5,6 +5,7 @@ import {
   BillsPage,
   ClientsPage,
   ContractsPage,
+  ErrorPage,
   InventoryPage,
   MainPage,
   RentPage,
@@ -25,6 +26,7 @@ function App(): ReactElement {
         <Route path="/contracts" component={ContractsPage} />
         <Route path="/bills" component={BillsPage} />
         <Route path="/audit" component={AuditPage} />
+        <Route path="*" component={ErrorPage} />
       </Switch>
     </>
   )

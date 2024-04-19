@@ -10,6 +10,9 @@ module.exports = {
         stroke: 'var(--color-stroke)',
         btn: 'var(--color-btn)',
         main: 'var(--color-main)'
+      },
+      fontFamily: {
+        sans: 'Montserrat, Arial, sans-serif'
       }
     }
   },
