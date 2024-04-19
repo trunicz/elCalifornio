@@ -1,5 +1,4 @@
-import { ReactElement, ComponentProps, useState, ComponentType, ComponentElement } from 'react'
-import { Button } from './button'
+import { ReactElement, ComponentProps } from 'react'
 import { TableType } from '@renderer/types'
 
 interface SearchBarType extends ComponentProps<'search'> {
@@ -8,21 +7,28 @@ interface SearchBarType extends ComponentProps<'search'> {
 }
 
 export const SearchBar = ({ searchFunction, data }: SearchBarType): ReactElement => {
-  const [SearchInput, setSearchInput] = useState('')
-
-  const handleInput = (event: { target: HTMLInputElement }): void => {
-    setSearchInput(event.target.value)
+  const Search = (value: string): void => {
+    if (value.length) {
+      const val = value.toLowerCase()
+      const returnedData: TableType = data.filter((e: TableType) => {
+        return Object.values(e).some(
+          (prop) => typeof prop === 'string' && prop.toLowerCase().includes(val)
+        )
+      })
+      searchFunction(returnedData)
+    } else {
+      searchFunction(data)
+    }
   }
+
   return (
     <search className="flex mb-2 ">
       <input
         type="text"
         placeholder="Buscar..."
-        className="ms-auto  active/focus:bg-secondary outline-none border-2 border-stroke p-1 px-2 "
-        onChange={() => handleInput}
+        className="ms-auto  focus:bg-main outline-none border-2 border-stroke p-1 px-2 "
+        onChange={(event) => Search(event.target.value)}
       />
-      <Button text="s" className="border-l-0" />
-      <span>{SearchInput}</span>
     </search>
   )
 }

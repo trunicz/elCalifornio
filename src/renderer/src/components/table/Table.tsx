@@ -12,31 +12,41 @@ export const Table = ({ className, data, ...props }: TableProps): ReactElement =
 
   return (
     <TableContext.Provider value={{ data }}>
-      <table className={cn(`w-full`, className)} {...props}>
-        <thead className="w-full bg-primary text-white">
-          <tr>
-            {headers.map((header, index) => (
-              <th id={`h-${index}`} className="border-2 border-stroke p-1" key={`header+${index}`}>
-                {header + ''}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((row: TableType) => (
-            <tr
-              className="hover:bg-secondary transition-colors duration-150 active:bg-accent"
-              key={row.id}
-            >
-              {Object.keys(row).map((key) => (
-                <td className="border-2 border-stroke text-center" key={key}>
-                  {row[key]}
-                </td>
+      {data.length > 0 ? (
+        <table className={cn(`w-full`, className)} {...props}>
+          <thead className="w-full bg-primary text-white">
+            <tr>
+              {headers.map((header, index) => (
+                <th
+                  id={`h-${index}`}
+                  className="border-2 border-stroke p-1"
+                  key={`header+${index}`}
+                >
+                  {header + ''}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.map((row: TableType) => (
+              <tr
+                className="hover:bg-secondary transition-colors duration-150 active:bg-accent"
+                key={row.id}
+              >
+                {Object.keys(row).map((key) => (
+                  <td className="border-2 border-stroke text-center" key={key}>
+                    {row[key]}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className="text-center">
+          <h3 className="text-3xl text-accent">Sin Información</h3>
+        </div>
+      )}
     </TableContext.Provider>
   )
 }

@@ -8,7 +8,7 @@ export const UsersPage = (): ReactElement => {
     <AppLayout>
       <AppLayout.Header title="App Name" leftButton={<Button text="Volver" to="/" />} />
       <AppLayout.Content>
-        <SearchBar searchFunction={setUserData} data={userData} />
+        <SearchBar searchFunction={setUserData} data={_userData} />
         <Table data={userData} />
       </AppLayout.Content>
     </AppLayout>
