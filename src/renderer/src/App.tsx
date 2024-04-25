@@ -9,7 +9,6 @@ import {
   InventoryPage,
   MainPage,
   RentPage,
-  SecondPage,
   UsersPage
 } from './pages'
 
@@ -18,7 +17,6 @@ function App(): ReactElement {
     <>
       <Switch>
         <Route path="/" component={MainPage} />
-        <Route path="/second" component={SecondPage} />
         <Route path="/users" component={UsersPage} />
         <Route path="/clients" component={ClientsPage} />
         <Route path="/inventory" component={InventoryPage} />

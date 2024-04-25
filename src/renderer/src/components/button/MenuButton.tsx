@@ -17,9 +17,9 @@ export const MenuButton = ({
   return (
     <button
       className={cn(
-        'bg-secondary text-stroke px-6 py-2 hover:bg-primary  active:scale-95 transition-all hover:text-main border-2 border-stroke duration-150',
+        'text-stroke gap-2 flex items-center text-lg rounded-[10px] px-3 py-2 overflow-hidden hover:text-white transition-all hover:bg-stroke duration-150 font-medium w-full',
         {
-          'flex flex-col justify-center items-center gap-2': icon
+          '': icon
         },
         className
       )}
@@ -30,8 +30,8 @@ export const MenuButton = ({
         }
       }}
     >
-      {icon && <span className="text-5xl text-primary bg-main rounded-full p-3">{icon}</span>}
-      {text}
+      {icon && <span className="text-2xl">{icon}</span>}
+      <span className="w-full text-start">{text}</span>
       {children}
     </button>
   )

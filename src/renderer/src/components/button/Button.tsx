@@ -22,9 +22,9 @@ export const Button = ({
   return (
     <button
       className={cn(
-        'bg-secondary text-stroke px-6 py-2 hover:bg-primary  active:scale-95 transition-all hover:text-main border-2 border-stroke duration-150',
+        'text-stroke flex items-center px-3 w-full py-2 hover:bg-primary  active:scale-95 transition-all max-h-10 hover:text-main border-2 border-primary rounded-lg duration-100 font-normal',
         {
-          'flex flex-col justify-center items-center gap-2': icon
+          '': icon
         },
         className
       )}
@@ -35,8 +35,8 @@ export const Button = ({
         }
       }}
     >
-      {icon && <span className="">{icon}</span>}
-      {!icon && text}
+      <span className="w-full">{text}</span>
+      {icon && <span className="text-xl">{icon}</span>}
       {children}
     </button>
   )

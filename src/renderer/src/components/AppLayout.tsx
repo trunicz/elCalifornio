@@ -8,7 +8,7 @@ export const AppLayout = ({
   ...props
 }: ComponentProps<'main'>): ReactElement => {
   return (
-    <main className={cn('bg-blue-200 theme-light h-full flex flex-col', className)} {...props}>
+    <main className={cn('bg-blue-200 theme-light h-full flex', className)} {...props}>
       {children}
     </main>
   )
@@ -28,7 +28,7 @@ const AppHeader = ({
   ...props
 }: AppHeaderButton): ReactElement => {
   return (
-    <header className={cn('bg-main text-stroke p-6 grid grid-cols-6', className)} {...props}>
+    <header className={cn('bg-main p-6 grid grid-cols-6', className)} {...props}>
       {children}
       {leftButton ? leftButton : <DropDownButton />}
       <h1 className="text-4xl col-span-4 text-center ">{title}</h1>
@@ -39,13 +39,7 @@ const AppHeader = ({
 
 const AppMenu = ({ className, children, ...props }: ComponentProps<'section'>): ReactElement => {
   return (
-    <section
-      className={cn(
-        'bg-main flex-1 p-6 overflow-hidden grid grid-rows-2 font-bold text-xl grid-cols-3 gap-6',
-        className
-      )}
-      {...props}
-    >
+    <section className={cn('bg-main w-[250px] p-4 flex flex-col text-xl', className)} {...props}>
       {children}
     </section>
   )
@@ -53,7 +47,7 @@ const AppMenu = ({ className, children, ...props }: ComponentProps<'section'>): 
 
 const AppContent = ({ className, children, ...props }: ComponentProps<'section'>): ReactElement => {
   return (
-    <section className={cn('bg-main text-stroke flex-1 p-6 text-xl ', className)} {...props}>
+    <section className={cn('bg-main text-xl ', className)} {...props}>
       {children}
     </section>
   )
