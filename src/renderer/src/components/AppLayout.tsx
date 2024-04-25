@@ -71,7 +71,7 @@ const AppMenu = ({ className, children, ...props }: ComponentProps<'section'>): 
 
 const AppContent = ({ className, children, ...props }: ComponentProps<'section'>): ReactElement => {
   return (
-    <section className={cn('bg-main flex-1 px-4 flex flex-col gap-2', className)} {...props}>
+    <section className={cn('bg-main flex-1 px-4 flex flex-col gap-4', className)} {...props}>
       {children}
     </section>
   )
@@ -88,8 +88,8 @@ const AppPageOptions = ({
   ...props
 }: AppPageOptions): ReactElement => {
   return (
-    <section className={cn('flex p-2', className)} {...props}>
-      <h1>{pageTitle}</h1>
+    <section className={cn('flex items-center p-2 border-b-2', className)} {...props}>
+      <h1 className="text-2xl w-full">{pageTitle}</h1>
       {children}
     </section>
   )
