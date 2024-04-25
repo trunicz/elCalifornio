@@ -21,7 +21,7 @@ export const AppLayout = ({
   ...props
 }: ComponentProps<'main'>): ReactElement => {
   return (
-    <main className={cn('bg-main py-4 theme-light h-full flex', className)} {...props}>
+    <main className={cn('bg-main theme-light h-full flex', className)} {...props}>
       <AppMenu>
         <div className="min-h-12 flex items-center justify-center gap-2">
           <LuSwords />
@@ -71,7 +71,7 @@ const AppMenu = ({ className, children, ...props }: ComponentProps<'section'>): 
 
 const AppContent = ({ className, children, ...props }: ComponentProps<'section'>): ReactElement => {
   return (
-    <section className={cn('bg-main flex-1 px-4 flex flex-col gap-4', className)} {...props}>
+    <section className={cn('bg-main flex-1 px-4 flex flex-col', className)} {...props}>
       {children}
     </section>
   )
@@ -88,7 +88,7 @@ const AppPageOptions = ({
   ...props
 }: AppPageOptions): ReactElement => {
   return (
-    <section className={cn('flex items-center p-2 border-b-2', className)} {...props}>
+    <section className={cn('flex items-center p-4 border-b-2', className)} {...props}>
       <h1 className="text-2xl w-full">{pageTitle}</h1>
       {children}
     </section>
