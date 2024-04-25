@@ -1,11 +1,11 @@
-import { AppLayout, Button } from '@renderer/components'
+import { AppLayout } from '@renderer/components'
 import { ReactElement } from 'react'
 
 export const RentPage = (): ReactElement => {
   return (
     <AppLayout>
-      <AppLayout.Header title="App Name" leftButton={<Button text="Volver" to="/" />} />
       <AppLayout.Content>
+        <AppLayout.Header title="App Name" />
         <h1>Tabla Rentas</h1>
       </AppLayout.Content>
     </AppLayout>

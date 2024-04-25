@@ -1,7 +1,7 @@
 import { ReactElement, ComponentProps } from 'react'
 import { TableType } from '@renderer/types'
 
-interface SearchBarType extends ComponentProps<'search'> {
+interface SearchBarType extends ComponentProps<'input'> {
   data: TableType
   searchFunction: React.Dispatch<React.SetStateAction<object>>
 }
@@ -22,13 +22,11 @@ export const SearchBar = ({ searchFunction, data }: SearchBarType): ReactElement
   }
 
   return (
-    <search className="flex mb-2 ">
-      <input
-        type="text"
-        placeholder="Buscar..."
-        className="ms-auto  focus:bg-main outline-none border-2 border-stroke p-1 px-2 "
-        onChange={(event) => Search(event.target.value)}
-      />
-    </search>
+    <input
+      type="text"
+      placeholder="Buscar..."
+      className="focus:bg-main outline-none border-2 rounded-xl p-1 px-2 "
+      onChange={(event) => Search(event.target.value)}
+    />
   )
 }

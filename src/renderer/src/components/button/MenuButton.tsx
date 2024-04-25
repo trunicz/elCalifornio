@@ -11,15 +11,15 @@ export const MenuButton = ({
   icon,
   ...props
 }: ButtonProps): ReactElement => {
-  const [_, setLocation] = useLocation()
-  if (!_) console.log(_)
+  const [location, setLocation] = useLocation()
 
   return (
     <button
       className={cn(
-        'text-stroke gap-2 flex items-center text-lg rounded-[10px] px-3 py-2 overflow-hidden hover:text-white transition-all hover:bg-stroke duration-150 font-medium w-full',
+        'text-stroke gap-2 flex items-center text-lg rounded-[10px] overflow-hidden hover:text-white transition-all hover:bg-primary duration-150 font-medium w-full active:scale-95 p-2',
         {
-          '': icon
+          '': icon,
+          'bg-stroke text-main hover:bg-primary': location === to
         },
         className
       )}
