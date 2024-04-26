@@ -5,7 +5,6 @@ export const RentPage = (): ReactElement => {
   return (
     <AppLayout>
       <AppLayout.Content>
-        <AppLayout.Header title="App Name" />
         <h1>Tabla Rentas</h1>
       </AppLayout.Content>
     </AppLayout>

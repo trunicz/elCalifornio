@@ -2,24 +2,63 @@ import { TableType } from '@renderer/types'
 
 export const _userData: TableType = [
   {
-    id: 1,
-    username: 'admin',
-    password: '$2y$10$1234567890',
-    email: 'admin@correo.com',
-    Rol_id: 1
+    nombres: 'Administrador',
+    apellidos: 'Principal',
+    ultimo_inicio: '2024-04-20T18:20:00',
+    rol: {
+      value: 1,
+      roles: {
+        1: {
+          name: 'admin',
+          color: '#F2E0FC',
+          textColor: '#AB80C3'
+        },
+        2: {
+          name: 'user',
+          color: '#D4EFFC',
+          textColor: '#80B4CE'
+        }
+      }
+    }
   },
   {
-    id: 2,
-    username: 'usuario1',
-    password: '$2y$10$1234567890',
-    email: 'usuario1@correo.com',
-    Rol_id: 2
+    nombres: 'Usuario 1',
+    apellidos: 'Prueba',
+    ultimo_inicio: '2024-04-20T18:20:00',
+    rol: {
+      value: 2,
+      roles: {
+        1: {
+          name: 'admin',
+          color: '#F2E0FC',
+          textColor: '#AB80C3'
+        },
+        2: {
+          name: 'user',
+          color: '#D4EFFC',
+          textColor: '#80B4CE'
+        }
+      }
+    }
   },
   {
-    id: 3,
-    username: 'usuario2',
-    password: '$2y$10$1234567890',
-    email: 'usuario2@correo.com',
-    Rol_id: 1
+    nombres: 'Usuario 2',
+    apellidos: 'Ejemplo',
+    ultimo_inicio: '2024-04-20T18:20:00',
+    rol: {
+      value: 2,
+      roles: {
+        1: {
+          name: 'admin',
+          color: '#F2E0FC',
+          textColor: '#AB80C3'
+        },
+        2: {
+          name: 'user',
+          color: '#D4EFFC',
+          textColor: '#80B4CE'
+        }
+      }
+    }
   }
 ]

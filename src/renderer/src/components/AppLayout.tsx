@@ -72,6 +72,7 @@ const AppMenu = ({ className, children, ...props }: ComponentProps<'section'>): 
 const AppContent = ({ className, children, ...props }: ComponentProps<'section'>): ReactElement => {
   return (
     <section className={cn('bg-main flex-1 px-4 flex flex-col', className)} {...props}>
+      <AppHeader title="nombre usuario" />
       {children}
     </section>
   )
