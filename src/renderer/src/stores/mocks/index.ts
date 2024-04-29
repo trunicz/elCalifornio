@@ -2,6 +2,7 @@ import { TableType } from '@renderer/types'
 
 export const _userData: TableType = [
   {
+    id: 1,
     nombres: 'Administrador',
     apellidos: 'Principal',
     ultimo_inicio: '2024-04-20T18:20:00',
@@ -22,6 +23,7 @@ export const _userData: TableType = [
     }
   },
   {
+    id: 2,
     nombres: 'Usuario 1',
     apellidos: 'Prueba',
     ultimo_inicio: '2024-04-20T18:20:00',
@@ -42,6 +44,7 @@ export const _userData: TableType = [
     }
   },
   {
+    id: 3,
     nombres: 'Usuario 2',
     apellidos: 'Ejemplo',
     ultimo_inicio: '2024-04-20T18:20:00',
@@ -65,6 +68,7 @@ export const _userData: TableType = [
 
 export const _clientData: TableType = [
   {
+    id: 1,
     nombre: 'Cliente 1',
     apellido: 'Apellido 1',
     direccion: 'Dirección 1',
@@ -98,6 +102,7 @@ export const _clientData: TableType = [
     }
   },
   {
+    id: 2,
     nombre: 'Cliente 2',
     apellido: 'Apellido 2',
     direccion: 'Dirección 2',
@@ -131,6 +136,7 @@ export const _clientData: TableType = [
     }
   },
   {
+    id: 3,
     nombre: 'Cliente 3',
     apellido: 'Apellido 3',
     direccion: 'Dirección 3',

@@ -3,7 +3,7 @@ import TableContext from './TableContext'
 import { TableType } from '@renderer/types'
 import { cn } from '@renderer/utils'
 import { Button } from '../button'
-import { LuMoreHorizontal } from 'react-icons/lu'
+import { LuEye, LuPencil, LuTrash2 } from 'react-icons/lu'
 
 interface TableProps extends ComponentProps<'table'> {
   data: TableType
@@ -18,6 +18,15 @@ export const Table = ({
 }: TableProps): ReactElement => {
   const headers = Array.from(new Set(data.flatMap((n: object) => Object.keys(n))))
 
+  const getOptions = (id: number): Array<{ [x: string]: string }> => {
+    return [
+      { name: 'Ver', to: `/${id}` },
+      { name: 'Editar', to: `/${id}/edit` },
+      { name: 'Eliminar', to: `/${id}/delete` }
+    ]
+  }
+
+  getOptions(1)
   return (
     <TableContext.Provider value={{ data }}>
       {data.length > 0 ? (
@@ -43,8 +52,25 @@ export const Table = ({
                         : formatDate(row[key])}
                     </td>
                   ))}
-                  <td className="px-6 py-4 flex justify-center">
-                    <Button className="rounded-xl" isIconOnly={true} icon={<LuMoreHorizontal />} />
+                  <td className="px-6 py-4 flex gap-2 justify-center">
+                    <Button
+                      className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
+                      icon={<LuEye />}
+                      isIconOnly={true}
+                      to={`/${row.id}`}
+                    />
+                    <Button
+                      className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
+                      icon={<LuPencil />}
+                      isIconOnly={true}
+                      to={`/${row.id}/edit`}
+                    />
+                    <Button
+                      className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
+                      icon={<LuTrash2 />}
+                      isIconOnly={true}
+                      to={`/${row.id}/delete`}
+                    />
                   </td>
                 </tr>
               ))}
@@ -67,17 +93,13 @@ function renderNestedObject(obj: unknown, key: number): ReactNode {
 
   const nestedObject = Object.values(_obj).find((value) => typeof value === 'object')
   if (nestedObject) {
-    const { name, bgColor, color } = nestedObject[_obj.value] as {
+    const { name } = nestedObject[_obj.value] as {
       name: string
       bgColor: string
       color: string
     }
     return (
-      <span
-        key={key}
-        style={{ backgroundColor: bgColor, color: color }}
-        className="px-2 py-1 rounded-xl"
-      >
+      <span key={key} className="px-2 py-1 rounded-xl bg-secondary border">
         {name}
       </span>
     )

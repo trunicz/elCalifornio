@@ -7,6 +7,7 @@ export interface ButtonProps extends ComponentProps<'button'> {
   text?: string
   to?: string
   isIconOnly?: boolean
+  iconLeft?: boolean
 }
 
 export const Button = ({
@@ -15,6 +16,7 @@ export const Button = ({
   text,
   to,
   icon,
+  iconLeft = false,
   isIconOnly,
   ...props
 }: ButtonProps): ReactElement => {
@@ -27,7 +29,7 @@ export const Button = ({
         'text-stroke flex items-center px-3 w-full py-2 hover:bg-primary  active:scale-95 transition-all max-h-10 hover:text-main border-2 border-primary rounded-lg duration-100 font-normal',
         {
           '': icon,
-          'w-auto p-0 px-6 py-1': isIconOnly
+          'w-auto px-6 py-1': isIconOnly
         },
         className
       )}
@@ -38,8 +40,9 @@ export const Button = ({
         }
       }}
     >
+      {iconLeft && <span className="text-xl">{icon}</span>}
       {!isIconOnly && <span className="w-full">{text}</span>}
-      {icon && <span className="text-xl">{icon}</span>}
+      {icon && !iconLeft && <span className="text-xl">{icon}</span>}
       {children}
     </button>
   )
