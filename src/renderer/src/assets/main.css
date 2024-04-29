@@ -28,3 +28,23 @@
   --color-btn: #fffffe;
   --color-main: #fffffe;
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e3e3e3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
