@@ -18,30 +18,24 @@ export const Table = ({
 }: TableProps): ReactElement => {
   const headers = Array.from(new Set(data.flatMap((n: object) => Object.keys(n))))
 
-  data.map((row) => {
-    Object.keys(row).map((key) => {
-      console.log(row[key])
-    })
-  })
-
   return (
     <TableContext.Provider value={{ data }}>
       {data.length > 0 ? (
         <section className="flex-1 overflow-x-auto">
           <table className={cn('w-full text-sm text-left', className)} {...props}>
             <thead className="uppercase border-b-2">
-              <tr>
+              <tr className="text-center">
                 {headers.map((head, index) => (
-                  <th className="px-6 py-3 font-medium" key={`${head}${index}`}>
+                  <th className="px-6 py-5 font-medium text-nowrap" key={`${head}${index}`}>
                     {String(head).replaceAll('_', ' ')}
                   </th>
                 ))}
-                {hasOptions && <th className="px-6 py-3 font-medium">Opciones</th>}
+                {hasOptions && <th className="px-6 py-5 font-medium">Opciones</th>}
               </tr>
             </thead>
             <tbody>
               {data.map((row: { [x: string]: string }, index: Key | null | undefined) => (
-                <tr className="border-b" key={index}>
+                <tr className="border-b text-center hover:bg-secondary" key={index}>
                   {Object.keys(row).map((key, index) => (
                     <td className="px-6 py-4 overflow-ellipsis text-nowrap" key={index}>
                       {typeof row[key] === 'object'
@@ -49,7 +43,7 @@ export const Table = ({
                         : formatDate(row[key])}
                     </td>
                   ))}
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-6 py-4 flex justify-center">
                     <Button className="rounded-xl" isIconOnly={true} icon={<LuMoreHorizontal />} />
                   </td>
                 </tr>
