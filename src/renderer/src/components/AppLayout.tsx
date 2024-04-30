@@ -26,7 +26,7 @@ export const AppLayout = ({
           <img src="/src/assets/frame.png?asset" className="w-[100px]  p-3" />
         </div>
         <div className="flex-1 flex flex-col gap-1">
-          <MenuButton icon={<LuHome />} to="/app" text="Inicio" />
+          <MenuButton icon={<LuHome />} to="/" text="Inicio" />
           <Separator text="Usuarios" />
           <MenuButton icon={<LuUsers />} to="/users" text="Usuarios" />
           <MenuButton icon={<LuUserCog />} to="/clients" text="Clientes" />

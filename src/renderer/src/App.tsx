@@ -19,7 +19,7 @@ function App(): ReactElement {
     <>
       <Switch>
         <ProtectedRoute>
-          <Route path="/app" component={MainPage} />
+          <Route path="/" component={MainPage} />
           <Route path="/users" component={UsersPage} />
           <Route path="/users/create" component={CreateUserPage} />
           <Route path="/clients" component={ClientsPage} />

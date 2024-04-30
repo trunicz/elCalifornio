@@ -5,7 +5,7 @@ export const ProtectedRoute = ({ children }: { children: ReactNode }): ReactNode
   const [location, setLocation] = useLocation()
 
   if (!location.includes('/')) {
-    setLocation('/')
+    setLocation('/app')
   }
   return children
 }
