@@ -8,7 +8,6 @@ import {
   LuHeartHandshake,
   LuFileEdit,
   LuLogOut,
-  LuSwords,
   LuHome,
   LuBookOpenCheck,
   LuSticker
@@ -23,9 +22,8 @@ export const AppLayout = ({
   return (
     <main className={cn('bg-main theme-light h-full flex', className)} {...props}>
       <AppMenu>
-        <div className="min-h-12 flex items-center justify-center gap-2">
-          <LuSwords />
-          App Name
+        <div className="flex items-center justify-center gap-2">
+          <img src="/src/assets/frame.png?asset" className="w-[100px]  p-3" />
         </div>
         <div className="flex-1 flex flex-col gap-1">
           <MenuButton icon={<LuHome />} to="/" text="Inicio" />
@@ -40,7 +38,11 @@ export const AppLayout = ({
           <MenuButton icon={<LuSticker />} to="/bills" text="Recibos" />
           <MenuButton icon={<LuBookOpenCheck />} to="/audit" text="Auditoria" />
         </div>
-        <Button text="Cerrar Sesión" className="text-base" icon={<LuLogOut />} />
+        <Button
+          text="Cerrar Sesión"
+          className="text-base text-stroke font-medium"
+          icon={<LuLogOut />}
+        />
       </AppMenu>
       {children}
     </main>
@@ -80,18 +82,26 @@ const AppContent = ({ className, children, ...props }: ComponentProps<'section'>
 
 interface AppPageOptions extends ComponentProps<'section'> {
   pageTitle: string
+  hasAddButton: boolean
 }
 
 const AppPageOptions = ({
   className,
   children,
   pageTitle,
+  hasAddButton = true,
   ...props
 }: AppPageOptions): ReactElement => {
   return (
     <section className={cn('flex items-center p-4 border-b-2', className)} {...props}>
       <h1 className="text-2xl w-full">{pageTitle}</h1>
       {children}
+      {hasAddButton && (
+        <Button
+          text="agregar"
+          className="ms-4 w-auto rounded-xl h-full border-emerald-400 text-emerald-400 font-medium hover:bg-emerald-400 gap-1"
+        />
+      )}
     </section>
   )
 }

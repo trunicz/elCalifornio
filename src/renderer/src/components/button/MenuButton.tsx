@@ -16,10 +16,10 @@ export const MenuButton = ({
   return (
     <button
       className={cn(
-        'text-stroke gap-2 flex items-center text-lg rounded-[10px] overflow-hidden hover:text-white transition-all hover:bg-primary duration-150 font-medium w-full active:scale-95 p-2',
+        'text-stroke gap-2 flex items-center text-lg rounded-[10px] overflow-hidden hover:text-white transition-all hover:bg-hover duration-150 font-medium w-full active:scale-95 p-2',
         {
           '': icon,
-          'bg-stroke text-main hover:bg-primary': location === to
+          'bg-accent text-main hover:bg-hover': location === to
         },
         className
       )}

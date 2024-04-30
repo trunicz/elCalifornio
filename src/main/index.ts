@@ -10,16 +10,19 @@ function createWindow(): void {
     height: 720,
     show: false,
     resizable: true,
+
     autoHideMenuBar: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      nodeIntegration: true
     }
   })
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    mainWindow.webContents.openDevTools()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

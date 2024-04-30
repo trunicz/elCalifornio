@@ -21,11 +21,11 @@
   }
 }
 .theme-light {
-  --color-primary: #838897;
+  --color-primary: #7a6d6a;
   --color-secondary: #e5e7eb;
-  --color-accent: #838897;
-  --color-stroke: #0d0c22;
-  --color-btn: #fffffe;
+  --color-accent: #972f34;
+  --color-hover: #f06123;
+  --color-stroke: #7a6d6a;
   --color-main: #fffffe;
 }
 
@@ -34,7 +34,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-200;
+  background: #ddd;
 }
 
 ::-webkit-scrollbar-thumb {

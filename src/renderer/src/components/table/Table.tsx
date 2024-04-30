@@ -33,7 +33,7 @@ export const Table = ({
         <section className="flex-1 overflow-x-auto">
           <table className={cn('w-full text-sm text-left', className)} {...props}>
             <thead className="uppercase border-b-2">
-              <tr className="text-center">
+              <tr className="text-center text-stroke">
                 {headers.map((head, index) => (
                   <th className="px-6 py-5 font-medium text-nowrap" key={`${head}${index}`}>
                     {String(head).replaceAll('_', ' ')}
@@ -44,7 +44,7 @@ export const Table = ({
             </thead>
             <tbody>
               {data.map((row: { [x: string]: string }, index: Key | null | undefined) => (
-                <tr className="border-b text-center hover:bg-secondary" key={index}>
+                <tr className="border-b text-stroke text-center hover:bg-secondary" key={index}>
                   {Object.keys(row).map((key, index) => (
                     <td className="px-6 py-4 overflow-ellipsis text-nowrap" key={index}>
                       {typeof row[key] === 'object'
@@ -99,7 +99,7 @@ function renderNestedObject(obj: unknown, key: number): ReactNode {
       color: string
     }
     return (
-      <span key={key} className="px-2 py-1 rounded-xl bg-secondary border">
+      <span key={key} className="px-2 py-1 rounded-xl bg-primary text-white">
         {name}
       </span>
     )

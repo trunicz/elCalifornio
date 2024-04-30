@@ -1,4 +1,5 @@
 import './assets/main.css'
+import './assets/frame.png'
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'

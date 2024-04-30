@@ -26,7 +26,7 @@ export const Button = ({
   return (
     <button
       className={cn(
-        'text-stroke flex items-center px-3 w-full py-2 hover:bg-primary  active:scale-95 transition-all max-h-10 hover:text-main border-2 border-primary rounded-lg duration-100 font-normal',
+        'flex items-center px-3 w-full py-2 hover:text-main text-stroke hover:bg-hover  active:scale-95 transition-all max-h-10 rounded-lg  border-2 border-base hover:border-transparent duration-150 font-normal',
         {
           '': icon,
           'w-auto px-6 py-1': isIconOnly
