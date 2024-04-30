@@ -2,6 +2,7 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import { Button } from '../button'
+import { ReactElement } from 'react'
 
 const useCustomForm = (schema: Yup.AnyObjectSchema): FieldValues => {
   const {
@@ -13,7 +14,7 @@ const useCustomForm = (schema: Yup.AnyObjectSchema): FieldValues => {
   return {
     handleSubmit,
     register,
-    formState: { errors }
+    errors
   }
 }
 export interface FormField {
@@ -28,13 +29,13 @@ interface FormProps {
   validationSchema: Yup.AnyObjectSchema
 }
 
-export const Form = ({ onSubmit, fields, validationSchema }: FormProps): FieldValues => {
+export const Form = ({ onSubmit, fields, validationSchema }: FormProps): ReactElement => {
   const { handleSubmit, register, errors } = useCustomForm(validationSchema)
 
   const submitHandler: SubmitHandler<FormField> = (data: FormField) => {
     onSubmit(data)
-    console.log(data)
   }
+  console.log(errors)
 
   return (
     <form onSubmit={handleSubmit(submitHandler)}>
@@ -42,7 +43,7 @@ export const Form = ({ onSubmit, fields, validationSchema }: FormProps): FieldVa
         <div key={field.name}>
           <label htmlFor={field.name}>{field.label}</label>
           <input type={field.type} id={field.name} {...register(field.name)} />
-          {errors[field.name] && <p>{errors[field.name]?.message}</p>}
+          {errors[field.name] && errors[field.name].message && <p>{errors[field.name].message}</p>}
         </div>
       ))}
       <Button text="Enviar" />
