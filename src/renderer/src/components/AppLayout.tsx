@@ -82,7 +82,8 @@ const AppContent = ({ className, children, ...props }: ComponentProps<'section'>
 
 interface AppPageOptions extends ComponentProps<'section'> {
   pageTitle: string
-  hasAddButton: boolean
+  hasAddButton?: boolean
+  addRoute?: string
 }
 
 const AppPageOptions = ({
@@ -90,16 +91,18 @@ const AppPageOptions = ({
   children,
   pageTitle,
   hasAddButton = true,
+  addRoute = '',
   ...props
 }: AppPageOptions): ReactElement => {
   return (
-    <section className={cn('flex items-center p-4 border-b-2', className)} {...props}>
+    <section className={cn('flex items-center min-h-20 p-4 border-b-2', className)} {...props}>
       <h1 className="text-2xl w-full">{pageTitle}</h1>
       {children}
       {hasAddButton && (
         <Button
           text="agregar"
           className="ms-4 w-auto rounded-xl h-full border-emerald-400 text-emerald-400 font-medium hover:bg-emerald-400 gap-1"
+          to={addRoute}
         />
       )}
     </section>

@@ -8,7 +8,7 @@ export const UsersPage = (): ReactElement => {
   return (
     <AppLayout>
       <AppLayout.Content>
-        <AppLayout.PageOptions pageTitle="Usuarios">
+        <AppLayout.PageOptions pageTitle="Usuarios" addRoute="/users/create">
           <SearchBar searchFunction={setUserData} data={_userData} />
         </AppLayout.PageOptions>
         <Table data={userData} />

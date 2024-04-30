@@ -1,4 +1,5 @@
 export * from './MainPage'
+export * from './Users/CreateUserPage'
 export * from './Users/UsersPage'
 export * from './Clients/ClientsPage'
 export * from './Inventory/InventoryPage'

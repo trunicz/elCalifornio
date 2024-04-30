@@ -9,7 +9,8 @@ import {
   InventoryPage,
   MainPage,
   RentPage,
-  UsersPage
+  UsersPage,
+  CreateUserPage
 } from './pages'
 
 function App(): ReactElement {
@@ -24,6 +25,7 @@ function App(): ReactElement {
         <Route path="/contracts" component={ContractsPage} />
         <Route path="/bills" component={BillsPage} />
         <Route path="/audit" component={AuditPage} />
+        <Route path="/users/create" component={CreateUserPage} />
         <Route path="*" component={ErrorPage} />
       </Switch>
     </>
