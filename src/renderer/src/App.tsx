@@ -21,11 +21,8 @@ function App(): ReactElement {
         <ProtectedRoute>
           <Router base="/app">
             <Route path="/" component={MainPage} />
-            <Route path="/users" component={UsersPage}>
-              <Route path="/create" component={CreateUserPage} />
-              <Route path="/edit" component={CreateUserPage} />
-              <Route path="/delete" component={CreateUserPage} />
-            </Route>
+            <Route path="/users" component={UsersPage} />
+            <Route path="/users/create" component={CreateUserPage} />
             <Route path="/clients" component={ClientsPage} />
             <Route path="/inventory" component={InventoryPage} />
             <Route path="/rent" component={RentPage} />
