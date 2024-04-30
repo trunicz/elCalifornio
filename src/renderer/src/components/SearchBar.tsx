@@ -25,7 +25,7 @@ export const SearchBar = ({ searchFunction, data }: SearchBarType): ReactElement
     <input
       type="text"
       placeholder="Buscar..."
-      className="focus:bg-main h-full outline-none border-2 rounded-xl p-1 px-2 "
+      className="focus:bg-main h-full outline-none border-2 rounded-xl p-1 px-2"
       onChange={(event) => Search(event.target.value)}
     />
   )

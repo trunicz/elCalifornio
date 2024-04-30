@@ -21,6 +21,8 @@ export interface FormField {
   name: string
   label: string
   type: string
+  placeholder?: string
+  isRequired?: boolean
 }
 
 interface FormProps {
@@ -33,20 +35,37 @@ export const Form = ({ onSubmit, fields, validationSchema }: FormProps): ReactEl
   const { handleSubmit, register, errors } = useCustomForm(validationSchema)
 
   const submitHandler: SubmitHandler<FormField> = (data: FormField) => {
-    onSubmit(data)
+    if (Object.keys(errors).length === 0) {
+      onSubmit(data)
+    }
   }
-  console.log(errors)
 
   return (
-    <form onSubmit={handleSubmit(submitHandler)}>
+    <form className="p-4 flex-1" onSubmit={handleSubmit(submitHandler)}>
       {fields.map((field) => (
-        <div key={field.name}>
-          <label htmlFor={field.name}>{field.label}</label>
-          <input type={field.type} id={field.name} {...register(field.name)} />
-          {errors[field.name] && errors[field.name].message && <p>{errors[field.name].message}</p>}
+        <div key={field.name} className="flex justify-between mb-5">
+          <label className="" htmlFor={field.name}>
+            {field.label}
+            {field.isRequired && <span className="text-red-500 relative bottom-1">*</span>}:
+          </label>
+          <div className="w-1/3 max-w-[350px] min-w-[200px] ">
+            <input
+              className="focus:bg-main w-full h-10 outline-none border-2 rounded-xl p-1 px-3"
+              type={field.type}
+              id={field.name}
+              placeholder={field?.placeholder}
+              {...register(field.name)}
+            />
+            {errors[field.name]?.message && (
+              <p className="text-red-600 font-medium text-xs mt-1">{errors[field.name].message}</p>
+            )}
+          </div>
         </div>
       ))}
-      <Button text="Enviar" />
+      <Button
+        className="fixed z-10 end-4 bottom-4 border-emerald-400 hover:bg-emerald-500  text-emerald-500 w-auto ms-auto px-12"
+        text="Continuar"
+      />
     </form>
   )
 }
