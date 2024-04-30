@@ -8,7 +8,7 @@ export const ErrorPage = (): ReactElement => {
   return (
     <main
       className="bg-red-600 flex flex-col justify-center items-center h-full"
-      onClick={() => setLocation('/app')}
+      onClick={() => setLocation('/')}
     >
       <h1 className="text-4xl font-sans font-bold">ERROR 0x19923100</h1>
       <span>click para continuar</span>
