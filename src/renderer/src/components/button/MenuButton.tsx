@@ -3,6 +3,10 @@ import { ReactElement } from 'react'
 import { useLocation } from 'wouter'
 import { ButtonProps } from './Button'
 
+interface MenuButtonProps extends ButtonProps {
+  to: string
+}
+
 export const MenuButton = ({
   className,
   children,
@@ -10,7 +14,7 @@ export const MenuButton = ({
   to,
   icon,
   ...props
-}: ButtonProps): ReactElement => {
+}: MenuButtonProps): ReactElement => {
   const [location, setLocation] = useLocation()
 
   return (
@@ -19,7 +23,7 @@ export const MenuButton = ({
         'text-stroke gap-2 flex items-center text-lg rounded-[10px] overflow-hidden hover:text-white transition-all hover:bg-hover duration-150 font-medium w-full active:scale-95 p-2',
         {
           '': icon,
-          'bg-accent text-main hover:bg-hover': location === to
+          'bg-accent text-main hover:bg-hover': location.includes(to)
         },
         className
       )}
