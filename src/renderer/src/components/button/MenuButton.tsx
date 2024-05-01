@@ -17,13 +17,16 @@ export const MenuButton = ({
 }: MenuButtonProps): ReactElement => {
   const [location, setLocation] = useLocation()
 
+  const isActive: boolean =
+    (to === '/' && location === '/') || (to !== '/' && location.startsWith(to))
+
   return (
     <button
       className={cn(
         'text-stroke gap-2 flex items-center text-lg rounded-[10px] overflow-hidden hover:text-white transition-all hover:bg-hover duration-150 font-medium w-full active:scale-95 p-2',
         {
           '': icon,
-          'bg-accent text-main hover:bg-hover': location.includes(to)
+          'bg-accent text-main hover:bg-hover': isActive
         },
         className
       )}
