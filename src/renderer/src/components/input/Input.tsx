@@ -13,7 +13,7 @@ interface InputProps {
 const Input: ForwardRefRenderFunction<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
   InputProps
-> = ({ as, type, options, value, className, placeholder, ...props }: InputProps, ref) => {
+> = ({ as, type, options = [], value, className, placeholder, ...props }: InputProps, ref) => {
   switch (as) {
     case 'input':
       return (
@@ -28,20 +28,18 @@ const Input: ForwardRefRenderFunction<
       )
     case 'select':
       return (
-        options && (
-          <select
-            ref={ref as React.MutableRefObject<HTMLSelectElement>}
-            className={cn('', className)}
-            value={value as string}
-            {...props}
-          >
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        )
+        <select
+          ref={ref as MutableRefObject<HTMLSelectElement>}
+          className={cn('', className)}
+          value={value as string}
+          {...props}
+        >
+          {options.map((option, index) => (
+            <option className="flex" key={option.value + String(index)} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       )
     case 'textarea':
       return (

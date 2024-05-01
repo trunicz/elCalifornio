@@ -59,6 +59,7 @@ export const Form = ({ onSubmit, fields, validationSchema }: FormProps): ReactEl
               className="focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3"
               type={field.type}
               id={field.name}
+              options={field?.options}
               placeholder={field?.placeholder}
               {...register(field.name)}
             />

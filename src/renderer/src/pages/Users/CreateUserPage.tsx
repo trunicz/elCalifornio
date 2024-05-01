@@ -45,6 +45,16 @@ const fields: FormField[] = [
     isRequired: true,
     as: 'input',
     value: ''
+  },
+  {
+    name: 'rol',
+    label: 'Rol',
+    type: '',
+    placeholder: 'Ingrese el Rol... ',
+    isRequired: true,
+    as: 'select',
+    value: '',
+    options: [{ value: '1', label: 'a' }]
   }
 ]
 
