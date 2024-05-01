@@ -33,6 +33,16 @@ const fields: FormField[] = [
     label: 'Correo Electrónico',
     type: 'email',
     placeholder: 'Ingrese el correo... ',
+    isRequired: true,
+    as: 'input',
+    value: ''
+  },
+  {
+    name: 'password',
+    label: 'Contraseña',
+    type: 'password',
+    placeholder: 'Ingrese la Contraseña... ',
+    isRequired: true,
     as: 'input',
     value: ''
   }
