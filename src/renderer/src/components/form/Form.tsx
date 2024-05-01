@@ -50,7 +50,7 @@ export const Form = ({ onSubmit, fields, validationSchema }: FormProps): ReactEl
           </label>
           <div className="w-1/3 max-w-[350px] min-w-[200px] ">
             <input
-              className="focus:bg-main w-full h-10 outline-none border-2 rounded-xl p-1 px-3"
+              className="focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3"
               type={field.type}
               id={field.name}
               placeholder={field?.placeholder}
