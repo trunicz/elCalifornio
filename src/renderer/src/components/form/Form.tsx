@@ -4,7 +4,6 @@ import * as Yup from 'yup'
 import { Button } from '../button'
 import { ReactElement } from 'react'
 import Input from '../input/Input'
-import { GroupBase, OptionsOrGroups } from 'react-select'
 
 const useCustomForm = (schema: Yup.AnyObjectSchema): FieldValues => {
   const {
@@ -26,7 +25,7 @@ export interface FormField {
   placeholder?: string
   isRequired?: boolean
   as: string
-  options?: OptionsOrGroups<string | number, GroupBase<string | number>>
+  options?: { value: string | number; label: string }[]
   value: string | number
   className?: string
 }
