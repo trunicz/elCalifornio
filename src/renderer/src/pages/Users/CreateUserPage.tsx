@@ -15,20 +15,26 @@ const fields: FormField[] = [
     label: 'Nombre(s)',
     type: 'text',
     placeholder: 'Ingrese el nombre... ',
-    isRequired: true
+    isRequired: true,
+    as: 'input',
+    value: ''
   },
   {
     name: 'lastname',
     label: 'Apellido(s)',
     type: 'text',
     placeholder: 'Ingrese el apellido... ',
-    isRequired: true
+    isRequired: true,
+    as: 'input',
+    value: ''
   },
   {
     name: 'email',
     label: 'Correo Electrónico',
     type: 'email',
-    placeholder: 'Ingrese el correo... '
+    placeholder: 'Ingrese el correo... ',
+    as: 'input',
+    value: ''
   }
 ]
 

@@ -3,6 +3,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import { Button } from '../button'
 import { ReactElement } from 'react'
+import Input from '../input/Input'
+import { GroupBase, OptionsOrGroups } from 'react-select'
 
 const useCustomForm = (schema: Yup.AnyObjectSchema): FieldValues => {
   const {
@@ -23,6 +25,10 @@ export interface FormField {
   type: string
   placeholder?: string
   isRequired?: boolean
+  as: string
+  options?: OptionsOrGroups<string | number, GroupBase<string | number>>
+  value: string | number
+  className?: string
 }
 
 interface FormProps {
@@ -49,7 +55,8 @@ export const Form = ({ onSubmit, fields, validationSchema }: FormProps): ReactEl
             {field.isRequired && <span className="text-red-500 relative bottom-1">*</span>}:
           </label>
           <div className="w-1/3 max-w-[350px] min-w-[200px] ">
-            <input
+            <Input
+              as={field.as}
               className="focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3"
               type={field.type}
               id={field.name}
