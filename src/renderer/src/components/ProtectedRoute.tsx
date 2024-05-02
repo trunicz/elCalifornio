@@ -1,18 +1,18 @@
 import { useAuthStore } from '@renderer/stores/useAuth'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { useLocation } from 'wouter'
 
 export const ProtectedRoute = ({ children }: { children: ReactNode }): ReactNode => {
   const [location, setLocation] = useLocation()
-
   const { user } = useAuthStore()
 
-  if (user) {
-    setLocation('/app')
-  } else {
-    setLocation('/login')
-  }
-  console.log(location, user)
+  useEffect(() => {
+    if (user !== null) {
+      setLocation('/')
+    } else {
+      setLocation('/login')
+    }
+  }, [user, location])
 
   return children
 }

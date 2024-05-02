@@ -11,9 +11,19 @@ interface authState {
 }
 
 export const useAuthStore = create<authState>((set) => ({
-  user: supabase.auth.getUser(),
-  isLoading: true,
+  user: null,
+  isLoading: false,
   error: null,
+  initializeUser: async (): Promise<void> => {
+    try {
+      const user = await supabase.auth.getUser()
+      console.log(user)
+      set({ user })
+    } catch (error) {
+      console.log(error)
+      set({ user: null, error })
+    }
+  },
   signIn: async (email, password): Promise<void> => {
     try {
       set({ isLoading: true })
