@@ -1,9 +1,9 @@
-import { ReactElement, ComponentProps } from 'react'
+import { ReactElement, ComponentProps, SetStateAction, Dispatch } from 'react'
 import { TableType } from '@renderer/types'
 
 interface SearchBarType extends ComponentProps<'input'> {
   data: TableType
-  searchFunction: React.Dispatch<React.SetStateAction<object>>
+  searchFunction: Dispatch<SetStateAction<never[]>>
 }
 
 export const SearchBar = ({ searchFunction, data }: SearchBarType): ReactElement => {
