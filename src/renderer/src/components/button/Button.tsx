@@ -8,6 +8,7 @@ export interface ButtonProps extends ComponentProps<'button'> {
   to?: string
   isIconOnly?: boolean
   iconLeft?: boolean
+  isLoading?: boolean
 }
 
 export const Button = ({
@@ -18,6 +19,7 @@ export const Button = ({
   icon,
   iconLeft = false,
   isIconOnly,
+  isLoading = false,
   ...props
 }: ButtonProps): ReactElement => {
   const [_, setLocation] = useLocation()
@@ -44,6 +46,7 @@ export const Button = ({
       {!isIconOnly && <span className="w-full">{text}</span>}
       {icon && !iconLeft && <span className="text-xl">{icon}</span>}
       {children}
+      {isLoading && <span>loading...</span>}
     </button>
   )
 }

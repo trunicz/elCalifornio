@@ -1,4 +1,5 @@
-import { Button, Form, FormField } from '@renderer/components'
+import { Button, Form, FormField, submitObject } from '@renderer/components'
+import { useAuthStore } from '@renderer/stores/useAuth'
 import { ReactElement } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import * as Yup from 'yup'
@@ -30,8 +31,11 @@ const fields: FormField[] = [
 ]
 
 export const AuthPage = (): ReactElement => {
-  const onSubmit: SubmitHandler<FormField> = (data) => {
-    console.log(data)
+  const { isLoading, error, signIn } = useAuthStore()
+  const onSubmit: SubmitHandler<submitObject> = (data) => {
+    const { email, password } = data
+    signIn(email, password)
+    if (error) console.log(data)
   }
   return (
     <main className="flex flex-col items-center h-full">
@@ -49,6 +53,7 @@ export const AuthPage = (): ReactElement => {
           <Button
             className="border-0 bg-red-800 hover:bg-orange-600 hover:text-white text-white w-full"
             text="Ingresar"
+            isLoading={isLoading}
           />
         </Form>
       </section>
