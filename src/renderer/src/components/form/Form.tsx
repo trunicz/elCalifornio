@@ -32,7 +32,7 @@ export interface FormField {
 }
 
 interface FormProps {
-  onSubmit: SubmitHandler<FormField>
+  onSubmit: SubmitHandler<object>
   fields: FormField[]
   validationSchema: Yup.AnyObjectSchema
   className?: string
@@ -51,7 +51,7 @@ export const Form = ({
 }: FormProps): ReactElement => {
   const { handleSubmit, register, errors } = useCustomForm(validationSchema)
 
-  const submitHandler: SubmitHandler<FormField> = (data: FormField) => {
+  const submitHandler: SubmitHandler<object> = (data: object) => {
     if (Object.keys(errors).length === 0) {
       onSubmit(data)
     }
