@@ -1,4 +1,4 @@
-import { Form, FormField } from '@renderer/components'
+import { Button, Form, FormField } from '@renderer/components'
 import { ReactElement } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import * as Yup from 'yup'
@@ -35,11 +35,22 @@ export const AuthPage = (): ReactElement => {
   }
   return (
     <main className="flex flex-col items-center h-full">
-      <section className="flex flex-col w-1/4 justify-center flex-1 gap-4">
+      <section className="flex flex-col sm:w-1/2 lg:w-1/3 xl:w-1/4 justify-center flex-1 gap-4">
         <div className="flex justify-center">
           <img className="w-1/2 h-auto" src="/src/assets/Frame.png" />
         </div>
-        <Form onSubmit={onSubmit} validationSchema={validationSchema} fields={fields} />
+        <Form
+          className="flex-none"
+          onSubmit={onSubmit}
+          validationSchema={validationSchema}
+          fields={fields}
+          formDirection="col"
+        >
+          <Button
+            className="border-0 bg-red-800 hover:bg-orange-600 hover:text-white text-white w-full"
+            text="Ingresar"
+          />
+        </Form>
       </section>
     </main>
   )
