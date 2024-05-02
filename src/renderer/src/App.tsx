@@ -14,6 +14,7 @@ import {
   AuthPage
 } from './pages'
 import { useAuthStore } from './stores/useAuth'
+import { Loading } from './components/Loading'
 
 function App(): ReactElement {
   const { user, isLoading, initializeUser } = useAuthStore()
@@ -22,7 +23,7 @@ function App(): ReactElement {
   }, [])
 
   if (isLoading) {
-    return <div>Cargando...</div>
+    return <Loading />
   }
   return (
     <>
