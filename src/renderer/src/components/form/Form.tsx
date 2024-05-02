@@ -2,8 +2,9 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import { Button } from '../button'
-import { ReactElement } from 'react'
+import { ReactElement, ReactNode } from 'react'
 import Input from '../input/Input'
+import { cn } from '@renderer/utils'
 
 const useCustomForm = (schema: Yup.AnyObjectSchema): FieldValues => {
   const {
@@ -34,9 +35,20 @@ interface FormProps {
   onSubmit: SubmitHandler<FormField>
   fields: FormField[]
   validationSchema: Yup.AnyObjectSchema
+  className?: string
+  children?: ReactNode
+  formDirection?: 'col' | 'row'
 }
 
-export const Form = ({ onSubmit, fields, validationSchema }: FormProps): ReactElement => {
+export const Form = ({
+  onSubmit,
+  fields,
+  validationSchema,
+  className,
+  children = null,
+  formDirection,
+  ...props
+}: FormProps): ReactElement => {
   const { handleSubmit, register, errors } = useCustomForm(validationSchema)
 
   const submitHandler: SubmitHandler<FormField> = (data: FormField) => {
@@ -46,14 +58,24 @@ export const Form = ({ onSubmit, fields, validationSchema }: FormProps): ReactEl
   }
 
   return (
-    <form className="p-4 flex-1" onSubmit={handleSubmit(submitHandler)}>
+    <form className={cn('p-4 flex-1', className)} onSubmit={handleSubmit(submitHandler)} {...props}>
       {fields.map((field) => (
-        <div key={field.name} className="flex justify-between mb-5">
+        <div
+          key={field.name}
+          className={cn('flex justify-between mb-5', {
+            'flex-col': formDirection === 'col'
+          })}
+        >
           <label className="" htmlFor={field.name}>
             {field.label}
             {field.isRequired && <span className="text-red-500 relative bottom-1">*</span>}:
           </label>
-          <div className="w-1/3 max-w-[350px] min-w-[200px] ">
+          <div
+            className={cn('', {
+              'w-1/3 max-w-[350px] min-w-[200px]': formDirection === 'row',
+              'mt-2': formDirection === 'col'
+            })}
+          >
             <Input
               as={field.as}
               className="focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3"
@@ -69,10 +91,13 @@ export const Form = ({ onSubmit, fields, validationSchema }: FormProps): ReactEl
           </div>
         </div>
       ))}
-      <Button
-        className="fixed z-10 end-4 bottom-4 border-emerald-400 hover:bg-emerald-500  text-emerald-500 w-auto ms-auto px-12"
-        text="Continuar"
-      />
+      {!children && (
+        <Button
+          className="fixed z-10 end-4 bottom-4 border-emerald-400 hover:bg-emerald-500  text-emerald-500 w-auto ms-auto px-12"
+          text="Continuar"
+        />
+      )}
+      {children}
     </form>
   )
 }
