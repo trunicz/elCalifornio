@@ -35,7 +35,7 @@ export const AuthPage = (): ReactElement => {
   const onSubmit: SubmitHandler<submitObject> = (data) => {
     const { email, password } = data
     signIn(email, password)
-    if (error) console.log(data)
+    if (error) console.log(error)
   }
   return (
     <main className="flex flex-col items-center h-full">

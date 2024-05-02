@@ -19,8 +19,8 @@ function App(): ReactElement {
   return (
     <>
       <Switch>
-        <Route path="/login" component={AuthPage} />
         <ProtectedRoute>
+          <Route path="/login" component={AuthPage} />
           <Route path="/" component={MainPage} />
           <Route path="/users" component={UsersPage} />
           <Route path="/users/create" component={CreateUserPage} />

@@ -5,11 +5,10 @@ import { useLocation } from 'wouter'
 export const ProtectedRoute = ({ children }: { children: ReactNode }): ReactNode => {
   const [location, setLocation] = useLocation()
   const { user } = useAuthStore()
+  console.log(user)
 
   useEffect(() => {
-    if (user !== null) {
-      setLocation('/')
-    } else {
+    if (!user) {
       setLocation('/login')
     }
   }, [user, location])
