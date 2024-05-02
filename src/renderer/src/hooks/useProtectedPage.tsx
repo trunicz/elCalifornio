@@ -1,5 +1,5 @@
-import { ComponentProps, ReactElement } from 'react'
+import { ComponentProps, ReactNode } from 'react'
 
-export const useProtectedPage = ({ children }: ComponentProps<'div'>): ReactElement => {
-  return <>{children}</>
+export const useProtectedPage = ({ children }: ComponentProps<'div'>): ReactNode => {
+  return children
 }
