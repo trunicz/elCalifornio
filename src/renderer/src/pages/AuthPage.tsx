@@ -15,7 +15,7 @@ const fields: FormField[] = [
     label: 'Correo',
     type: 'text',
     as: 'input',
-    value: '',
+    value: 'techdreamscope@gmail.com',
     isRequired: true,
     placeholder: 'example@mail.com'
   },
@@ -24,7 +24,7 @@ const fields: FormField[] = [
     label: 'Contraseña',
     type: 'password',
     as: 'input',
-    value: '',
+    value: 'checoperez11',
     isRequired: true,
     placeholder: '●●●●●●●●●●'
   }

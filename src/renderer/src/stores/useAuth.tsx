@@ -9,6 +9,7 @@ interface authState {
   signIn: (email: string, password: string) => void
   signUp: (email: string, password: string, options: object) => void
   signOut: () => void
+  initializeUser: () => void
 }
 
 export const useAuthStore = create<authState>((set) => ({
@@ -17,12 +18,12 @@ export const useAuthStore = create<authState>((set) => ({
   error: null,
   initializeUser: async (): Promise<void> => {
     try {
-      const user = await supabase.auth.getUser()
-      console.log(user)
-      set({ user })
+      set({ isLoading: true })
+      const auth = await supabase.auth.getUser()
+      set({ user: auth.data.user, isLoading: false })
     } catch (error) {
       console.log(error)
-      set({ user: null, error })
+      set({ user: null, error, isLoading: false })
     }
   },
   signIn: async (email, password): Promise<void> => {
@@ -30,7 +31,7 @@ export const useAuthStore = create<authState>((set) => ({
       set({ isLoading: true })
       const { data, error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
-      set({ user: data, isLoading: false })
+      set({ user: data.user, isLoading: false })
     } catch (error) {
       set({ error, isLoading: false })
     }
@@ -40,7 +41,7 @@ export const useAuthStore = create<authState>((set) => ({
       set({ isLoading: true })
       const { data, error } = await supabase.auth.signUp({ email, password, options })
       if (error) throw error
-      set({ user: data, isLoading: false })
+      set({ user: data.user, isLoading: false })
     } catch (error) {
       set({ error, isLoading: false })
     }

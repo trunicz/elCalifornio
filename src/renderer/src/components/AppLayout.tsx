@@ -13,12 +13,15 @@ import {
   LuSticker
 } from 'react-icons/lu'
 import { Separator } from './separator'
+import { Link } from 'wouter'
+import { useAuthStore } from '@renderer/stores/useAuth'
 
 export const AppLayout = ({
   className,
   children,
   ...props
 }: ComponentProps<'main'>): ReactElement => {
+  const { signOut } = useAuthStore()
   return (
     <main className={cn('bg-main theme-light h-full flex', className)} {...props}>
       <AppMenu>
@@ -42,6 +45,7 @@ export const AppLayout = ({
           text="Cerrar Sesión"
           className="text-base text-stroke font-medium"
           icon={<LuLogOut />}
+          onClick={() => signOut()}
         />
       </AppMenu>
       {children}
@@ -99,11 +103,12 @@ const AppPageOptions = ({
       <h1 className="text-2xl w-full">{pageTitle}</h1>
       {children}
       {hasAddButton && (
-        <Button
-          text="agregar"
-          className="ms-4 w-auto rounded-xl h-full border-emerald-400 text-emerald-400 font-medium hover:bg-emerald-400 gap-1"
+        <Link
+          className="ms-4 flex items-center justify-center border-2 hover:text-white transition-colors px-4 w-auto rounded-xl h-full border-emerald-400 text-emerald-400 font-medium hover:bg-emerald-400 gap-1"
           to={addRoute}
-        />
+        >
+          Agregar
+        </Link>
       )}
     </section>
   )

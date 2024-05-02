@@ -1,11 +1,9 @@
 import { cn } from '@renderer/utils'
 import { ComponentProps, ReactElement } from 'react'
-import { useLocation } from 'wouter'
 
 export interface ButtonProps extends ComponentProps<'button'> {
   icon?: ReactElement
   text?: string
-  to?: string
   isIconOnly?: boolean
   iconLeft?: boolean
   isLoading?: boolean
@@ -15,16 +13,12 @@ export const Button = ({
   className,
   children,
   text,
-  to,
   icon,
   iconLeft = false,
   isIconOnly,
   isLoading = false,
   ...props
 }: ButtonProps): ReactElement => {
-  const [_, setLocation] = useLocation()
-  if (!_) console.log(_)
-
   return (
     <button
       className={cn(
@@ -36,11 +30,6 @@ export const Button = ({
         className
       )}
       {...props}
-      onClick={() => {
-        if (to) {
-          setLocation(to)
-        }
-      }}
     >
       {iconLeft && <span className="text-xl">{icon}</span>}
       {!isIconOnly && <span className="w-full">{text}</span>}

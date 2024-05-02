@@ -85,6 +85,7 @@ export const Form = ({
               id={field.name}
               options={field?.options}
               placeholder={field?.placeholder}
+              value={field?.value}
               {...register(field.name)}
             />
             {errors[field.name]?.message && (

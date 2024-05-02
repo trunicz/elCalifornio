@@ -3,7 +3,7 @@ import { ReactElement, useState } from 'react'
 import { _userData } from '@renderer/stores/mocks'
 
 export const UsersPage = (): ReactElement => {
-  const [userData, setUserData] = useState([])
+  const [userData, setUserData] = useState(_userData)
 
   return (
     <AppLayout>

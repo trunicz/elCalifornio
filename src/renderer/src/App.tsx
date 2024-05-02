@@ -1,5 +1,5 @@
-import { ReactElement } from 'react'
-import { Route, Switch } from 'wouter'
+import { ReactElement, useEffect } from 'react'
+import { Redirect, Route, Switch } from 'wouter'
 import {
   AuditPage,
   BillsPage,
@@ -13,25 +13,37 @@ import {
   CreateUserPage,
   AuthPage
 } from './pages'
-import { ProtectedRoute } from './components'
+import { useAuthStore } from './stores/useAuth'
 
 function App(): ReactElement {
+  const { user, isLoading, initializeUser } = useAuthStore()
+  useEffect(() => {
+    initializeUser()
+  }, [])
+
+  if (isLoading) {
+    return <div>Cargando...</div>
+  }
   return (
     <>
       <Switch>
-        <ProtectedRoute>
-          <Route path="/login" component={AuthPage} />
-          <Route path="/" component={MainPage} />
-          <Route path="/users" component={UsersPage} />
-          <Route path="/users/create" component={CreateUserPage} />
-          <Route path="/clients" component={ClientsPage} />
-          <Route path="/inventory" component={InventoryPage} />
-          <Route path="/rent" component={RentPage} />
-          <Route path="/contracts" component={ContractsPage} />
-          <Route path="/bills" component={BillsPage} />
-          <Route path="/audit" component={AuditPage} />
-          <Route path="*" component={ErrorPage} />
-        </ProtectedRoute>
+        <Route path="/login">{!user ? <AuthPage /> : <Redirect to="/" />}</Route>
+        {user ? (
+          <>
+            <Route path="/" component={MainPage} />
+            <Route path="/users" component={UsersPage} />
+            <Route path="/users/create" component={CreateUserPage} />
+            <Route path="/clients" component={ClientsPage} />
+            <Route path="/inventory" component={InventoryPage} />
+            <Route path="/rent" component={RentPage} />
+            <Route path="/contracts" component={ContractsPage} />
+            <Route path="/bills" component={BillsPage} />
+            <Route path="/audit" component={AuditPage} />
+            <Route path="*" component={ErrorPage} />
+          </>
+        ) : (
+          <Redirect to="/login" />
+        )}
       </Switch>
     </>
   )
