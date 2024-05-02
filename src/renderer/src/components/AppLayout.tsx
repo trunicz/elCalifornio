@@ -1,5 +1,5 @@
 import { cn } from '@renderer/utils'
-import { ComponentProps, ReactElement } from 'react'
+import { ComponentProps, ReactElement, ReactNode } from 'react'
 import { Button, MenuButton } from './button'
 import {
   LuUsers,
@@ -53,7 +53,11 @@ export const AppLayout = ({
   )
 }
 
-interface AppHeaderButton extends ComponentProps<'header'> {}
+interface AppHeaderButton {
+  className?: string
+  title?: string | string[]
+  children?: ReactNode
+}
 
 const AppHeader = ({ className, title, children, ...props }: AppHeaderButton): ReactElement => {
   return (
@@ -76,9 +80,12 @@ const AppMenu = ({ className, children, ...props }: ComponentProps<'section'>): 
 }
 
 const AppContent = ({ className, children, ...props }: ComponentProps<'section'>): ReactElement => {
+  const { user } = useAuthStore()
   return (
     <section className={cn('bg-main flex-1 flex flex-col overflow-hidden', className)} {...props}>
-      <AppHeader title="nombre usuario" />
+      {user && (
+        <AppHeader title={Object.keys(user).map((key) => (key === 'email' ? user[key] : ''))} />
+      )}
       {children}
     </section>
   )
