@@ -10,7 +10,8 @@ import {
   MainPage,
   RentPage,
   UsersPage,
-  CreateUserPage
+  CreateUserPage,
+  AuthPage
 } from './pages'
 import { ProtectedRoute } from './components'
 
@@ -18,6 +19,7 @@ function App(): ReactElement {
   return (
     <>
       <Switch>
+        <Route path="/login" component={AuthPage} />
         <ProtectedRoute>
           <Route path="/" component={MainPage} />
           <Route path="/users" component={UsersPage} />
