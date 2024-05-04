@@ -3,7 +3,7 @@ import { TableType } from '@renderer/types'
 
 interface SearchBarType extends ComponentProps<'input'> {
   data: TableType
-  searchFunction: Dispatch<SetStateAction<never[]>>
+  searchFunction: Dispatch<SetStateAction<unknown[]>>
 }
 
 export const SearchBar = ({ searchFunction, data }: SearchBarType): ReactElement => {
