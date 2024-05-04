@@ -30,7 +30,7 @@ const Input: ForwardRefRenderFunction<
       return (
         <select
           ref={ref as MutableRefObject<HTMLSelectElement>}
-          className={cn('', className)}
+          className={cn('w-full', className)}
           value={value as string}
           {...props}
         >

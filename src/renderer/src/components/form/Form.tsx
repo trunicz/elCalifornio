@@ -27,7 +27,7 @@ export interface FormField {
   isRequired?: boolean
   as: string
   options?: { value: string | number; label: string }[]
-  value: string | number
+  value?: string | number
   className?: string
 }
 
@@ -48,7 +48,7 @@ export const Form = ({
   validationSchema,
   className,
   children = null,
-  formDirection,
+  formDirection = 'row',
   ...props
 }: FormProps): ReactElement => {
   const { handleSubmit, register, errors } = useCustomForm(validationSchema)

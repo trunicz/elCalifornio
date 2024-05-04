@@ -16,7 +16,7 @@ export const Table = ({
   hasOptions = true,
   ...props
 }: TableProps): ReactElement => {
-  const headers = Array.from(new Set(data.flatMap((n: object) => Object.keys(n))))
+  const headers = data ? Array.from(new Set(data?.flatMap((n: object) => Object.keys(n)))) : []
 
   const getOptions = (id: number): Array<{ [x: string]: string }> => {
     return [
@@ -57,19 +57,16 @@ export const Table = ({
                       className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
                       icon={<LuEye />}
                       isIconOnly={true}
-                      to={`/${row.id}`}
                     />
                     <Button
                       className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
                       icon={<LuPencil />}
                       isIconOnly={true}
-                      to={`/${row.id}/edit`}
                     />
                     <Button
                       className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
                       icon={<LuTrash2 />}
                       isIconOnly={true}
-                      to={`/${row.id}/delete`}
                     />
                   </td>
                 </tr>
@@ -107,11 +104,12 @@ function renderNestedObject(obj: unknown, key: number): ReactNode {
   return
 }
 function formatDate(dateString: string): string | null {
-  const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
+  const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+\d{2}:\d{2}$/
 
   if (!iso8601Regex.test(dateString)) {
     return dateString
   }
+
   const date = new Date(dateString)
   if (isNaN(date.getTime())) {
     return dateString

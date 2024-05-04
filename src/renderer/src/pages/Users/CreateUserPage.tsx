@@ -1,4 +1,5 @@
-import { AppLayout, Form, FormField } from '@renderer/components'
+import { AppLayout, Form, FormField, submitObject } from '@renderer/components'
+import { useAuthStore } from '@renderer/stores/useAuth'
 import { ReactElement } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import * as Yup from 'yup'
@@ -6,7 +7,11 @@ import * as Yup from 'yup'
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('El nombre es obligatorio'),
   lastname: Yup.string().required('El Apellido es obligatorio'),
-  email: Yup.string().email('El correo no es valido').required('El correo es obligatorio')
+  email: Yup.string().email('El correo no es valido').required('El correo es obligatorio'),
+  password: Yup.string()
+    .required('La Contraseña es obligatoria')
+    .min(8, 'La contraseña tiene que tener un mínimo de 8 caracteres'),
+  rol: Yup.string().required('El rol es obligatorio')
 })
 
 const fields: FormField[] = [
@@ -16,8 +21,7 @@ const fields: FormField[] = [
     type: 'text',
     placeholder: 'Ingrese el nombre... ',
     isRequired: true,
-    as: 'input',
-    value: ''
+    as: 'input'
   },
   {
     name: 'lastname',
@@ -25,8 +29,7 @@ const fields: FormField[] = [
     type: 'text',
     placeholder: 'Ingrese el apellido... ',
     isRequired: true,
-    as: 'input',
-    value: ''
+    as: 'input'
   },
   {
     name: 'email',
@@ -34,8 +37,7 @@ const fields: FormField[] = [
     type: 'email',
     placeholder: 'Ingrese el correo... ',
     isRequired: true,
-    as: 'input',
-    value: ''
+    as: 'input'
   },
   {
     name: 'password',
@@ -43,8 +45,7 @@ const fields: FormField[] = [
     type: 'password',
     placeholder: 'Ingrese la Contraseña... ',
     isRequired: true,
-    as: 'input',
-    value: ''
+    as: 'input'
   },
   {
     name: 'rol',
@@ -53,19 +54,18 @@ const fields: FormField[] = [
     placeholder: 'Ingrese el Rol... ',
     isRequired: true,
     as: 'select',
-    value: '',
     options: [
-      { value: '1', label: 'Admin' },
-      { value: '2', label: 'User' }
+      { value: 1, label: 'Admin' },
+      { value: 2, label: 'User' }
     ]
   }
 ]
 
-const onSubmit: SubmitHandler<FormField> = (data) => {
-  console.log(data) // TODO: Implementar logica para enviar info a supa
-}
-
 export const CreateUserPage = (): ReactElement => {
+  const { signUp } = useAuthStore()
+  const onSubmit: SubmitHandler<submitObject> = (data) => {
+    signUp(data.email, data.password, {}, data)
+  }
   return (
     <AppLayout>
       <AppLayout.Content>
