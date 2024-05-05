@@ -64,7 +64,7 @@ const fields: FormField[] = [
 export const CreateUserPage = (): ReactElement => {
   const { signUp } = useAuthStore()
   const onSubmit: SubmitHandler<submitObject> = (data) => {
-    signUp(data.email, data.password, {}, data)
+    signUp(data.email, data.password, { data: data })
   }
   return (
     <AppLayout>

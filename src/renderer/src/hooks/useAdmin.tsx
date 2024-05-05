@@ -1,38 +1,37 @@
 import supabase from '@renderer/utils/supabase'
-import { AuthError, UserIdentity } from '@supabase/supabase-js'
 import { useState } from 'react'
 
-interface UsersResponse {
-  data: null | { identities: UserIdentity[] }
-  error: null | AuthError
+interface AdminApi {
+  getUsers: () => Promise<object | void>
+  usersList: object
 }
 
-interface AdminFunctions {
-  users: () => Promise<unknown | UserIdentity[]>
-  usersList: UserIdentity[] | null | undefined
-}
+export const useAdmin = (): AdminApi => {
+  const [usersList, setUsersList] = useState<object>([{}])
 
-export const useAdmin = (): AdminFunctions => {
-  const [usersList, setUsersList] = useState<null | undefined | UserIdentity[]>(null)
-
-  const getUsers = async (): Promise<UsersResponse | null> => {
+  const getUsers = async (): Promise<object | void> => {
     try {
-      return await supabase.auth.getUserIdentities()
+      const {
+        data: { users }
+      } = await supabase.auth.admin.listUsers()
+
+      const usersMap = users
+        .filter((user) => Object.keys(user.user_metadata).length > 0)
+        .map((usr) => {
+          const userInfo = usr.user_metadata
+          return {
+            nombre: userInfo.name,
+            apellido: userInfo.lastname,
+            correo: userInfo.email,
+            rol: userInfo.rol === '1' ? 'Admin' : 'Usuario'
+          }
+        })
+      setUsersList(usersMap)
+      return usersMap
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
-    return null
   }
 
-  const users = async (): Promise<UserIdentity[]> => {
-    if (!usersList) {
-      const response = await getUsers()
-      const list = response ? response.data?.identities : []
-      setUsersList(list)
-      return list || []
-    }
-    return usersList
-  }
-
-  return { users, usersList }
+  return { getUsers, usersList }
 }

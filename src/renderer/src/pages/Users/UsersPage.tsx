@@ -6,11 +6,13 @@ import { UserIdentity } from '@supabase/supabase-js'
 import { useAdmin } from '@renderer/hooks/useAdmin'
 
 export const UsersPage = (): ReactElement => {
-  const { users, usersList } = useAdmin()
+  const { getUsers, usersList } = useAdmin()
   const [data, setData] = useState<unknown | UserIdentity[]>(null)
 
   useEffect(() => {
-    users().then((response) => setData(response))
+    getUsers().then((res) => {
+      setData(res)
+    })
   }, [])
   return (
     <AppLayout>

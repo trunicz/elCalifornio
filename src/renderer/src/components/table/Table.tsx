@@ -43,34 +43,38 @@ export const Table = ({
               </tr>
             </thead>
             <tbody>
-              {data.map((row: { [x: string]: string }, index: Key | null | undefined) => (
-                <tr className="border-b text-stroke text-center hover:bg-secondary" key={index}>
-                  {Object.keys(row).map((key, index) => (
-                    <td className="px-6 py-4 overflow-ellipsis text-nowrap" key={index}>
-                      {typeof row[key] === 'object'
-                        ? renderNestedObject(row[key], index)
-                        : formatDate(row[key])}
+              {data.map((row: { [x: string]: string }, index: Key | null | undefined) =>
+                row ? (
+                  <tr className="border-b text-stroke text-center hover:bg-secondary" key={index}>
+                    {Object.keys(row).map((key, index) => (
+                      <td className="px-6 py-4 overflow-ellipsis text-nowrap" key={index}>
+                        {typeof row[key] === 'object'
+                          ? renderNestedObject(row[key], index)
+                          : formatDate(row[key])}
+                      </td>
+                    ))}
+                    <td className="px-6 py-4 flex gap-2 justify-center">
+                      <Button
+                        className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
+                        icon={<LuEye />}
+                        isIconOnly={true}
+                      />
+                      <Button
+                        className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
+                        icon={<LuPencil />}
+                        isIconOnly={true}
+                      />
+                      <Button
+                        className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
+                        icon={<LuTrash2 />}
+                        isIconOnly={true}
+                      />
                     </td>
-                  ))}
-                  <td className="px-6 py-4 flex gap-2 justify-center">
-                    <Button
-                      className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
-                      icon={<LuEye />}
-                      isIconOnly={true}
-                    />
-                    <Button
-                      className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
-                      icon={<LuPencil />}
-                      isIconOnly={true}
-                    />
-                    <Button
-                      className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
-                      icon={<LuTrash2 />}
-                      isIconOnly={true}
-                    />
-                  </td>
-                </tr>
-              ))}
+                  </tr>
+                ) : (
+                  <></>
+                )
+              )}
             </tbody>
           </table>
         </section>
@@ -103,7 +107,7 @@ function renderNestedObject(obj: unknown, key: number): ReactNode {
   }
   return
 }
-function formatDate(dateString: string): string | null {
+function formatDate(dateString: string): ReactNode | null {
   const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+\d{2}:\d{2}$/
 
   if (!iso8601Regex.test(dateString)) {
