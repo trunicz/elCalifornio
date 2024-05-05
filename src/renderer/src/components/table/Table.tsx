@@ -8,6 +8,8 @@ import { LuEye, LuPencil, LuTrash2 } from 'react-icons/lu'
 interface TableProps extends ComponentProps<'table'> {
   data: TableType
   hasOptions?: boolean
+  watchFunction?: (id: string) => void
+  editFunction?: (id: string) => void
   deleteFunction?: (id: string) => void
 }
 
@@ -15,6 +17,8 @@ export const Table = ({
   className,
   data,
   hasOptions = true,
+  watchFunction,
+  editFunction,
   deleteFunction,
   ...props
 }: TableProps): ReactElement => {
@@ -60,11 +64,13 @@ export const Table = ({
                         className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
                         icon={<LuEye />}
                         isIconOnly={true}
+                        onClick={() => (watchFunction ? watchFunction(row.id) : '')}
                       />
                       <Button
                         className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
                         icon={<LuPencil />}
                         isIconOnly={true}
+                        onClick={() => (editFunction ? editFunction(row.id) : '')}
                       />
                       <Button
                         className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
