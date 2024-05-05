@@ -32,7 +32,7 @@ export const Button = ({
       {...props}
     >
       {iconLeft && <span className="text-xl">{icon}</span>}
-      {!isIconOnly && <span className="w-full">{text}</span>}
+      {!isIconOnly && text && <span className="w-full">{text}</span>}
       {icon && !iconLeft && <span className="text-xl">{icon}</span>}
       {children}
       {isLoading && <span>loading...</span>}
