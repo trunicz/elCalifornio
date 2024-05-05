@@ -2,6 +2,7 @@ import { AppLayout, Form, FormField, submitObject } from '@renderer/components'
 import { useAuthStore } from '@renderer/stores/useAuth'
 import { ReactElement } from 'react'
 import { SubmitHandler } from 'react-hook-form'
+import { useLocation } from 'wouter'
 import * as Yup from 'yup'
 
 const validationSchema = Yup.object().shape({
@@ -62,9 +63,16 @@ const fields: FormField[] = [
 ]
 
 export const CreateUserPage = (): ReactElement => {
-  const { signUp } = useAuthStore()
+  const [, setLocation] = useLocation()
+  const { createUser } = useAuthStore()
   const onSubmit: SubmitHandler<submitObject> = (data) => {
-    signUp(data.email, data.password, { data: data })
+    const user_metadata = {
+      name: data.name,
+      lastname: data.lastname,
+      email: data.email,
+      rol: data.rol
+    }
+    createUser(data.email, data.password, user_metadata).then(() => setLocation('/users'))
   }
   return (
     <AppLayout>

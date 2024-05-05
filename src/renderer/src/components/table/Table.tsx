@@ -8,12 +8,14 @@ import { LuEye, LuPencil, LuTrash2 } from 'react-icons/lu'
 interface TableProps extends ComponentProps<'table'> {
   data: TableType
   hasOptions?: boolean
+  deleteFunction?: (id: string) => void
 }
 
 export const Table = ({
   className,
   data,
   hasOptions = true,
+  deleteFunction,
   ...props
 }: TableProps): ReactElement => {
   const headers = data ? Array.from(new Set(data?.flatMap((n: object) => Object.keys(n)))) : []
@@ -68,6 +70,7 @@ export const Table = ({
                         className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
                         icon={<LuTrash2 />}
                         isIconOnly={true}
+                        onClick={() => (deleteFunction ? deleteFunction(row.id) : '')}
                       />
                     </td>
                   </tr>

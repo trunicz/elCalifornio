@@ -2,8 +2,9 @@ import supabase from '@renderer/utils/supabase'
 import { useState } from 'react'
 
 interface AdminApi {
-  getUsers: () => Promise<object | void>
   usersList: object
+  getUsers: () => Promise<object | void>
+  deleteUser: (id: string) => Promise<void>
 }
 
 export const useAdmin = (): AdminApi => {
@@ -23,7 +24,8 @@ export const useAdmin = (): AdminApi => {
             nombre: userInfo.name,
             apellido: userInfo.lastname,
             correo: userInfo.email,
-            rol: userInfo.rol === '1' ? 'Admin' : 'Usuario'
+            rol: userInfo.rol === '1' ? 'Admin' : 'Usuario',
+            id: usr.id
           }
         })
       setUsersList(usersMap)
@@ -33,5 +35,14 @@ export const useAdmin = (): AdminApi => {
     }
   }
 
-  return { getUsers, usersList }
+  const deleteUser = async (id: string): Promise<void> => {
+    try {
+      await supabase.auth.admin.deleteUser(id)
+      await getUsers()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  return { getUsers, usersList, deleteUser }
 }

@@ -7,8 +7,7 @@ interface authState {
   isLoading: boolean
   error: AuthError | unknown | null
   signIn: (email: string, password: string) => void
-  signUp: (email: string, password: string, options: object) => Promise<void>
-  // Change the return type of signUp to Promise<void>
+  createUser: (email: string, password: string, options: object) => Promise<void>
   signOut: () => void
   initializeUser: () => void
 }
@@ -37,15 +36,13 @@ export const useAuthStore = create<authState>((set) => ({
       set({ error, isLoading: false })
     }
   },
-  signUp: async (email, password, options): Promise<void> => {
+  createUser: async (email, password, user_metadata): Promise<void> => {
     try {
       set({ isLoading: true })
-      const {
-        data: { user },
-        error
-      } = await supabase.auth.signUp({ email, password, options })
-      if (error) throw error
-      set({ isLoading: false, user })
+      await supabase.auth.admin.createUser({ email, password, user_metadata }).then((res) => {
+        if (res.error) throw res.error
+      })
+      set({ isLoading: false })
     } catch (error) {
       set({ error, isLoading: false })
     }
