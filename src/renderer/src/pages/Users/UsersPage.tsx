@@ -15,7 +15,7 @@ export const UsersPage = (): ReactElement => {
     })
   }, [])
 
-  const funDeleteUser = async (id: string): Promise<void> => {
+  const onDeleteUser = async (id: string): Promise<void> => {
     try {
       setData(null)
       await deleteUser(id).then(async () => {
@@ -25,13 +25,14 @@ export const UsersPage = (): ReactElement => {
       console.error(error)
     }
   }
+
   return (
     <AppLayout>
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle="Usuarios" addRoute="/users/create">
           <SearchBar searchFunction={setData} data={usersList} />
         </AppLayout.PageOptions>
-        {data ? <Table data={data} deleteFunction={funDeleteUser} /> : <Loading />}
+        {data ? <Table data={data} deleteFunction={onDeleteUser} /> : <Loading />}
       </AppLayout.Content>
     </AppLayout>
   )
