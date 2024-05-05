@@ -4,6 +4,7 @@ import { useState } from 'react'
 interface AdminApi {
   usersList: object
   getUsers: () => Promise<object | void>
+  getUser: (id: string) => Promise<object | null>
   deleteUser: (id: string) => Promise<void>
 }
 
@@ -44,5 +45,25 @@ export const useAdmin = (): AdminApi => {
     }
   }
 
-  return { getUsers, usersList, deleteUser }
+  const getUser = async (id: string): Promise<object | null> => {
+    try {
+      const { data, error } = await supabase.auth.admin.getUserById(id)
+      if (error) console.log(error)
+      const tempUser = data.user?.user_metadata
+      return tempUser
+        ? {
+            Nombre: tempUser.name,
+            Apellido: tempUser.lastname,
+            Correo: tempUser.email,
+            Rol: tempUser.rol === '1' ? 'Admin' : 'User',
+            UltimoInicio: data.user?.updated_at
+          }
+        : {}
+    } catch (error) {
+      console.error(error)
+    }
+    return null
+  }
+
+  return { getUsers, getUser, usersList, deleteUser }
 }

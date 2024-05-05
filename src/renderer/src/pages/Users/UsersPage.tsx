@@ -1,13 +1,19 @@
-import { AppLayout, SearchBar, Table } from '@renderer/components'
+import { AppLayout, SearchBar, Table, useModal } from '@renderer/components'
 import { ReactElement, useEffect, useState } from 'react'
 // import { _userData } from '@renderer/stores/mocks'
 import { Loading } from '@renderer/components/Loading'
 import { UserIdentity } from '@supabase/supabase-js'
 import { useAdmin } from '@renderer/hooks/useAdmin'
+import { formatDate } from '@renderer/utils'
+import { useLocation } from 'wouter'
 
 export const UsersPage = (): ReactElement => {
-  const { getUsers, usersList, deleteUser } = useAdmin()
+  const { getUsers, getUser, usersList, deleteUser } = useAdmin()
   const [data, setData] = useState<unknown | UserIdentity[]>(null)
+  const [selectedUser, setSelectedUser] = useState<object | null>(null)
+  const [, setLocation] = useLocation()
+
+  const { Modal, openModal } = useModal()
 
   useEffect(() => {
     getUsers().then((res) => {
@@ -26,13 +32,40 @@ export const UsersPage = (): ReactElement => {
     }
   }
 
+  const watchUser = (id: string): void => {
+    getUser(id).then((res) => {
+      setSelectedUser(res)
+      openModal()
+    })
+  }
+
   return (
     <AppLayout>
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle="Usuarios" addRoute="/users/create">
           <SearchBar searchFunction={setData} data={usersList} />
         </AppLayout.PageOptions>
-        {data ? <Table data={data} deleteFunction={onDeleteUser} /> : <Loading />}
+        <Modal title="Usuario">
+          {selectedUser &&
+            Object.keys(selectedUser).map((key, index) => (
+              <div key={index} className="w-full flex justify-start  mt-1">
+                {key}:
+                <span className="ms-auto bg-gray-500 text-white px-2 rounded-lg">
+                  {formatDate(selectedUser[key])}
+                </span>
+              </div>
+            ))}
+        </Modal>
+        {data ? (
+          <Table
+            data={data}
+            editFunction={setLocation}
+            deleteFunction={onDeleteUser}
+            watchFunction={watchUser}
+          />
+        ) : (
+          <Loading />
+        )}
       </AppLayout.Content>
     </AppLayout>
   )
