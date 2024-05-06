@@ -1,4 +1,4 @@
-import { AppLayout, SearchBar, Table, useModal } from '@renderer/components'
+import { AppLayout, Button, SearchBar, Table, useModal } from '@renderer/components'
 import { ReactElement, useEffect, useState } from 'react'
 // import { _userData } from '@renderer/stores/mocks'
 import { Loading } from '@renderer/components/Loading'
@@ -6,6 +6,7 @@ import { UserIdentity } from '@supabase/supabase-js'
 import { useAdmin } from '@renderer/hooks/useAdmin'
 import { formatDate } from '@renderer/utils'
 import { useLocation } from 'wouter'
+import { LuCheckCircle, LuXCircle } from 'react-icons/lu'
 
 export const UsersPage = (): ReactElement => {
   const { getUsers, getUser, usersList, deleteUser } = useAdmin()
@@ -13,7 +14,7 @@ export const UsersPage = (): ReactElement => {
   const [selectedUser, setSelectedUser] = useState<object | null>(null)
   const [, setLocation] = useLocation()
 
-  const { Modal, openModal } = useModal()
+  const { Modal, openModal, closeModal } = useModal()
 
   useEffect(() => {
     getUsers().then((res) => {
@@ -22,20 +23,40 @@ export const UsersPage = (): ReactElement => {
   }, [])
 
   const onDeleteUser = async (id: string): Promise<void> => {
+    setSelectedUser(null)
     try {
       setData(null)
       await deleteUser(id).then(async () => {
         await getUsers().then((res) => setData(res))
+        openModal(
+          <div>
+            <span className="animate-fade-up animate-duration-200 text-6xl mb-4 flex justify-center text-green-500">
+              <LuCheckCircle />
+            </span>
+            <h3>¡Se Elimino Correctamente!</h3>
+            <Button className="mt-4" color="success" text="Aceptar" onClick={() => closeModal()} />
+          </div>
+        )
       })
     } catch (error) {
       console.error(error)
+      openModal(
+        <div>
+          <span className="animate-fade-up text-6xl mb-4 flex justify-center text-red-500">
+            <LuXCircle />
+          </span>
+          <h3>¡No se pudo eliminar el usuario!</h3>
+          <span>{String(error)}</span>
+          <Button className="mt-4" color="danger" text="Aceptar" onClick={() => closeModal()} />
+        </div>
+      )
     }
   }
 
   const watchUser = (id: string): void => {
     getUser(id).then((res) => {
       setSelectedUser(res)
-      openModal()
+      openModal(null)
     })
   }
 

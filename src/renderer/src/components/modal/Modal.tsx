@@ -1,4 +1,4 @@
-import { ComponentProps, useState } from 'react'
+import { ComponentProps, ReactElement, useState } from 'react'
 import { LuX } from 'react-icons/lu'
 
 interface ModalProps extends ComponentProps<'div'> {
@@ -6,16 +6,21 @@ interface ModalProps extends ComponentProps<'div'> {
 }
 
 interface Modal {
-  openModal: () => void
+  openModal: (jsx: ReactElement | null) => Promise<void>
   closeModal: () => void
-  Modal: (props: ModalProps) => JSX.Element
+  Modal: (props: ModalProps) => ReactElement
 }
 
 export const useModal = (): Modal => {
   const [showModal, setShowModal] = useState(false)
+  const [element, setElement] = useState<ReactElement | null>(null)
 
-  const openModal = (): void => {
-    setShowModal(true)
+  const openModal = (jsx: ReactElement | null): Promise<void> => {
+    return new Promise((resolve) => {
+      setElement(jsx)
+      setShowModal(true)
+      resolve()
+    })
   }
 
   const closeModal = (): void => {
@@ -36,6 +41,7 @@ export const useModal = (): Modal => {
                 <LuX />
               </button>
             </div>
+            {element ? element : ''}
             {children}
           </div>
         </div>
