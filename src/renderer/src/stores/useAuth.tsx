@@ -39,9 +39,11 @@ export const useAuthStore = create<authState>((set) => ({
   createUser: async (email, password, user_metadata): Promise<void> => {
     try {
       set({ isLoading: true })
-      await supabase.auth.admin.createUser({ email, password, user_metadata }).then((res) => {
-        if (res.error) throw res.error
-      })
+      await supabase.auth.admin
+        .createUser({ email, password, email_confirm: true, user_metadata })
+        .then((res) => {
+          if (res.error) throw res.error
+        })
       set({ isLoading: false })
     } catch (error) {
       set({ error, isLoading: false })

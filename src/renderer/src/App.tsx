@@ -10,7 +10,7 @@ import {
   MainPage,
   RentPage,
   UsersPage,
-  CreateUserPage,
+  CreateEditUserPage,
   AuthPage
 } from './pages'
 import { useAuthStore } from './stores/useAuth'
@@ -33,7 +33,8 @@ function App(): ReactElement {
           <>
             <Route path="/" component={MainPage} />
             <Route path="/users" component={UsersPage} />
-            <Route path="/users/create" component={CreateUserPage} />
+            <Route path="/users/create" component={CreateEditUserPage} />
+            <Route path="/users/:id" component={CreateEditUserPage} />
             <Route path="/clients" component={ClientsPage} />
             <Route path="/inventory" component={InventoryPage} />
             <Route path="/rent" component={RentPage} />

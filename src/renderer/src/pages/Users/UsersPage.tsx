@@ -39,6 +39,10 @@ export const UsersPage = (): ReactElement => {
     })
   }
 
+  const editUser = (id: string): void => {
+    setLocation('/users/' + id)
+  }
+
   return (
     <AppLayout>
       <AppLayout.Content>
@@ -49,7 +53,7 @@ export const UsersPage = (): ReactElement => {
           {selectedUser &&
             Object.keys(selectedUser).map((key, index) => (
               <div key={index} className="w-full flex justify-start  mt-1">
-                {key}:
+                {key.replaceAll('_', ' ')}:
                 <span className="ms-auto bg-gray-500 text-white px-2 rounded-lg">
                   {formatDate(selectedUser[key])}
                 </span>
@@ -59,7 +63,7 @@ export const UsersPage = (): ReactElement => {
         {data ? (
           <Table
             data={data}
-            editFunction={setLocation}
+            editFunction={editUser}
             deleteFunction={onDeleteUser}
             watchFunction={watchUser}
           />

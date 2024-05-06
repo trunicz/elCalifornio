@@ -6,15 +6,20 @@ import { ReactElement, ReactNode } from 'react'
 import Input from '../input/Input'
 import { cn } from '@renderer/utils'
 
-const useCustomForm = (schema: Yup.AnyObjectSchema): FieldValues => {
+const useCustomForm = (
+  schema: Yup.AnyObjectSchema,
+  initialValues: FieldValues | undefined
+): FieldValues => {
   const {
     handleSubmit,
+    control,
     register,
     formState: { errors }
-  } = useForm({ resolver: yupResolver(schema) })
+  } = useForm({ resolver: yupResolver(schema), defaultValues: initialValues })
 
   return {
     handleSubmit,
+    control,
     register,
     errors
   }
@@ -28,6 +33,7 @@ export interface FormField {
   as: string
   options?: { value: string | number; label: string }[]
   value?: string | number
+  isVisible?: boolean
   className?: string
 }
 
@@ -38,6 +44,7 @@ interface FormProps {
   className?: string
   children?: ReactNode
   formDirection?: 'col' | 'row'
+  defaultValues?: FieldValues
 }
 
 export type submitObject = { [x: string]: string }
@@ -49,9 +56,10 @@ export const Form = ({
   className,
   children = null,
   formDirection = 'row',
+  defaultValues,
   ...props
 }: FormProps): ReactElement => {
-  const { handleSubmit, register, errors } = useCustomForm(validationSchema)
+  const { handleSubmit, register, errors } = useCustomForm(validationSchema, defaultValues)
 
   const submitHandler: SubmitHandler<submitObject> = (data: submitObject) => {
     if (Object.keys(errors).length === 0) {
@@ -61,39 +69,44 @@ export const Form = ({
 
   return (
     <form className={cn('p-4 flex-1', className)} onSubmit={handleSubmit(submitHandler)} {...props}>
-      {fields.map((field) => (
-        <div
-          key={field.name}
-          className={cn('flex justify-between mb-5', {
-            'flex-col': formDirection === 'col'
-          })}
-        >
-          <label className="" htmlFor={field.name}>
-            {field.label}
-            {field.isRequired && <span className="text-red-500 relative bottom-1">*</span>}:
-          </label>
+      {fields.map((field) =>
+        field.isVisible === false ? (
+          <span key={field.name}></span>
+        ) : (
           <div
-            className={cn('', {
-              'w-1/3 max-w-[350px] min-w-[200px]': formDirection === 'row',
-              'mt-2': formDirection === 'col'
+            key={field.name}
+            className={cn('flex justify-between mb-5', {
+              'flex-col': formDirection === 'col'
             })}
           >
-            <Input
-              as={field.as}
-              className="focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3"
-              type={field.type}
-              id={field.name}
-              options={field?.options}
-              placeholder={field?.placeholder}
-              value={field?.value}
-              {...register(field.name)}
-            />
-            {errors[field.name]?.message && (
-              <p className="text-red-600 font-medium text-xs mt-1">{errors[field.name].message}</p>
-            )}
+            <label className="" htmlFor={field.name}>
+              {field.label}
+              {field.isRequired && <span className="text-red-500 relative bottom-1">*</span>}:
+            </label>
+            <div
+              className={cn('', {
+                'w-1/3 max-w-[350px] min-w-[200px]': formDirection === 'row',
+                'mt-2': formDirection === 'col'
+              })}
+            >
+              <Input
+                as={field.as}
+                className="focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3"
+                type={field.type}
+                id={field.name}
+                options={field?.options}
+                placeholder={field?.placeholder}
+                {...register(field.name)}
+              />
+              {errors[field.name]?.message && (
+                <p className="text-red-600 font-medium text-xs mt-1">
+                  {errors[field.name].message}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      )}
       {!children && (
         <Button
           className="fixed z-10 end-4 bottom-4 border-emerald-400 hover:bg-emerald-500  text-emerald-500 w-auto ms-auto px-12"

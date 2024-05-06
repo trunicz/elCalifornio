@@ -1,11 +1,13 @@
 import supabase from '@renderer/utils/supabase'
+import { UserMetadata } from '@supabase/supabase-js'
 import { useState } from 'react'
 
 interface AdminApi {
   usersList: object
   getUsers: () => Promise<object | void>
-  getUser: (id: string) => Promise<object | null>
+  getUser: (id: string) => Promise<UserMetadata | null>
   deleteUser: (id: string) => Promise<void>
+  updateUser: (id: string, attributes: object) => Promise<object | null>
 }
 
 export const useAdmin = (): AdminApi => {
@@ -25,7 +27,7 @@ export const useAdmin = (): AdminApi => {
             nombre: userInfo.name,
             apellido: userInfo.lastname,
             correo: userInfo.email,
-            rol: userInfo.rol === '1' ? 'Admin' : 'Usuario',
+            rol: userInfo.rol === '1' ? 'Admin' : 'User',
             id: usr.id
           }
         })
@@ -45,7 +47,7 @@ export const useAdmin = (): AdminApi => {
     }
   }
 
-  const getUser = async (id: string): Promise<object | null> => {
+  const getUser = async (id: string): Promise<UserMetadata | null> => {
     try {
       const { data, error } = await supabase.auth.admin.getUserById(id)
       if (error) console.log(error)
@@ -56,7 +58,7 @@ export const useAdmin = (): AdminApi => {
             Apellido: tempUser.lastname,
             Correo: tempUser.email,
             Rol: tempUser.rol === '1' ? 'Admin' : 'User',
-            UltimoInicio: data.user?.updated_at
+            'Último Inicio': data.user?.last_sign_in_at
           }
         : {}
     } catch (error) {
@@ -65,5 +67,17 @@ export const useAdmin = (): AdminApi => {
     return null
   }
 
-  return { getUsers, getUser, usersList, deleteUser }
+  const updateUser = async (id: string, attributes: object): Promise<object | null> => {
+    try {
+      const { data, error } = await supabase.auth.admin.updateUserById(id, attributes)
+      if (error) throw error
+      console.log(data)
+      return data
+    } catch (error) {
+      console.error(error)
+    }
+    return null
+  }
+
+  return { getUsers, getUser, usersList, deleteUser, updateUser }
 }
