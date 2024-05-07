@@ -111,7 +111,7 @@ const AppPageOptions = ({
       {children}
       {hasAddButton && (
         <Link
-          className="ms-4 flex items-center justify-center border-2 hover:text-white transition-colors px-4 w-auto rounded-xl h-full border-emerald-400 text-emerald-400 font-medium hover:bg-emerald-400 gap-1"
+          className="ms-4 flex items-center justify-center hover:bg-emerald-500 px-4 w-auto rounded-xl h-full bg-emerald-400  text-white font-medium active:scale-95 transition-all gap-1"
           to={addRoute}
         >
           Agregar

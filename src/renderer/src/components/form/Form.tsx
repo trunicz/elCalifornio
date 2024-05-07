@@ -111,7 +111,7 @@ export const Form = ({
       )}
       {!children && (
         <Button
-          className="fixed z-10 end-4 bottom-4 border-emerald-400 hover:bg-emerald-500  text-emerald-500 w-auto ms-auto px-12"
+          className="fixed z-10 end-4 bottom-4 bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
           text="Continuar"
         />
       )}

@@ -87,6 +87,7 @@ export const UsersPage = (): ReactElement => {
             editFunction={editUser}
             deleteFunction={onDeleteUser}
             watchFunction={watchUser}
+            hiddenKeys={['id']}
           />
         ) : (
           <Loading />
