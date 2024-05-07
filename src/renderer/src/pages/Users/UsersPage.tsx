@@ -6,7 +6,7 @@ import { UserIdentity } from '@supabase/supabase-js'
 import { useAdmin } from '@renderer/hooks/useAdmin'
 import { formatDate } from '@renderer/utils'
 import { useLocation } from 'wouter'
-import { LuCheckCircle, LuXCircle } from 'react-icons/lu'
+import { LuCheckCircle, LuMoreHorizontal, LuXCircle } from 'react-icons/lu'
 
 export const UsersPage = (): ReactElement => {
   const { getUsers, getUser, usersList, deleteUser } = useAdmin()
@@ -73,11 +73,17 @@ export const UsersPage = (): ReactElement => {
         <Modal title="Usuario">
           {selectedUser &&
             Object.keys(selectedUser).map((key, index) => (
-              <div key={index} className="w-full flex justify-start  mt-1">
+              <div key={index} className="w-full text-lg flex justify-start  mt-1">
                 {key.replaceAll('_', ' ')}:
-                <span className="ms-auto bg-gray-500 text-white px-2 rounded-lg">
-                  {formatDate(selectedUser[key])}
-                </span>
+                {selectedUser[key] ? (
+                  <span className="bg-accent ms-2 text-white px-2 rounded-lg">
+                    {formatDate(selectedUser[key])}
+                  </span>
+                ) : (
+                  <span className="text-accent flex text-xl items-center ms-2">
+                    <LuMoreHorizontal />
+                  </span>
+                )}
               </div>
             ))}
         </Modal>
