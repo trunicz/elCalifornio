@@ -74,8 +74,8 @@ export const CreateEditUserPage = (): ReactElement => {
       isRequired: true,
       as: 'select',
       options: [
-        { value: '1', label: 'Admin' },
-        { value: '2', label: 'Usuario' }
+        { value: 1, label: 'Admin' },
+        { value: 2, label: 'Usuario' }
       ]
     }
   ]
@@ -88,7 +88,7 @@ export const CreateEditUserPage = (): ReactElement => {
           lastname: res?.Apellido,
           email: res?.Correo,
           password: '',
-          rol: res?.Rol
+          rol: res?.Rol === 'Admin' ? 1 : 2
         })
         setShowForm(true)
       })
