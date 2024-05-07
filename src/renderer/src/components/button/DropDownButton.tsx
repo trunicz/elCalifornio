@@ -12,7 +12,6 @@ export const DropDownButton = ({
   className,
   children,
   text,
-  to,
   icon,
   isIconOnly
 }: DropDownButtonType): ReactElement => {
@@ -36,7 +35,7 @@ export const DropDownButton = ({
         <Menu.Item>
           <Link
             className="min-w-32 active:bg-primary active:scale-95 bg-main active:text-white hover:text-white hover:bg-primary text-black p-3 transition-all duration-150"
-            to={to || ''}
+            to={''}
           ></Link>
         </Menu.Item>
       </Menu.Items>
