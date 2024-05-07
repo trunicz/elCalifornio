@@ -35,6 +35,30 @@ export type Database = {
           }
         ]
       }
+      client_type: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: number
+          type_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          type_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          type_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       'client-status': {
         Row: {
           created_at: string
@@ -112,12 +136,35 @@ export type Database = {
             isOneToOne: false
             referencedRelation: 'client-status'
             referencedColumns: ['id']
+          }
+        ]
+      }
+      clients_types: {
+        Row: {
+          client_id: number
+          type_id: number
+        }
+        Insert: {
+          client_id: number
+          type_id: number
+        }
+        Update: {
+          client_id?: number
+          type_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'clients_types_client_id_fkey'
+            columns: ['client_id']
+            isOneToOne: false
+            referencedRelation: 'clients'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: 'clients_type_fkey'
-            columns: ['type']
+            foreignKeyName: 'clients_types_type_id_fkey'
+            columns: ['type_id']
             isOneToOne: false
-            referencedRelation: 'clients-type'
+            referencedRelation: 'client_type'
             referencedColumns: ['id']
           }
         ]
@@ -159,30 +206,6 @@ export type Database = {
             referencedColumns: ['id']
           }
         ]
-      }
-      'clients-type': {
-        Row: {
-          created_at: string
-          deleted_at: string | null
-          id: number
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          deleted_at?: string | null
-          id?: number
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          deleted_at?: string | null
-          id?: number
-          name?: string
-          updated_at?: string
-        }
-        Relationships: []
       }
       contracts: {
         Row: {

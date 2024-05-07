@@ -8,9 +8,9 @@ import { LuEye, LuPencil, LuTrash2 } from 'react-icons/lu'
 interface TableProps extends ComponentProps<'table'> {
   data: TableType
   hasOptions?: boolean
-  watchFunction?: (id: string) => void
-  editFunction?: (id: string) => void
-  deleteFunction?: (id: string) => void
+  watchFunction?: (id: string | number) => void
+  editFunction?: (id: string | number) => void
+  deleteFunction?: (id: string | number) => void
 }
 
 export const Table = ({
