@@ -8,6 +8,7 @@ import { LuEye, LuPencil, LuTrash2 } from 'react-icons/lu'
 interface TableProps extends ComponentProps<'table'> {
   data: TableType
   hasOptions?: boolean
+  hiddenKeys?: string[]
   watchFunction?: (id: string | number) => void
   editFunction?: (id: string | number) => void
   deleteFunction?: (id: string | number) => void
@@ -20,19 +21,19 @@ export const Table = ({
   watchFunction,
   editFunction,
   deleteFunction,
+  hiddenKeys = [],
   ...props
 }: TableProps): ReactElement => {
-  const headers = data ? Array.from(new Set(data?.flatMap((n: object) => Object.keys(n)))) : []
+  const headers = data
+    ? Array.from(
+        new Set(
+          data
+            ?.flatMap((n: object) => Object.keys(n))
+            .filter((key: string) => !hiddenKeys?.includes(key))
+        )
+      )
+    : []
 
-  const getOptions = (id: number): Array<{ [x: string]: string }> => {
-    return [
-      { name: 'Ver', to: `/${id}` },
-      { name: 'Editar', to: `/${id}/edit` },
-      { name: 'Eliminar', to: `/${id}/delete` }
-    ]
-  }
-
-  getOptions(1)
   return (
     <TableContext.Provider value={{ data }}>
       {data.length > 0 ? (
@@ -52,13 +53,15 @@ export const Table = ({
               {data.map((row: { [x: string]: string }, index: Key | null | undefined) =>
                 row ? (
                   <tr className="border-b text-stroke text-center hover:bg-secondary" key={index}>
-                    {Object.keys(row).map((key, index) => (
-                      <td className="px-6 py-4 overflow-ellipsis text-nowrap" key={index}>
-                        {typeof row[key] === 'object'
-                          ? renderNestedObject(row[key], index)
-                          : formatDate(row[key])}
-                      </td>
-                    ))}
+                    {Object.keys(row)
+                      .filter((key) => !hiddenKeys.includes(key))
+                      .map((key, index) => (
+                        <td className="px-6 py-4 overflow-ellipsis text-nowrap" key={index}>
+                          {typeof row[key] === 'object'
+                            ? renderNestedObject(row[key], index)
+                            : formatDate(row[key])}
+                        </td>
+                      ))}
                     <td className="px-6 py-4 flex gap-2 justify-center">
                       <Button
                         className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
