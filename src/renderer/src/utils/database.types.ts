@@ -86,46 +86,46 @@ export type Database = {
       clients: {
         Row: {
           address: string
-          building_address: string
+          building_address: string | null
           created_at: string
           deleted_at: string | null
           email: string | null
           id: number
-          isForeing: boolean
+          isForeign: boolean
           last_name: string
           name: string
           phone: number | null
-          status: number
+          status: number | null
           type: number
           updated_at: string
         }
         Insert: {
           address?: string
-          building_address?: string
-          created_at: string
+          building_address?: string | null
+          created_at?: string
           deleted_at?: string | null
           email?: string | null
           id?: number
-          isForeing?: boolean
+          isForeign?: boolean
           last_name?: string
           name?: string
           phone?: number | null
-          status?: number
+          status?: number | null
           type?: number
           updated_at?: string
         }
         Update: {
           address?: string
-          building_address?: string
+          building_address?: string | null
           created_at?: string
           deleted_at?: string | null
           email?: string | null
           id?: number
-          isForeing?: boolean
+          isForeign?: boolean
           last_name?: string
           name?: string
           phone?: number | null
-          status?: number
+          status?: number | null
           type?: number
           updated_at?: string
         }

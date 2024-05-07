@@ -31,7 +31,7 @@ export interface FormField {
   placeholder?: string
   isRequired?: boolean
   as: string
-  options?: { value: string | number; label: string }[]
+  options?: { value: string | number | boolean; label: string }[]
   value?: string | number
   isVisible?: boolean
   className?: string

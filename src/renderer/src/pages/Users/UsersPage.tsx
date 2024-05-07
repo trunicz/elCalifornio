@@ -22,7 +22,7 @@ export const UsersPage = (): ReactElement => {
     })
   }, [])
 
-  const onDeleteUser = async (id: string): Promise<void> => {
+  const onDeleteUser = async (id: string | number): Promise<void> => {
     setSelectedUser(null)
     try {
       setData(null)
@@ -53,14 +53,14 @@ export const UsersPage = (): ReactElement => {
     }
   }
 
-  const watchUser = (id: string): void => {
+  const watchUser = (id: string | number): void => {
     getUser(id).then((res) => {
       setSelectedUser(res)
       openModal(null)
     })
   }
 
-  const editUser = (id: string): void => {
+  const editUser = (id: string | number): void => {
     setLocation('/users/' + id)
   }
 

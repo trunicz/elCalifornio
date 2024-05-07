@@ -5,9 +5,9 @@ import { useState } from 'react'
 interface AdminApi {
   usersList: object
   getUsers: () => Promise<object | void>
-  getUser: (id: string) => Promise<UserMetadata | null>
-  deleteUser: (id: string) => Promise<void>
-  updateUser: (id: string, attributes: object) => Promise<object | null>
+  getUser: (id: string | number) => Promise<UserMetadata | null>
+  deleteUser: (id: string | number) => Promise<void>
+  updateUser: (id: string | number, attributes: object) => Promise<object | null>
 }
 
 export const useAdmin = (): AdminApi => {
@@ -38,18 +38,18 @@ export const useAdmin = (): AdminApi => {
     }
   }
 
-  const deleteUser = async (id: string): Promise<void> => {
+  const deleteUser = async (id: string | number): Promise<void> => {
     try {
-      await supabase.auth.admin.deleteUser(id)
+      await supabase.auth.admin.deleteUser(String(id))
       await getUsers()
     } catch (error) {
       console.error(error)
     }
   }
 
-  const getUser = async (id: string): Promise<UserMetadata | null> => {
+  const getUser = async (id: string | number): Promise<UserMetadata | null> => {
     try {
-      const { data, error } = await supabase.auth.admin.getUserById(id)
+      const { data, error } = await supabase.auth.admin.getUserById(String(id))
       if (error) console.log(error)
       const tempUser = data.user?.user_metadata
       return tempUser
@@ -67,9 +67,9 @@ export const useAdmin = (): AdminApi => {
     return null
   }
 
-  const updateUser = async (id: string, attributes: object): Promise<object | null> => {
+  const updateUser = async (id: string | number, attributes: object): Promise<object | null> => {
     try {
-      const { data, error } = await supabase.auth.admin.updateUserById(id, attributes)
+      const { data, error } = await supabase.auth.admin.updateUserById(String(id), attributes)
       if (error) throw error
       console.log(data)
       return data
