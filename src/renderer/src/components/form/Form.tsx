@@ -71,7 +71,7 @@ export const Form = ({
     <form className={cn('p-4 flex-1', className)} onSubmit={handleSubmit(submitHandler)} {...props}>
       {fields.map((field) =>
         field.isVisible === false ? (
-          <span key={field.name}></span>
+          <></>
         ) : (
           <div
             key={field.name}

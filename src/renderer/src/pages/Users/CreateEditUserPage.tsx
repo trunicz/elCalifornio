@@ -123,9 +123,11 @@ export const CreateEditUserPage = (): ReactElement => {
         />
         {showForm ? (
           <Form
+            className="mx-auto overflow-y-auto grid grid-cols-3 grid-rows-5 gap-4"
             onSubmit={onSubmit}
             defaultValues={defaultValues}
             fields={formFields}
+            formDirection="col"
             validationSchema={id ? updateUserSchema : createUserSchema}
           />
         ) : (
