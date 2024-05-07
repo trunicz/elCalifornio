@@ -23,28 +23,34 @@ export const ClientsPage = (): ReactElement => {
           <>
             {/* {JSON.stringify(client)} */}
             <p className="text-lg flex gap-2">
-              <span className="font-bold text-nowrap">Nombre:</span>
-              <span className="">{client.name + ' ' + client.last_name}</span>
+              <span className="font-medium text-nowrap">Nombre:</span>
+              <span className="bg-accent px-2 text-white rounded-md">
+                {client.name + ' ' + client.last_name}
+              </span>
             </p>
             <p className="text-lg flex gap-2">
-              <span className="font-bold text-nowrap">Correo:</span>
-              <span className="">{client.email}</span>
+              <span className="font-medium text-nowrap">Correo:</span>
+              <span className="bg-accent px-2 text-white rounded-md">{client.email}</span>
             </p>
             <p className="text-lg flex gap-2">
-              <span className="font-bold text-nowrap">Teléfono:</span>
-              <span className="">{client.phone}</span>
+              <span className="font-medium text-nowrap">Teléfono:</span>
+              <span className="bg-accent px-2 text-white rounded-md">{client.phone}</span>
             </p>
             <p className="text-lg flex gap-2">
-              <span className="font-bold text-nowrap">Foráneo:</span>
-              <span className="">{client.isForeign ? 'Si' : 'No'}</span>
+              <span className="font-medium text-nowrap">Foráneo:</span>
+              <span className="bg-accent px-2 text-white rounded-md">
+                {client.isForeign ? 'Si' : 'No'}
+              </span>
             </p>
             <p className="text-lg flex gap-2">
-              <span className="font-bold text-nowrap">Tipo de Cliente:</span>
-              <span className="">{client.client_type[0].type_name}</span>
+              <span className="font-medium text-nowrap">Tipo de Cliente:</span>
+              <span className="bg-accent px-2 text-white rounded-md">
+                {client.client_type[0].type_name}
+              </span>
             </p>
             <p className="text-lg flex gap-2">
-              <span className="font-bold text-nowrap">Dirección:</span>
-              <span className="">{client.address}</span>
+              <span className="font-medium text-nowrap">Dirección:</span>
+              <span className="bg-accent px-2 text-white rounded-md">{client.address}</span>
             </p>
           </>
         )
