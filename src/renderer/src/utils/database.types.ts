@@ -94,7 +94,7 @@ export type Database = {
           isForeign: boolean
           last_name: string
           name: string
-          phone: number | null
+          phone: string | null
           status: number | null
           type: number
           updated_at: string
@@ -109,7 +109,7 @@ export type Database = {
           isForeign?: boolean
           last_name?: string
           name?: string
-          phone?: number | null
+          phone?: string | null
           status?: number | null
           type?: number
           updated_at?: string
@@ -124,7 +124,7 @@ export type Database = {
           isForeign?: boolean
           last_name?: string
           name?: string
-          phone?: number | null
+          phone?: string | null
           status?: number | null
           type?: number
           updated_at?: string

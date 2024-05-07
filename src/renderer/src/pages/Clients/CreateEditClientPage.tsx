@@ -11,9 +11,12 @@ const clientSchema = Yup.object().shape({
   name: Yup.string().required('El nombre es Obligatorio'),
   last_name: Yup.string().required('El Apellido es Obligatorio'),
   email: Yup.string().required('El correo es Obligatorio'),
-  phone: Yup.number()
+  phone: Yup.string()
     .required('El Teléfono es Obligatorio')
-    .min(999999999, 'Ingrese un teléfono Valido'),
+    .matches(
+      /^(\+\d{1,3}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
+      'Por favor, introduce un número de teléfono válido.'
+    ),
   address: Yup.string().required('La Dirección es Obligatoria'),
   isForeign: Yup.boolean().required('Este Campo es Obligatorio'),
   type: Yup.number().required('Este campo es obligatorio')
@@ -53,7 +56,7 @@ export const CreateEditClientPage = (): ReactElement => {
     {
       name: 'phone',
       label: 'Teléfono',
-      type: 'number',
+      type: 'text',
       placeholder: 'Ingrese el Numero Telefónico... ',
       isRequired: true,
       as: 'input'
@@ -135,8 +138,10 @@ export const CreateEditClientPage = (): ReactElement => {
         />
         {canShowForm ? (
           <Form
+            className=" mx-auto overflow-y-auto grid grid-cols-3 grid-rows-5 gap-4"
             onSubmit={onSubmit}
             defaultValues={defaultValues}
+            formDirection="col"
             fields={formFields}
             validationSchema={clientSchema}
           />

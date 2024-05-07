@@ -98,10 +98,12 @@ export const Form = ({
                 placeholder={field?.placeholder}
                 {...register(field.name)}
               />
-              {errors[field.name]?.message && (
+              {errors[field.name]?.message ? (
                 <p className="text-red-600 font-medium text-xs mt-1">
                   {errors[field.name].message}
                 </p>
+              ) : (
+                <span className="text-white font-medium text-xs mt-1">...</span>
               )}
             </div>
           </div>
