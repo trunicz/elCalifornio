@@ -52,6 +52,14 @@ export const ClientsPage = (): ReactElement => {
               <span className="font-medium text-nowrap">Dirección:</span>
               <span className="bg-accent px-2 text-white rounded-md">{client.address}</span>
             </p>
+            <div className="flex gap-4 border-t-2 pt-4">
+              <a
+                className="bg-gray-500 border-0 text-xl w-full rounded-lg py-2 transition-all active:scale-95 text-white hover:bg-gray-600"
+                href={'whatsapp://send/?phone=' + client.phone}
+              >
+                Contactar con el cliente
+              </a>
+            </div>
           </>
         )
       }
@@ -82,13 +90,14 @@ export const ClientsPage = (): ReactElement => {
         <AppLayout.PageOptions pageTitle="Clientes" addRoute="/clients/create">
           <SearchBar searchFunction={setClients} data={clientList} />
         </AppLayout.PageOptions>
-        <Modal title="cliente" className="w-auto" />
+        <Modal title="cliente" className="w-auto min-w-[450px]" />
         {clientList ? (
           <Table
             data={clients}
             watchFunction={watchFunction}
             deleteFunction={deleteFunction}
             editFunction={editFunction}
+            hiddenKeys={['tipo_cliente', 'foráneo', 'id']}
           />
         ) : (
           <Loading />
