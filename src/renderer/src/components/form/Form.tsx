@@ -27,7 +27,7 @@ const useCustomForm = (
 export interface FormField {
   name: string
   label: string
-  type: string
+  type?: string
   placeholder?: string
   isRequired?: boolean
   as: string
