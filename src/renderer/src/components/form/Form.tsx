@@ -91,7 +91,10 @@ export const Form = ({
             >
               <Input
                 as={field.as}
-                className="focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3"
+                className={cn(
+                  'focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3',
+                  field.className
+                )}
                 type={field.type}
                 id={field.name}
                 options={field?.options}
