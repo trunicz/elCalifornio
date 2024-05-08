@@ -3,7 +3,7 @@ import { AppLayout, Form, submitObject } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { ReactElement, useEffect, useState } from 'react'
-import { SubmitHandler } from 'react-hook-form'
+import { FieldValues, SubmitHandler } from 'react-hook-form'
 import { useLocation, useParams } from 'wouter'
 import * as Yup from 'yup'
 
@@ -17,9 +17,11 @@ const inventoryPage = Yup.object().shape({
 
 export const CreateEditInventoryPage = (): ReactElement => {
   const [, setLocation] = useLocation()
+  const [defaultValues, setDefaultValues] = useState<FieldValues | undefined>()
   const [equipmentTypes, setEquipmentTypes] = useState<selectType[] | null>(null)
   const [equipmentStatus, setEquipmentStatus] = useState<selectType[] | null>(null)
-  const { getEquipmentTypes, getEquipmentStatus, createEquipment } = useInventory()
+  const [showForm, setShowForm] = useState<boolean>(false)
+  const { getEquipmentTypes, getEquipmentStatus, createEquipment, getItem } = useInventory()
   const { id } = useParams()
 
   useEffect(() => {
@@ -44,6 +46,21 @@ export const CreateEditInventoryPage = (): ReactElement => {
         })
       )
     })
+
+    if (id) {
+      getItem(id).then((res) => {
+        if (res) {
+          const equipment = res[0]
+          setDefaultValues({
+            type: equipment.tipo_id,
+            reference: equipment.referencia
+          })
+          setShowForm(true)
+        }
+      })
+    } else {
+      setShowForm(true)
+    }
   }, [])
 
   const onSubmit: SubmitHandler<submitObject> = (data) => {
@@ -58,8 +75,9 @@ export const CreateEditInventoryPage = (): ReactElement => {
     <AppLayout>
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle="Agregar Equipo" hasAddButton={false} />
-        {equipmentTypes && equipmentStatus ? (
+        {equipmentTypes && equipmentStatus && showForm ? (
           <Form
+            defaultValues={defaultValues}
             className="grid auto-cols-max w-2/4 auto-rows-max mx-auto gap-4"
             onSubmit={onSubmit}
             validationSchema={inventoryPage}

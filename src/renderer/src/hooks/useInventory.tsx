@@ -62,13 +62,14 @@ export const useInventory = (): InventoryMethods => {
     try {
       const { data, error } = await supabase
         .from('equipment')
-        .select('id,type(type_name),reference,status(status_name)')
+        .select('id,type(id,type_name),reference,status(status_name)')
         .eq('id', id)
       if (error) throw error
       const filteredInventory = data.map((inv: any) => {
         return {
           id: inv.id,
           tipo: inv.type.type_name,
+          tipo_id: inv.type.id,
           estado: inv.status.status_name,
           referencia: inv.reference ? inv.reference : 'Sin Referencia'
         }

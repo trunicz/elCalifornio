@@ -3,8 +3,10 @@ import { Loading } from '@renderer/components/Loading'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { ReactElement, useEffect, useState } from 'react'
 import { LuCheckCircle2, LuMoreHorizontal } from 'react-icons/lu'
+import { useLocation } from 'wouter'
 
 export const InventoryPage = (): ReactElement => {
+  const [, setLocation] = useLocation()
   const [inventoryList, setInventoryList] = useState<unknown[] | null>(null)
   const { getAllInventory, inventory, getItem, deleteEquipment } = useInventory()
   const { Modal, openModal, closeModal } = useModal()
@@ -22,7 +24,7 @@ export const InventoryPage = (): ReactElement => {
         openModal(
           <>
             {Object.keys(item)
-              .filter((k) => !['id'].includes(k))
+              .filter((k) => !['id', 'tipo_id'].includes(k))
               .map((key, index) => (
                 <p key={key + index} className="text-lg flex gap-4">
                   <span className="w-1/3 text-start text-nowrap">
@@ -70,6 +72,10 @@ export const InventoryPage = (): ReactElement => {
     })
   }
 
+  const editFunction = (id: string | number): void => {
+    setLocation('/inventory/' + id)
+  }
+
   return (
     <AppLayout>
       <AppLayout.Content>
@@ -83,6 +89,7 @@ export const InventoryPage = (): ReactElement => {
             deleteFunction={deleteFunction}
             hiddenKeys={['id']}
             watchFunction={moreInfo}
+            editFunction={editFunction}
           />
         ) : (
           <Loading />
