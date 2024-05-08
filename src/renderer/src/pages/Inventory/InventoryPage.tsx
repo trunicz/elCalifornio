@@ -48,7 +48,7 @@ export const InventoryPage = (): ReactElement => {
   return (
     <AppLayout>
       <AppLayout.Content>
-        <AppLayout.PageOptions pageTitle="Inventario">
+        <AppLayout.PageOptions pageTitle="Inventario" addRoute="/inventory/add">
           <SearchBar searchFunction={setInventoryList} data={inventory} />
         </AppLayout.PageOptions>
         <Modal title="Inventario" className="max-w-[550px]" />

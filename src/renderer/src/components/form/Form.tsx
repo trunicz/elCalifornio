@@ -2,7 +2,7 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import { Button } from '../button'
-import { ReactElement, ReactNode } from 'react'
+import { Fragment, ReactElement, ReactNode } from 'react'
 import Input from '../input/Input'
 import { cn } from '@renderer/utils'
 
@@ -71,11 +71,11 @@ export const Form = ({
     <form className={cn('p-4 flex-1', className)} onSubmit={handleSubmit(submitHandler)} {...props}>
       {fields.map((field) =>
         field.isVisible === false ? (
-          <></>
+          <Fragment key={field.name}></Fragment>
         ) : (
           <div
             key={field.name}
-            className={cn('flex justify-between mb-5', {
+            className={cn('flex justify-between mb-5', field.className, {
               'flex-col': formDirection === 'col'
             })}
           >
@@ -92,8 +92,7 @@ export const Form = ({
               <Input
                 as={field.as}
                 className={cn(
-                  'focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3',
-                  field.className
+                  'focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3'
                 )}
                 type={field.type}
                 id={field.name}
