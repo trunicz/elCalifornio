@@ -5,10 +5,24 @@ import { useState } from 'react'
 interface RentalsMethods {
   rentals: any[] | null
   getAllRentals: () => Promise<any[] | null>
+  deleteRental: (id: string | number) => Promise<void>
 }
 
 export const useRentals = (): RentalsMethods => {
   const [rentals, setRentals] = useState<any[] | null>(null)
+
+  const deleteRental = async (id: string | number): Promise<void> => {
+    try {
+      const { error } = await supabase
+        .from('rentals')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id)
+
+      if (error) throw error
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const getAllRentals = async (): Promise<any[] | null> => {
     try {
@@ -57,5 +71,5 @@ export const useRentals = (): RentalsMethods => {
     return null
   }
 
-  return { getAllRentals, rentals }
+  return { getAllRentals, rentals, deleteRental }
 }
