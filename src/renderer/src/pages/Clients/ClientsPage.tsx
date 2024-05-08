@@ -22,39 +22,37 @@ export const ClientsPage = (): ReactElement => {
         openModal(
           <>
             {/* {JSON.stringify(client)} */}
-            <p className="text-lg flex gap-2">
-              <span className="font-medium text-nowrap">Nombre:</span>
-              <span className="bg-accent px-2 text-white rounded-md">
+            <p className="text-lg flex gap-4">
+              <span className="font-medium text-nowrap w-1/3 text-start">Nombre:</span>
+              <span className="bg-gray-100 px-2  rounded-md">
                 {client.name + ' ' + client.last_name}
               </span>
             </p>
-            <p className="text-lg flex gap-2">
-              <span className="font-medium text-nowrap">Correo:</span>
-              <span className="bg-accent px-2 text-white rounded-md">{client.email}</span>
+            <p className="text-lg flex gap-4">
+              <span className="font-medium text-nowrap w-1/3 text-start">Correo:</span>
+              <span className="bg-gray-100 px-2  rounded-md">{client.email}</span>
             </p>
-            <p className="text-lg flex gap-2">
-              <span className="font-medium text-nowrap">Teléfono:</span>
-              <span className="bg-accent px-2 text-white rounded-md">{client.phone}</span>
+            <p className="text-lg flex gap-4">
+              <span className="font-medium text-nowrap w-1/3 text-start">Teléfono:</span>
+              <span className="bg-gray-100 px-2  rounded-md">{client.phone}</span>
             </p>
-            <p className="text-lg flex gap-2">
-              <span className="font-medium text-nowrap">Foráneo:</span>
-              <span className="bg-accent px-2 text-white rounded-md">
-                {client.isForeign ? 'Si' : 'No'}
-              </span>
+            <p className="text-lg flex gap-4">
+              <span className="font-medium text-nowrap w-1/3 text-start">Foráneo:</span>
+              <span className="bg-gray-100 px-2  rounded-md">{client.isForeign ? 'Si' : 'No'}</span>
             </p>
-            <p className="text-lg flex gap-2">
-              <span className="font-medium text-nowrap">Tipo de Cliente:</span>
-              <span className="bg-accent px-2 text-white rounded-md">
+            <p className="text-lg flex gap-4">
+              <span className="font-medium text-nowrap w-1/3 text-start">Tipo de Cliente:</span>
+              <span className="bg-gray-100 px-2  rounded-md">
                 {client.client_type[0].type_name}
               </span>
             </p>
-            <p className="text-lg flex gap-2">
-              <span className="font-medium text-nowrap">Dirección:</span>
-              <span className="bg-accent px-2 text-white rounded-md">{client.address}</span>
+            <p className="text-lg flex gap-4">
+              <span className="font-medium text-nowrap w-1/3 text-start">Dirección:</span>
+              <span className="bg-gray-100 px-2  rounded-md">{client.address}</span>
             </p>
             <div className="flex gap-4 border-t-2 pt-4">
               <a
-                className="bg-gray-500 border-0 text-xl w-full rounded-lg py-2 transition-all active:scale-95 text-white hover:bg-gray-600"
+                className="bg-green-500 border-0 text-xl w-full rounded-lg py-2 transition-all active:scale-95 text-white  hover:bg-green-600"
                 href={'whatsapp://send/?phone=' + client.phone}
               >
                 Contactar con el cliente

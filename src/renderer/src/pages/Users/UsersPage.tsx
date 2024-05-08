@@ -74,13 +74,13 @@ export const UsersPage = (): ReactElement => {
           {selectedUser &&
             Object.keys(selectedUser).map((key, index) => (
               <div key={index} className="w-full text-lg flex justify-start  mt-1">
-                {key.replaceAll('_', ' ')}:
+                <span className="w-1/3 text-start">{key.replaceAll('_', ' ')}:</span>
                 {selectedUser[key] ? (
-                  <span className="bg-accent ms-2 text-white px-2 rounded-lg">
+                  <span className="bg-gray-100 ms-2 px-2 rounded-lg">
                     {formatDate(selectedUser[key])}
                   </span>
                 ) : (
-                  <span className="text-accent flex text-xl items-center ms-2">
+                  <span className="text-gray-500 flex text-xl items-center ms-2">
                     <LuMoreHorizontal />
                   </span>
                 )}
