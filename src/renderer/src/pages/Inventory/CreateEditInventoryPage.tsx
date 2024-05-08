@@ -21,7 +21,8 @@ export const CreateEditInventoryPage = (): ReactElement => {
   const [equipmentTypes, setEquipmentTypes] = useState<selectType[] | null>(null)
   const [equipmentStatus, setEquipmentStatus] = useState<selectType[] | null>(null)
   const [showForm, setShowForm] = useState<boolean>(false)
-  const { getEquipmentTypes, getEquipmentStatus, createEquipment, getItem } = useInventory()
+  const { getEquipmentTypes, getEquipmentStatus, createEquipment, getItem, updateEquipment } =
+    useInventory()
   const { id } = useParams()
 
   useEffect(() => {
@@ -65,7 +66,7 @@ export const CreateEditInventoryPage = (): ReactElement => {
 
   const onSubmit: SubmitHandler<submitObject> = (data) => {
     if (id) {
-      console.log(data)
+      updateEquipment(id, data).then(() => setLocation('/inventory'))
     } else {
       createEquipment(data).then(() => setLocation('/inventory'))
     }
