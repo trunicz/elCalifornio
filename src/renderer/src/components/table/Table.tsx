@@ -58,11 +58,11 @@ export const Table = ({
                       .map((key, index) => (
                         <td className="px-6 py-4 overflow-ellipsis text-nowrap" key={index}>
                           {typeof row[key] === 'object'
-                            ? renderNestedObject(row[key], index)
+                            ? renderNestedObject(row[key])
                             : formatDate(row[key])}
                         </td>
                       ))}
-                    <td className="px-6 py-4 flex gap-2 justify-center">
+                    <td className="px-6 py-4 flex gap-2 items-center justify-center">
                       <Button
                         className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
                         icon={<LuEye />}
@@ -99,25 +99,30 @@ export const Table = ({
   )
 }
 
-function renderNestedObject(obj: unknown, key: number): ReactNode {
+interface NestedObject {
+  [key: string]: string | NestedObject
+}
+
+function renderNestedObject(obj: unknown): ReactNode {
   if (obj === null || typeof obj !== 'object') return
 
-  const _obj = obj as { value: string }
+  const _obj = obj as NestedObject
 
-  const nestedObject = Object.values(_obj).find((value) => typeof value === 'object')
-  if (nestedObject) {
-    const { name } = nestedObject[_obj.value] as {
-      name: string
-      bgColor: string
-      color: string
-    }
-    return (
-      <span key={key} className="px-2 py-1 rounded-xl bg-primary text-white">
-        {name}
-      </span>
-    )
-  }
-  return
+  return (
+    <div className="grid auto-cols-fr auto-rows-min gap-1">
+      {Object.values(_obj).map((value, index) => {
+        if (typeof value === 'object') {
+          return <div key={index}>{renderNestedObject(value)}</div>
+        } else {
+          return (
+            <span key={index} className="px-2 py-1 rounded-xl bg-red-800/10">
+              {value}
+            </span>
+          )
+        }
+      })}
+    </div>
+  )
 }
 function formatDate(dateString: string): ReactNode | null {
   const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+\d{2}:\d{2}$/
