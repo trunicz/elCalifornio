@@ -1,13 +1,13 @@
-import { AppLayout, SearchBar, Table, useModal } from '@renderer/components'
+import { AppLayout, Button, SearchBar, Table, useModal } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { ReactElement, useEffect, useState } from 'react'
-import { LuMoreHorizontal } from 'react-icons/lu'
+import { LuCheckCircle2, LuMoreHorizontal } from 'react-icons/lu'
 
 export const InventoryPage = (): ReactElement => {
   const [inventoryList, setInventoryList] = useState<unknown[] | null>(null)
-  const { getAllInventory, inventory, getItem } = useInventory()
-  const { Modal, openModal } = useModal()
+  const { getAllInventory, inventory, getItem, deleteEquipment } = useInventory()
+  const { Modal, openModal, closeModal } = useModal()
 
   useEffect(() => {
     getAllInventory().then((res) => {
@@ -45,6 +45,31 @@ export const InventoryPage = (): ReactElement => {
     })
   }
 
+  const deleteFunction = (id: string | number): void => {
+    setInventoryList(null)
+    deleteEquipment(id).then(() => {
+      getAllInventory().then((res) => {
+        setInventoryList(res)
+        openModal(
+          <>
+            <div>
+              <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
+                <LuCheckCircle2 />
+              </span>
+              <h3>¡El Equipo y/o Herramienta se elimino con éxito!</h3>
+              <Button
+                className="mt-4"
+                color="success"
+                text="Aceptar"
+                onClick={() => closeModal()}
+              />
+            </div>
+          </>
+        )
+      })
+    })
+  }
+
   return (
     <AppLayout>
       <AppLayout.Content>
@@ -53,7 +78,12 @@ export const InventoryPage = (): ReactElement => {
         </AppLayout.PageOptions>
         <Modal title="Inventario" className="max-w-[550px]" />
         {inventoryList ? (
-          <Table data={inventoryList} hiddenKeys={['id']} watchFunction={moreInfo} />
+          <Table
+            data={inventoryList}
+            deleteFunction={deleteFunction}
+            hiddenKeys={['id']}
+            watchFunction={moreInfo}
+          />
         ) : (
           <Loading />
         )}

@@ -9,10 +9,23 @@ interface InventoryMethods {
   getEquipmentTypes: () => Promise<object[] | null>
   getEquipmentStatus: () => Promise<object[] | null>
   createEquipment: (values: object) => Promise<void>
+  deleteEquipment: (id: string | number) => Promise<void>
 }
 
 export const useInventory = (): InventoryMethods => {
   const [inventory, setInventory] = useState<object[] | null>(null)
+
+  const deleteEquipment = async (id: string | number): Promise<void> => {
+    try {
+      const { error } = await supabase
+        .from('equipment')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id)
+      if (error) throw error
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const createEquipment = async (values: object): Promise<void> => {
     try {
@@ -72,6 +85,7 @@ export const useInventory = (): InventoryMethods => {
       const { data, error } = await supabase
         .from('equipment')
         .select('id,type(type_name),reference,status(status_name)')
+        .is('deleted_at', null)
       if (error) throw error
       const filteredInventory = data.map((inv: any) => {
         return {
@@ -96,6 +110,7 @@ export const useInventory = (): InventoryMethods => {
     getItem,
     getEquipmentTypes,
     getEquipmentStatus,
-    createEquipment
+    createEquipment,
+    deleteEquipment
   }
 }
