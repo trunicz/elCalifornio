@@ -241,36 +241,138 @@ export type Database = {
       }
       equipment: {
         Row: {
-          amount: number
-          available: number
           created_at: string
           deleted_at: string | null
-          description: string | null
           id: number
-          name: string
+          reference: string | null
+          status: number
+          type: number
           updated_at: string
         }
         Insert: {
-          amount?: number
-          available?: number
           created_at?: string
           deleted_at?: string | null
-          description?: string | null
           id?: number
-          name: string
+          reference?: string | null
+          status?: number
+          type?: number
           updated_at?: string
         }
         Update: {
-          amount?: number
-          available?: number
           created_at?: string
           deleted_at?: string | null
-          description?: string | null
           id?: number
-          name?: string
+          reference?: string | null
+          status?: number
+          type?: number
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: 'equipment_status_fkey'
+            columns: ['status']
+            isOneToOne: false
+            referencedRelation: 'equipment_status'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'equipment_type_fkey'
+            columns: ['type']
+            isOneToOne: false
+            referencedRelation: 'equipment_type'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      equipment_status: {
+        Row: {
+          id: number
+          status_name: string
+        }
+        Insert: {
+          id?: number
+          status_name: string
+        }
+        Update: {
+          id?: number
+          status_name?: string
+        }
         Relationships: []
+      }
+      equipment_type: {
+        Row: {
+          id: number
+          type_name: string
+        }
+        Insert: {
+          id?: number
+          type_name: string
+        }
+        Update: {
+          id?: number
+          type_name?: string
+        }
+        Relationships: []
+      }
+      equipments_status: {
+        Row: {
+          equipment_id: number
+          status_id: number
+        }
+        Insert: {
+          equipment_id: number
+          status_id: number
+        }
+        Update: {
+          equipment_id?: number
+          status_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'equipments_status_equipment_id_fkey'
+            columns: ['equipment_id']
+            isOneToOne: false
+            referencedRelation: 'equipment'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'equipments_status_status_id_fkey'
+            columns: ['status_id']
+            isOneToOne: false
+            referencedRelation: 'equipment_status'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      equipments_types: {
+        Row: {
+          equipment_id: number
+          type_id: number
+        }
+        Insert: {
+          equipment_id: number
+          type_id: number
+        }
+        Update: {
+          equipment_id?: number
+          type_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'equipments_types_equipment_id_fkey'
+            columns: ['equipment_id']
+            isOneToOne: false
+            referencedRelation: 'equipment'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'equipments_types_type_id_fkey'
+            columns: ['type_id']
+            isOneToOne: false
+            referencedRelation: 'equipment_type'
+            referencedColumns: ['id']
+          }
+        ]
       }
       logs: {
         Row: {
