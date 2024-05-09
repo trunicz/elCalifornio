@@ -23,6 +23,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "@formkit/auto-animate": "^0.8.2",
     "@supabase/supabase-js": "^2.43.0",
     "electron-updater": "^6.1.7"
   },
