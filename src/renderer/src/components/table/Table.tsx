@@ -12,6 +12,7 @@ interface TableProps extends ComponentProps<'table'> {
   watchFunction?: (id: string | number) => void
   editFunction?: (id: string | number) => void
   deleteFunction?: (id: string | number) => void
+  customDeleteBtn?: { icon: ReactElement; title: string }
 }
 
 export const Table = ({
@@ -21,6 +22,7 @@ export const Table = ({
   watchFunction,
   editFunction,
   deleteFunction,
+  customDeleteBtn,
   hiddenKeys = [],
   ...props
 }: TableProps): ReactElement => {
@@ -67,18 +69,21 @@ export const Table = ({
                         className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
                         icon={<LuEye />}
                         isIconOnly={true}
+                        title="Ver"
                         onClick={() => (watchFunction ? watchFunction(row.id) : '')}
                       />
                       <Button
                         className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
                         icon={<LuPencil />}
                         isIconOnly={true}
+                        title="Editar"
                         onClick={() => (editFunction ? editFunction(row.id) : '')}
                       />
                       <Button
                         className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
-                        icon={<LuTrash2 />}
+                        icon={customDeleteBtn ? customDeleteBtn.icon : <LuTrash2 />}
                         isIconOnly={true}
+                        title={customDeleteBtn ? customDeleteBtn.title : 'Eliminar'}
                         onClick={() => (deleteFunction ? deleteFunction(row.id) : '')}
                       />
                     </td>
