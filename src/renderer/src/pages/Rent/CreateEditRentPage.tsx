@@ -136,7 +136,7 @@ export const CreateEditRentPage = (): ReactElement => {
           <form
             ref={parent}
             onSubmit={handleSubmit(onSubmit)}
-            className="overflow-y-auto overflow-x-hidden w-1/2 px-8 flex-1 grid auto-rows-max  mx-auto"
+            className="overflow-y-auto overflow-x-hidden xl:w-1/3 w-1/2 px-8 flex-1 grid auto-rows-max  mx-auto"
           >
             <div ref={parent}>
               <Controller

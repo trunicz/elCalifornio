@@ -3,12 +3,15 @@ import { AppLayout, Button, SearchBar, Table, useModal } from '@renderer/compone
 import { Loading } from '@renderer/components/Loading'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { ReactElement, ReactNode, useEffect, useState } from 'react'
-import { LuCheckCircle2 } from 'react-icons/lu'
+import { LuCheckCircle2, LuSettings2 } from 'react-icons/lu'
+import { useLocation } from 'wouter'
 
 export const InventoryPage = (): ReactElement => {
+  const [, setLocation] = useLocation()
   const [inventoryList, setInventoryList] = useState<unknown[] | null>(null)
   const [inventoryListView, setInventoryListView] = useState<object[] | null>(null)
-  const { getAllInventory, inventory, deleteEquipment, getAllInventoryView } = useInventory()
+  const { getAllInventory, inventory, deleteEquipment, getAllInventoryView, getItem } =
+    useInventory()
   const { Modal, openModal, closeModal } = useModal()
 
   useEffect(() => {
@@ -21,13 +24,14 @@ export const InventoryPage = (): ReactElement => {
   }, [])
 
   const moreInfo = (id: any): void => {
-    if (inventoryListView) {
-      console.log(inventoryListView)
+    console.log(typeof id)
 
-      const filteredInv = inventoryListView.filter((inv: any) => id.includes(inv.id))
-      openModal(
-        <div className="overflow-y-auto grid gap-2">
-          {filteredInv.map((item: any) => (
+    if (typeof id === 'number') {
+      getItem(id).then((response: any) => {
+        const item = response[0]
+        console.log(item)
+        openModal(
+          <>
             <div key={item.id} className="bg-gray-100 rounded-xl text-lg p-4">
               {Object.entries(item)
                 .filter(([key]: [string, any]) => !['id'].includes(key))
@@ -37,6 +41,57 @@ export const InventoryPage = (): ReactElement => {
                     <div>{renderNestedObject(value)}</div>
                   </div>
                 ))}
+              <div className="flex gap-2 mt-4">
+                <Button
+                  className="bg-amber-500 hover:bg-amber-600 text-white"
+                  color="warning"
+                  text="Editar"
+                  onClick={() => editFunction(item.id)}
+                />
+                <Button
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                  color="danger"
+                  text="Eliminar"
+                  onClick={() => deleteFunction(item.id)}
+                />
+              </div>
+            </div>
+          </>
+        )
+      })
+    }
+    if (inventoryListView && typeof id === 'object') {
+      const filteredInv = inventoryListView.filter((inv: any) => id.includes(inv.id))
+      openModal(
+        <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-2">
+          {filteredInv.map((item: any) => (
+            <div key={item.id} className="bg-gray-100 rounded-xl text-lg p-4 overflow-ellipsis">
+              {Object.entries(item)
+                .filter(([key]: [string, any]) => !['id'].includes(key))
+                .map(([key, value]: [string, any], index) => (
+                  <div key={index} className="flex gap-2 py-1">
+                    <div className="w-1/3 text-start text-wrap">
+                      {key[0].toUpperCase() + key.slice(1)}:
+                    </div>
+                    <div className="flex justify-start flex-1">
+                      {renderNestedObject(value.slice(0, 30))}
+                    </div>
+                  </div>
+                ))}
+              <div className="flex gap-2 mt-4">
+                <Button
+                  className="bg-amber-500 hover:bg-amber-600 text-white"
+                  color="warning"
+                  text="Editar"
+                  onClick={() => editFunction(item.id)}
+                />
+                <Button
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                  color="danger"
+                  text="Eliminar"
+                  onClick={() => deleteFunction(item.id)}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -70,27 +125,7 @@ export const InventoryPage = (): ReactElement => {
   }
 
   const editFunction = (id: any): void => {
-    if (inventoryListView) {
-      console.log(inventoryListView)
-
-      const filteredInv = inventoryListView.filter((inv: any) => id.includes(inv.id))
-      openModal(
-        <div className="overflow-y-auto grid gap-2">
-          {filteredInv.map((item: any) => (
-            <div key={item.id} className="bg-gray-100 rounded-xl text-lg p-4">
-              {Object.entries(item)
-                .filter(([key]: [string, any]) => !['id'].includes(key))
-                .map(([key, value]: [string, any], index) => (
-                  <div key={index} className="flex py-1">
-                    <div className="w-1/3 text-start">{key[0].toUpperCase() + key.slice(1)}:</div>
-                    <div>{renderNestedObject(value)}</div>
-                  </div>
-                ))}
-            </div>
-          ))}
-        </div>
-      )
-    }
+    setLocation(`/inventory/${id}`)
   }
 
   return (
@@ -104,9 +139,12 @@ export const InventoryPage = (): ReactElement => {
           <Table
             data={inventoryList}
             deleteFunction={deleteFunction}
-            hiddenKeys={['id', 'referencia']}
+            hiddenKeys={['id', 'referencias']}
             watchFunction={moreInfo}
             editFunction={editFunction}
+            customMoreBtn={{ icon: <LuSettings2 />, title: 'Ver' }}
+            canSeeEdit={false}
+            canSeeDelete={false}
           />
         ) : (
           <Loading />
@@ -126,7 +164,7 @@ function renderNestedObject(obj: any): ReactNode {
   const _obj = obj as NestedObject
 
   return (
-    <div className="grid auto-cols-fr overflow-hidden auto-rows-min gap-1">
+    <div className="">
       {Object.values(_obj).map((value, index) => {
         if (typeof value === 'object') {
           return <div key={index}>{renderNestedObject(value)}</div>

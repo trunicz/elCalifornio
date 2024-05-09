@@ -9,7 +9,7 @@ import * as Yup from 'yup'
 
 const inventoryPage = Yup.object().shape({
   type: Yup.number().required(''),
-  status: Yup.number(),
+  cost: Yup.number(),
   reference: Yup.string()
 })
 
@@ -50,9 +50,12 @@ export const CreateEditInventoryPage = (): ReactElement => {
       getItem(id).then((res) => {
         if (res) {
           const equipment = res[0]
+          console.log(equipment)
+
           setDefaultValues({
             type: equipment.tipo_id,
-            reference: equipment.referencia
+            reference: equipment.referencia,
+            cost: equipment.costo
           })
           setShowForm(true)
         }
@@ -63,6 +66,8 @@ export const CreateEditInventoryPage = (): ReactElement => {
   }, [])
 
   const onSubmit: SubmitHandler<submitObject> = (data) => {
+    console.log(data)
+
     if (id) {
       updateEquipment(id, data).then(() => setLocation('/inventory'))
     } else {
@@ -77,7 +82,7 @@ export const CreateEditInventoryPage = (): ReactElement => {
         {equipmentTypes && equipmentStatus && showForm ? (
           <Form
             defaultValues={defaultValues}
-            className="grid auto-cols-max w-2/4 auto-rows-max mx-auto gap-4"
+            className="grid grid-cols-2 w-3/4 auto-rows-max mx-auto gap-4"
             onSubmit={onSubmit}
             validationSchema={inventoryPage}
             formDirection="col"
@@ -99,10 +104,17 @@ export const CreateEditInventoryPage = (): ReactElement => {
               },
               {
                 name: 'reference',
-                label: 'Referencia y/o Descripción del Estado del Equipo y/o Herramienta',
+                label: 'Referencia y/o Descripción del Equipo y/o Herramienta',
                 as: 'textarea',
                 isRequired: true,
-                className: ''
+                className: 'flex'
+              },
+              {
+                name: 'cost',
+                label: 'Precio de la renta',
+                type: 'number',
+                as: 'input',
+                isRequired: true
               }
             ]}
           />

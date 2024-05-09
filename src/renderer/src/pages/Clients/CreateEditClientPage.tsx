@@ -10,7 +10,6 @@ import { Loading } from '@renderer/components/Loading'
 const clientSchema = Yup.object().shape({
   name: Yup.string().required('El nombre es Obligatorio'),
   last_name: Yup.string().required('El Apellido es Obligatorio'),
-  email: Yup.string().required('El correo es Obligatorio'),
   phone: Yup.string()
     .required('El Teléfono es Obligatorio')
     .matches(
@@ -51,7 +50,8 @@ export const CreateEditClientPage = (): ReactElement => {
       type: 'email',
       placeholder: 'Ingrese el correo... ',
       isRequired: true,
-      as: 'input'
+      as: 'input',
+      isVisible: false
     },
     {
       name: 'phone',
@@ -77,8 +77,8 @@ export const CreateEditClientPage = (): ReactElement => {
       isRequired: true,
       as: 'select',
       options: [
-        { value: true, label: 'SI' },
-        { value: false, label: 'NO' }
+        { value: false, label: 'NO' },
+        { value: true, label: 'SI' }
       ]
     },
     {
@@ -138,7 +138,7 @@ export const CreateEditClientPage = (): ReactElement => {
         />
         {canShowForm ? (
           <Form
-            className=" mx-auto overflow-y-auto grid grid-cols-3 grid-rows-5 gap-4"
+            className="mx-auto overflow-y-auto w-1/2 auto-rows-max grid grid-cols-2 gap-4"
             onSubmit={onSubmit}
             defaultValues={defaultValues}
             formDirection="col"

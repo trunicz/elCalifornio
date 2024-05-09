@@ -6,7 +6,7 @@ interface SearchBarType extends ComponentProps<'input'> {
   searchFunction: Dispatch<SetStateAction<unknown[] | null>>
 }
 
-export const SearchBar = ({ searchFunction, data }: SearchBarType): ReactElement => {
+export const SearchBar = ({ searchFunction, data, ...props }: SearchBarType): ReactElement => {
   const Search = (value: string): void => {
     if (value.length) {
       const val = value.toLowerCase()
@@ -27,6 +27,7 @@ export const SearchBar = ({ searchFunction, data }: SearchBarType): ReactElement
       placeholder="Buscar..."
       className="focus:bg-main h-full outline-none border-2 rounded-xl p-1 px-2"
       onChange={(event) => Search(event.target.value)}
+      {...props}
     />
   )
 }

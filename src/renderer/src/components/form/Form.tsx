@@ -39,7 +39,7 @@ export interface FormField {
   isVisible?: boolean
   className?: string
 }
-export type SelectOptions = { value: string | number; label: string }[] | null
+export type SelectOptions = { value: any; label: string }[] | null
 
 interface FormProps {
   onSubmit: SubmitHandler<submitObject>
@@ -90,7 +90,7 @@ export const Form = ({
           ) : (
             <div
               key={field?.name + index}
-              className={cn('flex justify-between mb-5', field.className, {
+              className={cn('flex justify-between items-between mb-5', field.className, {
                 'flex-col': formDirection === 'col'
               })}
             >
@@ -101,7 +101,7 @@ export const Form = ({
               <div
                 className={cn('', {
                   'w-1/3 max-w-[350px] min-w-[200px]': formDirection === 'row',
-                  'mt-2': formDirection === 'col'
+                  'mt-2 flex items-center ': formDirection === 'col'
                 })}
               >
                 <Input

@@ -123,7 +123,7 @@ export const CreateEditUserPage = (): ReactElement => {
         />
         {showForm ? (
           <Form
-            className="mx-auto overflow-y-auto grid grid-cols-3 grid-rows-5 gap-4"
+            className="mx-auto overflow-y-auto lg:w-1/2 grid grid-cols-2 auto-rows-max gap-4"
             onSubmit={onSubmit}
             defaultValues={defaultValues}
             fields={formFields}

@@ -14,7 +14,11 @@ interface TableProps extends ComponentProps<'table'> {
   editFunction?: (id: any) => void
   deleteFunction?: (id: string | number) => void
   customDeleteBtn?: { icon: ReactElement; title: string }
+  customMoreBtn?: { icon: ReactElement; title: string }
+  customEditBtn?: { icon: ReactElement; title: string }
   canSeeEdit?: boolean
+  canSeeDelete?: boolean
+  canSeeMore?: boolean
 }
 
 export const Table = ({
@@ -26,6 +30,10 @@ export const Table = ({
   deleteFunction,
   customDeleteBtn,
   canSeeEdit = true,
+  canSeeMore = true,
+  canSeeDelete = true,
+  customMoreBtn,
+  customEditBtn,
   hiddenKeys = [],
   ...props
 }: TableProps): ReactElement => {
@@ -69,30 +77,33 @@ export const Table = ({
                       ))}
                     {hasOptions && (
                       <td className="px-6 py-4 flex gap-2 items-center justify-center">
-                        <Button
-                          className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
-                          icon={<LuEye />}
-                          isIconOnly={true}
-                          title="Ver"
-                          onClick={() => (watchFunction ? watchFunction(row.id) : '')}
-                        />
+                        {canSeeMore && (
+                          <Button
+                            className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
+                            icon={customMoreBtn ? customMoreBtn.icon : <LuEye />}
+                            isIconOnly={true}
+                            title={customMoreBtn ? customMoreBtn.title : 'Ver'}
+                            onClick={() => (watchFunction ? watchFunction(row.id) : '')}
+                          />
+                        )}
                         {canSeeEdit && (
                           <Button
                             className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
-                            icon={<LuPencil />}
+                            icon={customEditBtn ? customEditBtn.icon : <LuPencil />}
                             isIconOnly={true}
-                            title="Editar"
+                            title={customEditBtn ? customEditBtn.title : 'Editar'}
                             onClick={() => (editFunction ? editFunction(row.id) : '')}
                           />
                         )}
-
-                        <Button
-                          className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
-                          icon={customDeleteBtn ? customDeleteBtn.icon : <LuTrash2 />}
-                          isIconOnly={true}
-                          title={customDeleteBtn ? customDeleteBtn.title : 'Eliminar'}
-                          onClick={() => (deleteFunction ? deleteFunction(row.id) : '')}
-                        />
+                        {canSeeDelete && (
+                          <Button
+                            className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
+                            icon={customDeleteBtn ? customDeleteBtn.icon : <LuTrash2 />}
+                            isIconOnly={true}
+                            title={customDeleteBtn ? customDeleteBtn.title : 'Eliminar'}
+                            onClick={() => (deleteFunction ? deleteFunction(row.id) : '')}
+                          />
+                        )}
                       </td>
                     )}
                   </tr>
