@@ -62,7 +62,9 @@ export const CreateEditRentPage = (): ReactElement => {
   }, [register])
 
   useEffect(() => {
-    handleSelectChange(client_id)
+    if (client_id !== undefined) {
+      handleSelectChange(client_id)
+    }
   }, [client_id])
 
   useEffect(() => {
@@ -85,7 +87,7 @@ export const CreateEditRentPage = (): ReactElement => {
     getAvailableInventory().then((res) => {
       setInv(
         res?.map((item: any) => {
-          return { value: item.id, label: item.reference }
+          return { value: item.id, label: `${item.type.type_name}: ${item.reference}` }
         })
       )
     })
@@ -120,7 +122,7 @@ export const CreateEditRentPage = (): ReactElement => {
       getClientById(client_id).then((res: any) => {
         setShowForeign(res[0].isForeign)
         if (!res[0].isForeign) {
-          reset({ client_reference_id: null })
+          reset({ client_reference_id: null }, { keepDirtyValues: true })
         }
       })
     }
@@ -212,6 +214,19 @@ export const CreateEditRentPage = (): ReactElement => {
                 {errors.end_date ? (
                   <p className="text-red-500 mt-2">
                     {errors.end_date ? 'Ingresa una fecha valida' : ''}
+                  </p>
+                ) : null}
+              </div>
+              <div className="w-full p-4">
+                <label className="block mb-2">Dirección de la obra:</label>
+                <input
+                  {...register('building_address')}
+                  type="text"
+                  className="border p-1.5  w-full outline-none rounded-lg"
+                />
+                {errors.end_date ? (
+                  <p className="text-red-500 mt-2">
+                    {errors.building_address ? 'Ingresa una fecha valida' : ''}
                   </p>
                 ) : null}
               </div>
