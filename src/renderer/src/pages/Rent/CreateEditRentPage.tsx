@@ -22,6 +22,7 @@ const useCustomForm = (
     control,
     register,
     watch,
+    reset,
     formState: { errors }
   } = useForm({ resolver: yupResolver(schema), defaultValues: initialValues })
 
@@ -30,17 +31,17 @@ const useCustomForm = (
     control,
     register,
     errors,
-    watch
+    watch,
+    reset
   }
 }
 
 const rentalSchema = Yup.object().shape({
-  client_id: Yup.object().required(),
-  end_date: Yup.date().required()
+  end_date: Yup.date()
 })
 
 export const CreateEditRentPage = (): ReactElement => {
-  const { handleSubmit, register, errors, control } = useCustomForm(rentalSchema)
+  const { handleSubmit, register, errors, control, watch, reset } = useCustomForm(rentalSchema)
   const { user } = useAuthStore()
   const { getAllClients, getClientById, getAllLocalClients } = useClients()
   const { createRental } = useRentals()
@@ -51,10 +52,18 @@ export const CreateEditRentPage = (): ReactElement => {
   const [inv, setInv] = useState<{ value: string; label: string }[]>()
   const [showForeign, setShowForeign] = useState<boolean>(false)
   const [parent] = useAutoAnimate()
-  const [selectedOption, setSelectedOption] = useState<{ value: string; label: string } | null>(
-    null
-  )
   const { id } = useParams()
+
+  const client_id = watch('client_id')
+
+  useEffect(() => {
+    register('client_id')
+    register('client_reference_id')
+  }, [register])
+
+  useEffect(() => {
+    handleSelectChange(client_id)
+  }, [client_id])
 
   useEffect(() => {
     getAllClients().then((res) => {
@@ -86,8 +95,6 @@ export const CreateEditRentPage = (): ReactElement => {
     console.log(data)
 
     if (!id) {
-      console.log(data)
-
       if (data.equipments) {
         const equipments = data.equipments.map((equip: any) => {
           return equip.value
@@ -98,23 +105,25 @@ export const CreateEditRentPage = (): ReactElement => {
           end_date: data.end_date,
           equipments_id: equipments
         }
-        createRental(values).then(() => setLocation('/rent'))
+        const clientReferenceId = !showForeign ? null : data.client_reference_id?.value || null
+
+        createRental({ ...values, client_reference_id: clientReferenceId }).then(() =>
+          setLocation('/rent')
+        )
       }
     }
   }
 
-  const handleSelectChange = (option: { value: number; label: string }): void => {
-    const client_id = option.value
-    getClientById(client_id).then((res: any) => {
-      setShowForeign(res[0].isForeign)
-    })
-    if (!showForeign) {
-      setSelectedOption(null)
+  const handleSelectChange = (option: { value: string; label: string }): void => {
+    if (option) {
+      const client_id = option.value
+      getClientById(client_id).then((res: any) => {
+        setShowForeign(res[0].isForeign)
+        if (!res[0].isForeign) {
+          reset({ client_reference_id: null })
+        }
+      })
     }
-  }
-
-  const handleForeignChange = (option: { value: number; label: string }): void => {
-    setSelectedOption(option as any)
   }
 
   return (
@@ -123,6 +132,7 @@ export const CreateEditRentPage = (): ReactElement => {
         <AppLayout.PageOptions pageTitle={id ? 'Modificar Renta' : 'Rentar'} hasAddButton={false} />
         {clients && (
           <form
+            ref={parent}
             onSubmit={handleSubmit(onSubmit)}
             className="overflow-y-auto overflow-x-hidden w-1/2 px-8 flex-1 grid auto-rows-max  mx-auto"
           >
@@ -137,7 +147,6 @@ export const CreateEditRentPage = (): ReactElement => {
                       {...field}
                       options={clients}
                       isSearchable
-                      onChange={handleSelectChange}
                       styles={{
                         control: (provided) => ({
                           ...provided,
@@ -175,8 +184,6 @@ export const CreateEditRentPage = (): ReactElement => {
                           {...field}
                           options={localClients}
                           isSearchable
-                          onChange={handleForeignChange as any}
-                          value={selectedOption}
                           styles={{
                             control: (provided) => ({
                               ...provided,

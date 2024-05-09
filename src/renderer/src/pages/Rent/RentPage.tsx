@@ -73,7 +73,7 @@ export const RentPage = (): ReactElement => {
             to="/rentals/history"
             className="ms-4 flex items-center justify-center hover:bg-gray-500 px-4 w-auto rounded-xl h-full bg-gray-400 text-nowrap text-white font-medium active:scale-95 transition-all gap-1"
           >
-            Rentas Pasadas
+            Historial de Rentas
           </Link>
         </AppLayout.PageOptions>
         <Modal title="Renta" className="w-[500px]" />
@@ -84,6 +84,7 @@ export const RentPage = (): ReactElement => {
             deleteFunction={deleteFunction}
             watchFunction={watchRental}
             customDeleteBtn={{ icon: <FiWatch />, title: 'Terminar Renta' }}
+            canSeeEdit={false}
           />
         ) : (
           <Loading />

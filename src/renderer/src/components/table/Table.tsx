@@ -13,6 +13,7 @@ interface TableProps extends ComponentProps<'table'> {
   editFunction?: (id: string | number) => void
   deleteFunction?: (id: string | number) => void
   customDeleteBtn?: { icon: ReactElement; title: string }
+  canSeeEdit?: boolean
 }
 
 export const Table = ({
@@ -23,6 +24,7 @@ export const Table = ({
   editFunction,
   deleteFunction,
   customDeleteBtn,
+  canSeeEdit = true,
   hiddenKeys = [],
   ...props
 }: TableProps): ReactElement => {
@@ -73,13 +75,16 @@ export const Table = ({
                           title="Ver"
                           onClick={() => (watchFunction ? watchFunction(row.id) : '')}
                         />
-                        <Button
-                          className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
-                          icon={<LuPencil />}
-                          isIconOnly={true}
-                          title="Editar"
-                          onClick={() => (editFunction ? editFunction(row.id) : '')}
-                        />
+                        {canSeeEdit && (
+                          <Button
+                            className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
+                            icon={<LuPencil />}
+                            isIconOnly={true}
+                            title="Editar"
+                            onClick={() => (editFunction ? editFunction(row.id) : '')}
+                          />
+                        )}
+
                         <Button
                           className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
                           icon={customDeleteBtn ? customDeleteBtn.icon : <LuTrash2 />}

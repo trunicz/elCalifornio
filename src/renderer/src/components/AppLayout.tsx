@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { cn } from '@renderer/utils'
 import { ComponentProps, ReactElement, ReactNode } from 'react'
 import { Button, MenuButton } from './button'
@@ -55,7 +56,7 @@ export const AppLayout = ({
 
 interface AppHeaderButton {
   className?: string
-  title?: string | string[]
+  title?: any | any[]
   children?: ReactNode
 }
 
@@ -95,12 +96,14 @@ interface AppPageOptions extends ComponentProps<'section'> {
   pageTitle: string
   hasAddButton?: boolean
   addRoute?: string
+  customButtonAddText?: string
 }
 
 const AppPageOptions = ({
   className,
   children,
   pageTitle,
+  customButtonAddText,
   hasAddButton = true,
   addRoute = '',
   ...props
@@ -111,10 +114,14 @@ const AppPageOptions = ({
       {children}
       {hasAddButton && (
         <Link
-          className="ms-4 flex items-center justify-center hover:bg-emerald-500 px-4 w-auto rounded-xl h-full bg-emerald-400  text-white font-medium active:scale-95 transition-all gap-1"
+          className="ms-4 flex items-center justify-center hover:bg-emerald-500 px-4 w-auto rounded-xl h-full bg-emerald-400 text-nowrap  text-white font-medium active:scale-95 transition-all gap-1"
           to={addRoute}
         >
-          Agregar
+          {customButtonAddText
+            ? customButtonAddText
+            : `Agregar ${
+                pageTitle[pageTitle.length - 1].includes('s') ? pageTitle.slice(0, -1) : pageTitle
+              }`}
         </Link>
       )}
     </section>

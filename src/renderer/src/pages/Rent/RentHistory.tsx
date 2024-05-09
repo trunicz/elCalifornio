@@ -16,7 +16,7 @@ export const RentHistory = (): ReactElement => {
     <AppLayout>
       <AppLayout.Content>
         <AppLayout.PageOptions
-          pageTitle="Historial Alquileres"
+          pageTitle="Historial de Rentas"
           hasAddButton={false}
         ></AppLayout.PageOptions>
         {listRentals ? (
