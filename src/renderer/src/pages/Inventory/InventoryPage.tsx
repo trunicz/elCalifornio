@@ -1,50 +1,47 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppLayout, Button, SearchBar, Table, useModal } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useInventory } from '@renderer/hooks/useInventory'
-import { ReactElement, useEffect, useState } from 'react'
-import { LuCheckCircle2, LuMoreHorizontal } from 'react-icons/lu'
-import { useLocation } from 'wouter'
+import { ReactElement, ReactNode, useEffect, useState } from 'react'
+import { LuCheckCircle2 } from 'react-icons/lu'
 
 export const InventoryPage = (): ReactElement => {
-  const [, setLocation] = useLocation()
   const [inventoryList, setInventoryList] = useState<unknown[] | null>(null)
-  const { getAllInventory, inventory, getItem, deleteEquipment } = useInventory()
+  const [inventoryListView, setInventoryListView] = useState<object[] | null>(null)
+  const { getAllInventory, inventory, deleteEquipment, getAllInventoryView } = useInventory()
   const { Modal, openModal, closeModal } = useModal()
 
   useEffect(() => {
     getAllInventory().then((res) => {
+      setInventoryListView(res)
+    })
+    getAllInventoryView().then((res) => {
       setInventoryList(res)
     })
   }, [])
 
-  const moreInfo = (id: string | number): void => {
-    getItem(id).then((res) => {
-      if (res) {
-        const item = res[0]
-        openModal(
-          <>
-            {Object.keys(item)
-              .filter((k) => !['id', 'tipo_id'].includes(k))
-              .map((key, index) => (
-                <p key={key + index} className="text-lg flex gap-4">
-                  <span className="w-1/3 text-start text-nowrap">
-                    {key[0].toUpperCase() + key.slice(1).toLowerCase()}:
-                  </span>
-                  {item[key] ? (
-                    <span className="bg-gray-100 px-2 flex-1 text-start rounded-lg">
-                      {item[key]}
-                    </span>
-                  ) : (
-                    <span className="flex items-center">
-                      <LuMoreHorizontal />
-                    </span>
-                  )}
-                </p>
-              ))}
-          </>
-        )
-      }
-    })
+  const moreInfo = (id: any): void => {
+    if (inventoryListView) {
+      console.log(inventoryListView)
+
+      const filteredInv = inventoryListView.filter((inv: any) => id.includes(inv.id))
+      openModal(
+        <div className="overflow-y-auto grid gap-2">
+          {filteredInv.map((item: any) => (
+            <div key={item.id} className="bg-gray-100 rounded-xl text-lg p-4">
+              {Object.entries(item)
+                .filter(([key]: [string, any]) => !['id'].includes(key))
+                .map(([key, value]: [string, any], index) => (
+                  <div key={index} className="flex py-1">
+                    <div className="w-1/3 text-start">{key[0].toUpperCase() + key.slice(1)}:</div>
+                    <div>{renderNestedObject(value)}</div>
+                  </div>
+                ))}
+            </div>
+          ))}
+        </div>
+      )
+    }
   }
 
   const deleteFunction = (id: string | number): void => {
@@ -72,8 +69,28 @@ export const InventoryPage = (): ReactElement => {
     })
   }
 
-  const editFunction = (id: string | number): void => {
-    setLocation('/inventory/' + id)
+  const editFunction = (id: any): void => {
+    if (inventoryListView) {
+      console.log(inventoryListView)
+
+      const filteredInv = inventoryListView.filter((inv: any) => id.includes(inv.id))
+      openModal(
+        <div className="overflow-y-auto grid gap-2">
+          {filteredInv.map((item: any) => (
+            <div key={item.id} className="bg-gray-100 rounded-xl text-lg p-4">
+              {Object.entries(item)
+                .filter(([key]: [string, any]) => !['id'].includes(key))
+                .map(([key, value]: [string, any], index) => (
+                  <div key={index} className="flex py-1">
+                    <div className="w-1/3 text-start">{key[0].toUpperCase() + key.slice(1)}:</div>
+                    <div>{renderNestedObject(value)}</div>
+                  </div>
+                ))}
+            </div>
+          ))}
+        </div>
+      )
+    }
   }
 
   return (
@@ -82,12 +99,12 @@ export const InventoryPage = (): ReactElement => {
         <AppLayout.PageOptions pageTitle="Inventario" addRoute="/inventory/add">
           <SearchBar searchFunction={setInventoryList} data={inventory} />
         </AppLayout.PageOptions>
-        <Modal title="Inventario" className="max-w-[550px]" />
+        <Modal title="Inventario" className="max-w-[550px] max-h-[600px] overflow-y-auto" />
         {inventoryList ? (
           <Table
             data={inventoryList}
             deleteFunction={deleteFunction}
-            hiddenKeys={['id']}
+            hiddenKeys={['id', 'referencia']}
             watchFunction={moreInfo}
             editFunction={editFunction}
           />
@@ -96,5 +113,31 @@ export const InventoryPage = (): ReactElement => {
         )}
       </AppLayout.Content>
     </AppLayout>
+  )
+}
+
+interface NestedObject {
+  [key: string]: string | NestedObject
+}
+
+function renderNestedObject(obj: any): ReactNode {
+  if (obj === null || typeof obj !== 'object') return obj
+
+  const _obj = obj as NestedObject
+
+  return (
+    <div className="grid auto-cols-fr overflow-hidden auto-rows-min gap-1">
+      {Object.values(_obj).map((value, index) => {
+        if (typeof value === 'object') {
+          return <div key={index}>{renderNestedObject(value)}</div>
+        } else {
+          return (
+            <span key={index} className="bg-gray-200 p-2 rounded-lg">
+              {value}
+            </span>
+          )
+        }
+      })}
+    </div>
   )
 }

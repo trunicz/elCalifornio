@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ReactElement, ComponentProps, ReactNode, Key } from 'react'
 import TableContext from './TableContext'
 import { TableType } from '@renderer/types'
@@ -10,7 +11,7 @@ interface TableProps extends ComponentProps<'table'> {
   hasOptions?: boolean
   hiddenKeys?: string[]
   watchFunction?: (id: string | number) => void
-  editFunction?: (id: string | number) => void
+  editFunction?: (id: any) => void
   deleteFunction?: (id: string | number) => void
   customDeleteBtn?: { icon: ReactElement; title: string }
   canSeeEdit?: boolean
@@ -56,11 +57,11 @@ export const Table = ({
             <tbody>
               {data.map((row: { [x: string]: string }, index: Key | null | undefined) =>
                 row ? (
-                  <tr className="border-b text-stroke text-center hover:bg-secondary" key={index}>
+                  <tr className="border-b text-stroke text-center " key={index}>
                     {Object.keys(row)
                       .filter((key) => !hiddenKeys.includes(key))
                       .map((key, index) => (
-                        <td className="px-6 py-4 overflow-ellipsis text-nowrap" key={index}>
+                        <td className="px-6 py-4 text-nowrap" key={index}>
                           {typeof row[key] === 'object'
                             ? renderNestedObject(row[key])
                             : formatDate(row[key])}
@@ -121,7 +122,7 @@ function renderNestedObject(obj: unknown): ReactNode {
   const _obj = obj as NestedObject
 
   return (
-    <div className="grid auto-cols-fr overflow-hidden auto-rows-min gap-1">
+    <div className="flex flex-col overflow-y-auto gap-2 max-h-[70px]">
       {Object.values(_obj).map((value, index) => {
         if (typeof value === 'object') {
           return <div key={index}>{renderNestedObject(value)}</div>

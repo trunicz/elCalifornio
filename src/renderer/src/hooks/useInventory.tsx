@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 interface InventoryMethods {
   inventory: object[] | null
+  getAllInventoryView: () => Promise<object[] | null>
   getAllInventory: () => Promise<object[] | null>
   getItem: (id: string | number) => Promise<object | null>
   getEquipmentTypes: () => Promise<object[] | null>
@@ -107,6 +108,18 @@ export const useInventory = (): InventoryMethods => {
     return null
   }
 
+  const getAllInventoryView = async (): Promise<object[] | null> => {
+    try {
+      const { data, error } = await supabase.from('all_inventory').select()
+      if (error) throw error
+      setInventory(data)
+      return data
+    } catch (error) {
+      console.error(error)
+    }
+    return null
+  }
+
   const getAllInventory = async (): Promise<object[] | null> => {
     try {
       const { data, error } = await supabase
@@ -122,7 +135,6 @@ export const useInventory = (): InventoryMethods => {
           estado: inv.status.status_name
         }
       })
-
       setInventory(filteredInventory)
       return filteredInventory
     } catch (error) {
@@ -140,6 +152,7 @@ export const useInventory = (): InventoryMethods => {
     createEquipment,
     deleteEquipment,
     updateEquipment,
-    getAvailableInventory
+    getAvailableInventory,
+    getAllInventoryView
   }
 }

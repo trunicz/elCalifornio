@@ -225,6 +225,7 @@ export type Database = {
       }
       equipment: {
         Row: {
+          cost: number | null
           created_at: string
           deleted_at: string | null
           id: number
@@ -234,6 +235,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cost?: number | null
           created_at?: string
           deleted_at?: string | null
           id?: number
@@ -243,6 +245,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cost?: number | null
           created_at?: string
           deleted_at?: string | null
           id?: number
@@ -443,7 +446,9 @@ export type Database = {
       }
       rentals: {
         Row: {
+          building_address: string | null
           client_id: number
+          client_reference_id: number | null
           created_at: string
           deleted_at: string | null
           end_date: string
@@ -453,7 +458,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          building_address?: string | null
           client_id: number
+          client_reference_id?: number | null
           created_at?: string
           deleted_at?: string | null
           end_date: string
@@ -463,7 +470,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          building_address?: string | null
           client_id?: number
+          client_reference_id?: number | null
           created_at?: string
           deleted_at?: string | null
           end_date?: string
@@ -476,6 +485,13 @@ export type Database = {
           {
             foreignKeyName: 'rentals_client_id_fkey'
             columns: ['client_id']
+            isOneToOne: false
+            referencedRelation: 'clients'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'rentals_client_reference_id_fkey'
+            columns: ['client_reference_id']
             isOneToOne: false
             referencedRelation: 'clients'
             referencedColumns: ['id']
@@ -512,6 +528,36 @@ export type Database = {
           },
           {
             foreignKeyName: 'rentals_clients_rental_id_fkey'
+            columns: ['rental_id']
+            isOneToOne: false
+            referencedRelation: 'rentals'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      rentals_references_clients: {
+        Row: {
+          client_id: number
+          rental_id: number
+        }
+        Insert: {
+          client_id: number
+          rental_id: number
+        }
+        Update: {
+          client_id?: number
+          rental_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'rentals_references_clients_client_id_fkey'
+            columns: ['client_id']
+            isOneToOne: false
+            referencedRelation: 'clients'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'rentals_references_clients_rental_id_fkey'
             columns: ['rental_id']
             isOneToOne: false
             referencedRelation: 'rentals'
@@ -617,7 +663,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      all_inventory: {
+        Row: {
+          cantidad: number | null
+          disponibles: number | null
+          en_renta: number | null
+          id: number[] | null
+          referencia: string[] | null
+          tipo_herramienta: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
