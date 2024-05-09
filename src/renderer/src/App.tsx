@@ -18,6 +18,7 @@ import { Loading } from './components/Loading'
 import { CreateEditClientPage } from './pages/Clients/CreateEditClientPage'
 import { CreateEditInventoryPage } from './pages/Inventory/CreateEditInventoryPage'
 import { CreateEditRentPage } from './pages/Rent/CreateEditRentPage'
+import { RentHistory } from './pages/Rent/RentHistory'
 
 function App(): ReactElement {
   const { user, isLoading, initializeUser } = useAuthStore()
@@ -47,6 +48,7 @@ function App(): ReactElement {
             <Route path="/rent" component={RentPage} />
             <Route path="/rent/create" component={CreateEditRentPage} />
             <Route path="/rent/:id" component={CreateEditRentPage} />
+            <Route path="/rentals/history" component={RentHistory} />
             <Route path="/contracts" component={ContractsPage} />
             <Route path="/bills" component={BillsPage} />
             <Route path="/audit" component={AuditPage} />

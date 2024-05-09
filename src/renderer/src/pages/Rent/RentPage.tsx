@@ -5,6 +5,7 @@ import { useRentals } from '@renderer/hooks/useRentals'
 import { ReactElement, ReactNode, useEffect, useState } from 'react'
 import { LuCheckCircle } from 'react-icons/lu'
 import { FiWatch } from 'react-icons/fi'
+import { Link } from 'wouter'
 
 export const RentPage = (): ReactElement => {
   const { getAllRentals, rentals, deleteRental, getRental } = useRentals()
@@ -68,6 +69,12 @@ export const RentPage = (): ReactElement => {
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle="Rentas" hasAddButton={true} addRoute="/rent/create">
           <SearchBar searchFunction={setRentList} data={rentals} />
+          <Link
+            to="/rentals/history"
+            className="ms-4 flex items-center justify-center hover:bg-gray-500 px-4 w-auto rounded-xl h-full bg-gray-400 text-nowrap text-white font-medium active:scale-95 transition-all gap-1"
+          >
+            Rentas Pasadas
+          </Link>
         </AppLayout.PageOptions>
         <Modal title="Renta" className="w-[500px]" />
         {rentList ? (

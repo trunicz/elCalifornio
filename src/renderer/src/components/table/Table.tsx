@@ -41,7 +41,7 @@ export const Table = ({
       {data.length > 0 ? (
         <section className="flex-1 overflow-x-auto">
           <table className={cn('w-full text-sm text-left', className)} {...props}>
-            <thead className="uppercase border-b-2">
+            <thead className="uppercase sticky bg-white shadow-md top-0">
               <tr className="text-center text-stroke">
                 {headers.map((head, index) => (
                   <th className="px-6 py-5 font-medium text-nowrap" key={`${head}${index}`}>
@@ -64,29 +64,31 @@ export const Table = ({
                             : formatDate(row[key])}
                         </td>
                       ))}
-                    <td className="px-6 py-4 flex gap-2 items-center justify-center">
-                      <Button
-                        className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
-                        icon={<LuEye />}
-                        isIconOnly={true}
-                        title="Ver"
-                        onClick={() => (watchFunction ? watchFunction(row.id) : '')}
-                      />
-                      <Button
-                        className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
-                        icon={<LuPencil />}
-                        isIconOnly={true}
-                        title="Editar"
-                        onClick={() => (editFunction ? editFunction(row.id) : '')}
-                      />
-                      <Button
-                        className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
-                        icon={customDeleteBtn ? customDeleteBtn.icon : <LuTrash2 />}
-                        isIconOnly={true}
-                        title={customDeleteBtn ? customDeleteBtn.title : 'Eliminar'}
-                        onClick={() => (deleteFunction ? deleteFunction(row.id) : '')}
-                      />
-                    </td>
+                    {hasOptions && (
+                      <td className="px-6 py-4 flex gap-2 items-center justify-center">
+                        <Button
+                          className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
+                          icon={<LuEye />}
+                          isIconOnly={true}
+                          title="Ver"
+                          onClick={() => (watchFunction ? watchFunction(row.id) : '')}
+                        />
+                        <Button
+                          className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
+                          icon={<LuPencil />}
+                          isIconOnly={true}
+                          title="Editar"
+                          onClick={() => (editFunction ? editFunction(row.id) : '')}
+                        />
+                        <Button
+                          className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
+                          icon={customDeleteBtn ? customDeleteBtn.icon : <LuTrash2 />}
+                          isIconOnly={true}
+                          title={customDeleteBtn ? customDeleteBtn.title : 'Eliminar'}
+                          onClick={() => (deleteFunction ? deleteFunction(row.id) : '')}
+                        />
+                      </td>
+                    )}
                   </tr>
                 ) : (
                   <></>
