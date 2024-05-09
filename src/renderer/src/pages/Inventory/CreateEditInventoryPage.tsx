@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppLayout, Form, submitObject } from '@renderer/components'
+import { AppLayout, Form, SelectOptions, submitObject } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { ReactElement, useEffect, useState } from 'react'
 import { FieldValues, SubmitHandler } from 'react-hook-form'
 import { useLocation, useParams } from 'wouter'
 import * as Yup from 'yup'
-
-type selectType = { value: string | number | boolean; label: string }
 
 const inventoryPage = Yup.object().shape({
   type: Yup.number().required(''),
@@ -18,8 +16,8 @@ const inventoryPage = Yup.object().shape({
 export const CreateEditInventoryPage = (): ReactElement => {
   const [, setLocation] = useLocation()
   const [defaultValues, setDefaultValues] = useState<FieldValues | undefined>()
-  const [equipmentTypes, setEquipmentTypes] = useState<selectType[] | null>(null)
-  const [equipmentStatus, setEquipmentStatus] = useState<selectType[] | null>(null)
+  const [equipmentTypes, setEquipmentTypes] = useState<SelectOptions>(null)
+  const [equipmentStatus, setEquipmentStatus] = useState<SelectOptions>(null)
   const [showForm, setShowForm] = useState<boolean>(false)
   const { getEquipmentTypes, getEquipmentStatus, createEquipment, getItem, updateEquipment } =
     useInventory()
