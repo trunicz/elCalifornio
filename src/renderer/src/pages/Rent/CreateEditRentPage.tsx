@@ -10,6 +10,8 @@ import * as Yup from 'yup'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { useRentals } from '@renderer/hooks/useRentals'
 import { useAuthStore } from '@renderer/stores/useAuth'
+import { LuAlertCircle } from 'react-icons/lu'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 
 const useCustomForm = (
   schema: Yup.AnyObjectSchema,
@@ -33,23 +35,43 @@ const useCustomForm = (
 }
 
 const rentalSchema = Yup.object().shape({
-  client_id: Yup.number().required(''),
+  client_id: Yup.object().required(),
   end_date: Yup.date().required()
 })
 
 export const CreateEditRentPage = (): ReactElement => {
   const { handleSubmit, register, errors, control } = useCustomForm(rentalSchema)
   const { user } = useAuthStore()
-  const { getAllClients } = useClients()
+  const { getAllClients, getClientById, getAllLocalClients } = useClients()
   const { createRental } = useRentals()
   const { getAvailableInventory } = useInventory()
-  const [clients, setClients] = useState<object[]>()
+  const [clients, setClients] = useState<{ value: string; label: string }[]>()
+  const [localClients, setLocalClients] = useState<{ value: string; label: string }[]>()
   const [, setLocation] = useLocation()
   const [inv, setInv] = useState<{ value: string; label: string }[]>()
+  const [showForeign, setShowForeign] = useState<boolean>(false)
+  const [parent] = useAutoAnimate()
+  const [selectedOption, setSelectedOption] = useState<{ value: string; label: string } | null>(
+    null
+  )
   const { id } = useParams()
 
   useEffect(() => {
-    getAllClients().then((res) => setClients(res ? res : []))
+    getAllClients().then((res) => {
+      setClients(
+        res?.map((item: any) => {
+          return { value: item.id, label: `${item['nombre(s)']} ${item['apellido(s)']}` }
+        })
+      )
+    })
+
+    getAllLocalClients().then((res) => {
+      setLocalClients(
+        res?.map((item: any) => {
+          return { value: item.id, label: `${item['nombre(s)']} ${item['apellido(s)']}` }
+        })
+      )
+    })
 
     getAvailableInventory().then((res) => {
       setInv(
@@ -61,13 +83,17 @@ export const CreateEditRentPage = (): ReactElement => {
   }, [])
 
   const onSubmit = (data: any): void => {
+    console.log(data)
+
     if (!id) {
+      console.log(data)
+
       if (data.equipments) {
         const equipments = data.equipments.map((equip: any) => {
           return equip.value
         })
         const values = {
-          client_id: data.client_id,
+          client_id: data.client_id.value,
           user_id: user?.id,
           end_date: data.end_date,
           equipments_id: equipments
@@ -75,6 +101,20 @@ export const CreateEditRentPage = (): ReactElement => {
         createRental(values).then(() => setLocation('/rent'))
       }
     }
+  }
+
+  const handleSelectChange = (option: { value: number; label: string }): void => {
+    const client_id = option.value
+    getClientById(client_id).then((res: any) => {
+      setShowForeign(res[0].isForeign)
+    })
+    if (!showForeign) {
+      setSelectedOption(null)
+    }
+  }
+
+  const handleForeignChange = (option: { value: number; label: string }): void => {
+    setSelectedOption(option as any)
   }
 
   return (
@@ -86,60 +126,116 @@ export const CreateEditRentPage = (): ReactElement => {
             onSubmit={handleSubmit(onSubmit)}
             className="overflow-y-auto overflow-x-hidden w-1/2 px-8 flex-1 grid auto-rows-max  mx-auto"
           >
-            <div className="w-full p-4">
-              <label className="block mb-2">Cliente:</label>
-              <select
+            <div ref={parent}>
+              <Controller
                 name="client_id"
-                className="border-2 p-2 w-full text-lg outline-none rounded-lg"
-                {...register('client_id')}
-              >
-                {clients.map((client: any, index) => {
-                  return (
-                    <option
-                      value={client.id}
-                      key={client.id + index}
-                    >{`${client['nombre(s)']} ${client['apellido(s)']}`}</option>
-                  )
-                })}
-              </select>
-              <p className="text-red-500 mt-2">{errors.client_id?.message}</p>
-            </div>
-            <div className="w-full p-4">
-              <label className="block mb-2">Fecha Termino:</label>
-              <input
-                {...register('end_date')}
-                type="date"
-                className="border-2 p-1 text-lg w-full outline-none rounded-lg"
+                control={control}
+                render={({ field }) => (
+                  <div className="w-full p-4">
+                    <label className="block mb-2">Seleccionar Cliente:</label>
+                    <Select
+                      {...field}
+                      options={clients}
+                      isSearchable
+                      onChange={handleSelectChange}
+                      styles={{
+                        control: (provided) => ({
+                          ...provided,
+                          borderColor: '#E5E7EB',
+                          borderRadius: '0.375rem',
+                          boxShadow: 'none',
+                          '&:hover': {
+                            borderColor: '#D1D5DB'
+                          }
+                        })
+                      }}
+                    />
+                    <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
+                  </div>
+                )}
               />
-              <p className="text-red-500 mt-2">{errors.end_date?.message}</p>
-            </div>
-            <Controller
-              name="equipments"
-              control={control}
-              defaultValue={[]}
-              render={({ field }) => (
+              {showForeign && (
                 <>
-                  <Select
-                    {...field}
-                    options={inv}
-                    className="w-full p-4"
-                    isMulti
-                    styles={{
-                      control: (provided) => ({
-                        ...provided,
-                        borderColor: '#E5E7EB',
-                        borderRadius: '0.375rem',
-                        boxShadow: 'none',
-                        '&:hover': {
-                          borderColor: '#D1D5DB'
-                        }
-                      })
-                    }}
+                  <small className="m-4 flex gap-2 items-center p-2 mb-0 bg-blue-500 w-fu text-white rounded-lg">
+                    <LuAlertCircle />
+                    Como el usuario es foráneo se necesita una cliente local de referencia:
+                  </small>
+                  <small className="m-4 flex gap-2 items-center p-2 mb-0 bg-amber-600 w-fu text-white rounded-lg">
+                    <LuAlertCircle />
+                    Si aun no tiene cuenta el cliente de referencia, agrégalo y luego haz este
+                    proceso:
+                  </small>
+                  <Controller
+                    name="client_reference_id"
+                    control={control}
+                    render={({ field }) => (
+                      <div className="w-full p-4">
+                        <label className="block mb-2">Referencia:</label>
+                        <Select
+                          {...field}
+                          options={localClients}
+                          isSearchable
+                          onChange={handleForeignChange as any}
+                          value={selectedOption}
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              borderColor: '#E5E7EB',
+                              borderRadius: '0.375rem',
+                              boxShadow: 'none',
+                              '&:hover': {
+                                borderColor: '#D1D5DB'
+                              }
+                            })
+                          }}
+                        />
+                        <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
+                      </div>
+                    )}
                   />
-                  <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
                 </>
               )}
-            />
+              <div ref={parent} className="w-full p-4">
+                <label className="block mb-2">Fecha Termino:</label>
+                <input
+                  {...register('end_date')}
+                  type="date"
+                  className="border p-1.5  w-full outline-none rounded-lg"
+                />
+                {errors.end_date ? (
+                  <p className="text-red-500 mt-2">
+                    {errors.end_date ? 'Ingresa una fecha valida' : ''}
+                  </p>
+                ) : null}
+              </div>
+              <Controller
+                name="equipments"
+                control={control}
+                defaultValue={[]}
+                render={({ field }) => (
+                  <div className="w-full p-4">
+                    <label className="block mb-2">Equipos y/o Herramientas:</label>
+                    <Select
+                      {...field}
+                      options={inv}
+                      isMulti
+                      styles={{
+                        control: (provided) => ({
+                          ...provided,
+                          borderColor: '#E5E7EB',
+                          borderRadius: '0.375rem',
+                          boxShadow: 'none',
+                          '&:hover': {
+                            borderColor: '#D1D5DB'
+                          }
+                        })
+                      }}
+                    />
+                    <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
+                  </div>
+                )}
+              />
+            </div>
             <Button
               type="submit"
               className="fixed z-10 end-4 bottom-4 bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
