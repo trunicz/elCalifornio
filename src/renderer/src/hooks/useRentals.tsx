@@ -6,6 +6,7 @@ interface RentalsMethods {
   rentals: any[] | null
   getAllRentals: () => Promise<any[] | null>
   deleteRental: (id: string | number) => Promise<void>
+  createRental: (values: any) => Promise<void>
 }
 
 export const useRentals = (): RentalsMethods => {
@@ -18,6 +19,15 @@ export const useRentals = (): RentalsMethods => {
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id)
 
+      if (error) throw error
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const createRental = async (values: any): Promise<void> => {
+    try {
+      const { error } = await supabase.from('rentals').insert(values)
       if (error) throw error
     } catch (error) {
       console.error(error)
@@ -43,8 +53,6 @@ export const useRentals = (): RentalsMethods => {
         const filteredRentalsPromises = rentals.map(async (rental) => {
           const response = await supabase.auth.admin.getUserById(rental.user_id)
           const user = response.data.user?.user_metadata
-          console.log(rental)
-
           if (user) {
             return {
               id: rental.id,
@@ -71,5 +79,5 @@ export const useRentals = (): RentalsMethods => {
     return null
   }
 
-  return { getAllRentals, rentals, deleteRental }
+  return { getAllRentals, rentals, deleteRental, createRental }
 }

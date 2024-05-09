@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import supabase from '@renderer/utils/supabase'
-import { AuthError } from '@supabase/supabase-js'
+import { AuthError, User } from '@supabase/supabase-js'
 
 interface authState {
-  user: object | null
+  user: User | null
   isLoading: boolean
   error: AuthError | unknown | null
   signIn: (email: string, password: string) => void

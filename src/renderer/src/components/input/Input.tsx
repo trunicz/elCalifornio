@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { cn } from '@renderer/utils'
 import { ForwardRefRenderFunction, MutableRefObject, forwardRef } from 'react'
 
