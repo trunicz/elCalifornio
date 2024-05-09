@@ -63,7 +63,7 @@ export const useRentals = (): RentalsMethods => {
               cliente: `${rental.clients?.name} ${rental.clients?.last_name}`,
               user_id: rental.user_id,
               fecha_final: new Date(rental.end_date).toLocaleDateString(),
-              usuario: `${user.name} ${user.lastname}`,
+              arrendatario: `${user.name} ${user.lastname}`,
               alquilado: rental.equipment.map(
                 (item: any) => `${item.type.type_name}: ${item.reference}`
               )
@@ -108,7 +108,7 @@ export const useRentals = (): RentalsMethods => {
               cliente: `${rental.clients?.name} ${rental.clients?.last_name}`,
               user_id: rental.user_id,
               fecha_final: new Date(rental.end_date).toLocaleDateString(),
-              usuario: `${user.name} ${user.lastname}`,
+              arrendatario: `${user.name} ${user.lastname}`,
               alquilado: rental.equipment.map(
                 (item: any) => `${item.type.type_name}: ${item.reference}`
               )
