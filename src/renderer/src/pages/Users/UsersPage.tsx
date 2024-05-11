@@ -75,22 +75,6 @@ export const UsersPage = (): ReactElement => {
     } catch (error) {
       console.error(error)
     }
-
-    // try {
-
-    // } catch (error) {
-    //   console.error(error)
-    //   openModal(
-    //     <div>
-    //       <span className="animate-fade-up text-6xl mb-4 flex justify-center text-red-500">
-    //         <LuXCircle />
-    //       </span>
-    //       <h3>¡No se pudo eliminar el usuario!</h3>
-    //       <span>{String(error)}</span>
-    //       <Button className="mt-4" color="danger" text="Aceptar" onClick={() => closeModal()} />
-    //     </div>
-    //   )
-    // }
   }
 
   const watchUser = (id: string | number): void => {

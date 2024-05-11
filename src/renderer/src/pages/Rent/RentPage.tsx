@@ -6,6 +6,7 @@ import { ReactElement, ReactNode, useEffect, useState } from 'react'
 import { LuCheckCircle } from 'react-icons/lu'
 import { FiWatch } from 'react-icons/fi'
 import { Link } from 'wouter'
+import { IoWarning } from 'react-icons/io5'
 
 export const RentPage = (): ReactElement => {
   const { getAllRentals, rentals, deleteRental, getRental } = useRentals()
@@ -38,6 +39,36 @@ export const RentPage = (): ReactElement => {
         )
       })
     })
+  }
+
+  const endRent = (id: string | number): void => {
+    openModal(
+      <>
+        <div className="flex flex-col gap-4">
+          <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
+            <IoWarning />
+          </div>
+          <div className="">
+            <p>Al realizar esta acción no se podrá deshacer</p>
+            <p>¿Quiere continuar?</p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              className="animate-fade animate-ease-out animate-duration-200"
+              color="danger"
+              text="cancelar"
+              onClick={closeModal}
+            />
+            <Button
+              className="animate-fade animate-ease-out animate-duration-200"
+              color="success"
+              text="aceptar"
+              onClick={() => deleteFunction(id)}
+            />
+          </div>
+        </div>
+      </>
+    )
   }
 
   const watchRental = (id: string | number): void => {
@@ -81,7 +112,7 @@ export const RentPage = (): ReactElement => {
           <Table
             data={rentList}
             hiddenKeys={['id', 'client_id', 'user_id']}
-            deleteFunction={deleteFunction}
+            deleteFunction={endRent}
             watchFunction={watchRental}
             customDeleteBtn={{ icon: <FiWatch />, title: 'Terminar Renta' }}
             canSeeEdit={false}
