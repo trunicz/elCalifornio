@@ -118,8 +118,8 @@ export const ClientsPage = (): ReactElement => {
         <AppLayout.PageOptions pageTitle="Clientes" addRoute="/clients/create">
           <SearchBar searchFunction={setClients} data={clientList} />
         </AppLayout.PageOptions>
-        <Modal title="cliente" className="w-auto min-w-[450px]" />
-        {clients ? (
+        <Modal title="Cliente" className="w-auto min-w-[450px]" />
+        {clientList ? (
           <Table
             data={clients}
             watchFunction={watchFunction}

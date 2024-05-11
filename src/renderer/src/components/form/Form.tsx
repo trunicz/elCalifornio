@@ -80,60 +80,69 @@ export const Form = ({
   }
 
   return (
-    <form className={cn('p-4 flex-1', className)} onSubmit={handleSubmit(submitHandler)} {...props}>
-      {fields.map((field: any, index) => {
-        if (isValidElement(field)) {
-          return field
-        } else {
-          return field.isVisible === false ? (
-            <Fragment key={field?.name + index}></Fragment>
-          ) : (
-            <div
-              key={field?.name + index}
-              className={cn('flex justify-between items-between mb-5', field.className, {
-                'flex-col': formDirection === 'col'
-              })}
-            >
-              <label className="" htmlFor={field?.name}>
-                {field.label}
-                {field.isRequired && <span className="text-red-500 relative bottom-1">*</span>}:
-              </label>
+    <>
+      <p className=" p-4 text-slate-400">
+        El (<span className="text-red-500">*</span>) indica un campo obligatorio.
+      </p>
+      <form
+        className={cn('p-4 flex-1', className)}
+        onSubmit={handleSubmit(submitHandler)}
+        {...props}
+      >
+        {fields.map((field: any, index) => {
+          if (isValidElement(field)) {
+            return field
+          } else {
+            return field.isVisible === false ? (
+              <Fragment key={field?.name + index}></Fragment>
+            ) : (
               <div
-                className={cn('', {
-                  'w-1/3 max-w-[350px] min-w-[200px]': formDirection === 'row',
-                  'mt-2 flex items-center ': formDirection === 'col'
+                key={field?.name + index}
+                className={cn('flex justify-between items-between mb-5', field.className, {
+                  'flex-col': formDirection === 'col'
                 })}
               >
-                <Input
-                  as={field.as}
-                  className={cn(
-                    'focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3'
+                <label className="" htmlFor={field?.name}>
+                  {field.label}
+                  {field.isRequired && <span className="text-red-500 relative bottom-1">*</span>}:
+                </label>
+                <div
+                  className={cn('', {
+                    'w-1/3 max-w-[350px] min-w-[200px]': formDirection === 'row',
+                    'mt-2 flex items-center ': formDirection === 'col'
+                  })}
+                >
+                  <Input
+                    as={field.as}
+                    className={cn(
+                      'focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3'
+                    )}
+                    type={field.type}
+                    id={field?.name}
+                    options={field?.options}
+                    placeholder={field?.placeholder}
+                    {...register(field?.name)}
+                  />
+                  {errors[field?.name]?.message ? (
+                    <p className="text-red-600 font-medium text-xs mt-1">
+                      {errors[field.name].message}
+                    </p>
+                  ) : (
+                    <span className="text-white font-medium text-xs mt-1">...</span>
                   )}
-                  type={field.type}
-                  id={field?.name}
-                  options={field?.options}
-                  placeholder={field?.placeholder}
-                  {...register(field?.name)}
-                />
-                {errors[field?.name]?.message ? (
-                  <p className="text-red-600 font-medium text-xs mt-1">
-                    {errors[field.name].message}
-                  </p>
-                ) : (
-                  <span className="text-white font-medium text-xs mt-1">...</span>
-                )}
+                </div>
               </div>
-            </div>
-          )
-        }
-      })}
-      {!children && (
-        <Button
-          className="fixed z-10 end-4 bottom-4 bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
-          text="Continuar"
-        />
-      )}
-      {children}
-    </form>
+            )
+          }
+        })}
+        {!children && (
+          <Button
+            className="fixed z-10 end-4 bottom-4 bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
+            text="Continuar"
+          />
+        )}
+        {children}
+      </form>
+    </>
   )
 }

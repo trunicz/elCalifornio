@@ -1,4 +1,10 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   public: {
@@ -51,7 +57,7 @@ export type Database = {
         }
         Relationships: []
       }
-      'client-status': {
+      "client-status": {
         Row: {
           created_at: string
           deleted_at: string | null
@@ -78,57 +84,66 @@ export type Database = {
       clients: {
         Row: {
           address: string
-          building_address: string | null
+          city: string | null
           created_at: string
           deleted_at: string | null
           email: string | null
           id: number
           isForeign: boolean
           last_name: string
+          license: string | null
           name: string
           phone: string | null
+          rfc: string | null
           status: number | null
           type: number
           updated_at: string
+          voter_code: string | null
         }
         Insert: {
           address?: string
-          building_address?: string | null
+          city?: string | null
           created_at?: string
           deleted_at?: string | null
           email?: string | null
           id?: number
           isForeign?: boolean
           last_name?: string
+          license?: string | null
           name?: string
           phone?: string | null
+          rfc?: string | null
           status?: number | null
           type?: number
           updated_at?: string
+          voter_code?: string | null
         }
         Update: {
           address?: string
-          building_address?: string | null
+          city?: string | null
           created_at?: string
           deleted_at?: string | null
           email?: string | null
           id?: number
           isForeign?: boolean
           last_name?: string
+          license?: string | null
           name?: string
           phone?: string | null
+          rfc?: string | null
           status?: number | null
           type?: number
           updated_at?: string
+          voter_code?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'clients_status_fkey'
-            columns: ['status']
+            foreignKeyName: "clients_status_fkey"
+            columns: ["status"]
             isOneToOne: false
-            referencedRelation: 'client-status'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "client-status"
+            referencedColumns: ["id"]
+          },
         ]
       }
       clients_types: {
@@ -146,22 +161,22 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'clients_types_client_id_fkey'
-            columns: ['client_id']
+            foreignKeyName: "clients_types_client_id_fkey"
+            columns: ["client_id"]
             isOneToOne: false
-            referencedRelation: 'clients'
-            referencedColumns: ['id']
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'clients_types_type_id_fkey'
-            columns: ['type_id']
+            foreignKeyName: "clients_types_type_id_fkey"
+            columns: ["type_id"]
             isOneToOne: false
-            referencedRelation: 'client_type'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "client_type"
+            referencedColumns: ["id"]
+          },
         ]
       }
-      'clients-calls': {
+      "clients-calls": {
         Row: {
           client_id: number
           created_at: string
@@ -191,12 +206,12 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'client-calls_client_id_fkey'
-            columns: ['client_id']
+            foreignKeyName: "client-calls_client_id_fkey"
+            columns: ["client_id"]
             isOneToOne: false
-            referencedRelation: 'clients'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
         ]
       }
       contracts: {
@@ -256,19 +271,19 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'equipment_status_fkey'
-            columns: ['status']
+            foreignKeyName: "equipment_status_fkey"
+            columns: ["status"]
             isOneToOne: false
-            referencedRelation: 'equipment_status'
-            referencedColumns: ['id']
+            referencedRelation: "equipment_status"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'equipment_type_fkey'
-            columns: ['type']
+            foreignKeyName: "equipment_type_fkey"
+            columns: ["type"]
             isOneToOne: false
-            referencedRelation: 'equipment_type'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "equipment_type"
+            referencedColumns: ["id"]
+          },
         ]
       }
       equipment_status: {
@@ -316,19 +331,19 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'equipments_status_equipment_id_fkey'
-            columns: ['equipment_id']
+            foreignKeyName: "equipments_status_equipment_id_fkey"
+            columns: ["equipment_id"]
             isOneToOne: false
-            referencedRelation: 'equipment'
-            referencedColumns: ['id']
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'equipments_status_status_id_fkey'
-            columns: ['status_id']
+            foreignKeyName: "equipments_status_status_id_fkey"
+            columns: ["status_id"]
             isOneToOne: false
-            referencedRelation: 'equipment_status'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "equipment_status"
+            referencedColumns: ["id"]
+          },
         ]
       }
       equipments_types: {
@@ -346,19 +361,19 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'equipments_types_equipment_id_fkey'
-            columns: ['equipment_id']
+            foreignKeyName: "equipments_types_equipment_id_fkey"
+            columns: ["equipment_id"]
             isOneToOne: false
-            referencedRelation: 'equipment'
-            referencedColumns: ['id']
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'equipments_types_type_id_fkey'
-            columns: ['type_id']
+            foreignKeyName: "equipments_types_type_id_fkey"
+            columns: ["type_id"]
             isOneToOne: false
-            referencedRelation: 'equipment_type'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "equipment_type"
+            referencedColumns: ["id"]
+          },
         ]
       }
       logs: {
@@ -406,12 +421,12 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'payments_bill_id_fkey'
-            columns: ['bill_id']
+            foreignKeyName: "payments_bill_id_fkey"
+            columns: ["bill_id"]
             isOneToOne: false
-            referencedRelation: 'bills'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          },
         ]
       }
       rental_equipments: {
@@ -429,19 +444,19 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'rentals_equipments_equipment_id_fkey'
-            columns: ['equipment_id']
+            foreignKeyName: "rentals_equipments_equipment_id_fkey"
+            columns: ["equipment_id"]
             isOneToOne: false
-            referencedRelation: 'equipment'
-            referencedColumns: ['id']
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'rentals_equipments_rental_id_fkey'
-            columns: ['rental_id']
+            foreignKeyName: "rentals_equipments_rental_id_fkey"
+            columns: ["rental_id"]
             isOneToOne: false
-            referencedRelation: 'rentals'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "rentals"
+            referencedColumns: ["id"]
+          },
         ]
       }
       rentals: {
@@ -454,6 +469,7 @@ export type Database = {
           end_date: string
           equipments_id: number[]
           id: number
+          total_cost: number | null
           updated_at: string
           user_id: string
         }
@@ -466,6 +482,7 @@ export type Database = {
           end_date: string
           equipments_id: number[]
           id?: number
+          total_cost?: number | null
           updated_at?: string
           user_id: string
         }
@@ -478,31 +495,32 @@ export type Database = {
           end_date?: string
           equipments_id?: number[]
           id?: number
+          total_cost?: number | null
           updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'rentals_client_id_fkey'
-            columns: ['client_id']
+            foreignKeyName: "rentals_client_id_fkey"
+            columns: ["client_id"]
             isOneToOne: false
-            referencedRelation: 'clients'
-            referencedColumns: ['id']
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'rentals_client_reference_id_fkey'
-            columns: ['client_reference_id']
+            foreignKeyName: "rentals_client_reference_id_fkey"
+            columns: ["client_reference_id"]
             isOneToOne: false
-            referencedRelation: 'clients'
-            referencedColumns: ['id']
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'rentals_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "rentals_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
         ]
       }
       rentals_clients: {
@@ -520,19 +538,19 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'rentals_clients_client_id_fkey'
-            columns: ['client_id']
+            foreignKeyName: "rentals_clients_client_id_fkey"
+            columns: ["client_id"]
             isOneToOne: false
-            referencedRelation: 'clients'
-            referencedColumns: ['id']
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'rentals_clients_rental_id_fkey'
-            columns: ['rental_id']
+            foreignKeyName: "rentals_clients_rental_id_fkey"
+            columns: ["rental_id"]
             isOneToOne: false
-            referencedRelation: 'rentals'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "rentals"
+            referencedColumns: ["id"]
+          },
         ]
       }
       rentals_references_clients: {
@@ -550,19 +568,19 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'rentals_references_clients_client_id_fkey'
-            columns: ['client_id']
+            foreignKeyName: "rentals_references_clients_client_id_fkey"
+            columns: ["client_id"]
             isOneToOne: false
-            referencedRelation: 'clients'
-            referencedColumns: ['id']
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'rentals_references_clients_rental_id_fkey'
-            columns: ['rental_id']
+            foreignKeyName: "rentals_references_clients_rental_id_fkey"
+            columns: ["rental_id"]
             isOneToOne: false
-            referencedRelation: 'rentals'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "rentals"
+            referencedColumns: ["id"]
+          },
         ]
       }
       rentals_users: {
@@ -580,19 +598,19 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'rentals_users_rental_id_fkey'
-            columns: ['rental_id']
+            foreignKeyName: "rentals_users_rental_id_fkey"
+            columns: ["rental_id"]
             isOneToOne: false
-            referencedRelation: 'rentals'
-            referencedColumns: ['id']
+            referencedRelation: "rentals"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'rentals_users_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "rentals_users_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
         ]
       }
       roles: {
@@ -646,19 +664,19 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'user_roles_rol_id_fkey'
-            columns: ['rol_id']
+            foreignKeyName: "user_roles_rol_id_fkey"
+            columns: ["rol_id"]
             isOneToOne: false
-            referencedRelation: 'roles'
-            referencedColumns: ['id']
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'user_roles_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          }
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -669,7 +687,7 @@ export type Database = {
           disponibles: number | null
           en_renta: number | null
           id: number[] | null
-          referencia: string[] | null
+          referencias: string[] | null
           tipo_herramienta: string | null
         }
         Relationships: []
@@ -687,25 +705,27 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, 'public'>]
+type PublicSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (PublicSchema['Tables'] & PublicSchema['Views'])
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-        Database[PublicTableNameOrOptions['schema']]['Views'])
-    : never = never
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-      Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] & PublicSchema['Views'])
-    ? (PublicSchema['Tables'] & PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -713,18 +733,20 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
+  PublicTableNameOrOptions extends
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
-    : never = never
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -732,18 +754,20 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
+  PublicTableNameOrOptions extends
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
-    : never = never
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -751,12 +775,14 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends keyof PublicSchema['Enums'] | { schema: keyof Database },
+  PublicEnumNameOrOptions extends
+    | keyof PublicSchema["Enums"]
+    | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
-    : never = never
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
-    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
     : never

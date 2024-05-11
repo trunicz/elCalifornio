@@ -70,6 +70,39 @@ export const CreateEditClientPage = (): ReactElement => {
       as: 'input'
     },
     {
+      name: 'city',
+      label: 'Ciudad',
+      type: 'text',
+      placeholder: 'Ingrese la Ciudad...',
+      isRequired: true,
+      as: 'input'
+    },
+    {
+      className: 'uppercase',
+      name: 'rfc',
+      label: 'RFC',
+      type: 'text',
+      placeholder: 'Ingrese el RFC...',
+      isRequired: false,
+      as: 'input'
+    },
+    {
+      name: 'license',
+      label: 'Licencia Automovilista',
+      type: 'text',
+      placeholder: 'Ingrese licencia...',
+      isRequired: false,
+      as: 'input'
+    },
+    {
+      name: 'voter_code',
+      label: 'Clave Elector',
+      type: 'text',
+      placeholder: 'Ingrese la Clave Elector...',
+      isRequired: false,
+      as: 'input'
+    },
+    {
       name: 'isForeign',
       label: 'Foráneo',
       type: '',
@@ -137,14 +170,16 @@ export const CreateEditClientPage = (): ReactElement => {
           hasAddButton={false}
         />
         {canShowForm ? (
-          <Form
-            className="mx-auto overflow-y-auto w-1/2 auto-rows-max grid grid-cols-2 gap-4"
-            onSubmit={onSubmit}
-            defaultValues={defaultValues}
-            formDirection="col"
-            fields={formFields}
-            validationSchema={clientSchema}
-          />
+          <>
+            <Form
+              className="mx-auto overflow-y-auto w-5/6 auto-rows-max grid md:grid-cols-2 lg:grid-cols-3 gap-4"
+              onSubmit={onSubmit}
+              defaultValues={defaultValues}
+              formDirection="col"
+              fields={formFields}
+              validationSchema={clientSchema}
+            />
+          </>
         ) : (
           <Loading />
         )}
