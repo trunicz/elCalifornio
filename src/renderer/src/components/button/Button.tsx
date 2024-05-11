@@ -22,14 +22,14 @@ export const Button = ({
   ...props
 }: ButtonProps): ReactElement => {
   const colorStyle: { [x: string]: string } = {
-    danger: 'hover:bg-red-500 hover:text-white border-red-500 text-red-500',
-    success: 'hover:bg-green-500 hover:text-white border-green-500 text-green-500',
-    warning: 'hover:bg-amber-500 hover:text-white border-amber-500 text-amber-500'
+    danger: 'hover:bg-red-600 text-white border bg-red-500',
+    success: 'hover:bg-green-600 text-white border bg-green-500',
+    warning: 'hover:bg-amber-600 text-white border bg-amber-500'
   }
   return (
     <button
       className={cn(
-        'flex items-center px-3 w-full py-2 hover:text-main text-stroke hover:bg-hover  active:scale-95 transition-all max-h-10 rounded-lg  border-2 border-base hover:border-transparent duration-150 font-normal',
+        'flex items-center px-3 text-white w-full py-2 hover:text-main text-stroke hover:bg-hover  active:scale-95 transition-all max-h-10 rounded-lg  border-2 border-base hover:border-transparent duration-150 font-normal',
         color ? colorStyle[color] : '',
         {
           '': icon,

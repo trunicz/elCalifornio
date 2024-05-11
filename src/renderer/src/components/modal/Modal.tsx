@@ -8,7 +8,7 @@ interface ModalProps extends ComponentProps<'div'> {
 
 interface Modal {
   openModal: (jsx: ReactElement | null) => Promise<void>
-  closeModal: () => void
+  closeModal: () => Promise<void>
   Modal: (props: ModalProps) => ReactElement
 }
 
