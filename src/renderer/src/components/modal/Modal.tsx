@@ -24,8 +24,16 @@ export const useModal = (): Modal => {
     })
   }
 
-  const closeModal = (): void => {
-    setShowModal(false)
+  const closeModal = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      try {
+        setShowModal(false)
+        resolve()
+      } catch (error) {
+        console.error(error)
+        reject(error)
+      }
+    })
   }
 
   const Modal = ({ title, className, children }: ModalProps): JSX.Element => (
