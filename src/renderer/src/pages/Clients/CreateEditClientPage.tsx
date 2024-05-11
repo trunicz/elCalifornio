@@ -131,19 +131,22 @@ export const CreateEditClientPage = (): ReactElement => {
   useEffect(() => {
     if (id) {
       getClientById(id).then((res) => {
-        setDefaultValues(
-          res
-            ? {
-                name: res[0]?.name,
-                last_name: res[0]?.last_name,
-                phone: res[0]?.phone,
-                email: res[0]?.email,
-                address: res[0]?.address,
-                isForeign: res[0]?.isForeign,
-                type: res[0]?.type
-              }
-            : {}
-        )
+        if (res) {
+          const tempClient = res[0]
+          setDefaultValues({
+            name: tempClient.name,
+            last_name: tempClient.last_name,
+            phone: tempClient.phone,
+            email: tempClient.email,
+            address: tempClient.address,
+            city: tempClient.city,
+            rfc: tempClient.rfc,
+            license: tempClient.license,
+            voter_code: tempClient.voter_code,
+            isForeign: tempClient.isForeign,
+            type: tempClient.type
+          })
+        }
         setCanShowForm(true)
       })
     } else {
