@@ -3,6 +3,7 @@ import { AppLayout, Button, SearchBar, Table, useModal } from '@renderer/compone
 import { Loading } from '@renderer/components/Loading'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { ReactElement, ReactNode, useEffect, useState } from 'react'
+import { IoWarning } from 'react-icons/io5'
 import { LuCheckCircle2, LuSettings2 } from 'react-icons/lu'
 import { useLocation } from 'wouter'
 
@@ -13,6 +14,7 @@ export const InventoryPage = (): ReactElement => {
   const { getAllInventory, inventory, deleteEquipment, getAllInventoryView, getItem } =
     useInventory()
   const { Modal, openModal, closeModal } = useModal()
+  const [selectInv, setSelectInv] = useState<any>()
 
   useEffect(() => {
     getAllInventory().then((res) => {
@@ -24,8 +26,6 @@ export const InventoryPage = (): ReactElement => {
   }, [])
 
   const moreInfo = (id: any): void => {
-    console.log(typeof id)
-
     if (typeof id === 'number') {
       getItem(id).then((response: any) => {
         const item = response[0]
@@ -62,6 +62,8 @@ export const InventoryPage = (): ReactElement => {
     }
     if (inventoryListView && typeof id === 'object') {
       const filteredInv = inventoryListView.filter((inv: any) => id.includes(inv.id))
+      setSelectInv(id)
+
       openModal(
         <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-2">
           {filteredInv.map((item: any) => (
@@ -99,7 +101,7 @@ export const InventoryPage = (): ReactElement => {
     }
   }
 
-  const deleteFunction = (id: string | number): void => {
+  const remove = (id: any): void => {
     setInventoryList(null)
     deleteEquipment(id).then(() => {
       getAllInventory().then((res) => {
@@ -122,6 +124,36 @@ export const InventoryPage = (): ReactElement => {
         )
       })
     })
+  }
+
+  const deleteFunction = (id: string | number): void => {
+    openModal(
+      <>
+        <div className="flex flex-col gap-4 overflow-hidden">
+          <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
+            <IoWarning />
+          </div>
+          <div className="">
+            <p>Al realizar esta acción no se podrá deshacer</p>
+            <p>¿Quiere continuar?</p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              className="animate-fade animate-ease-out animate-duration-200"
+              color="danger"
+              text="cancelar"
+              onClick={() => closeModal().then(() => moreInfo(selectInv))}
+            />
+            <Button
+              className="animate-fade animate-ease-out animate-duration-200"
+              color="success"
+              text="aceptar"
+              onClick={() => closeModal().then(() => remove(id))}
+            />
+          </div>
+        </div>
+      </>
+    )
   }
 
   const editFunction = (id: any): void => {
