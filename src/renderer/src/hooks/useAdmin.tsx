@@ -57,8 +57,7 @@ export const useAdmin = (): AdminApi => {
             Nombre: tempUser.name,
             Apellido: tempUser.lastname,
             Correo: tempUser.email,
-            Rol: tempUser.rol === '1' ? 'Admin' : 'User',
-            'Último Inicio': data.user?.last_sign_in_at
+            Rol: tempUser.rol === '1' ? 'Admin' : 'User'
           }
         : {}
     } catch (error) {

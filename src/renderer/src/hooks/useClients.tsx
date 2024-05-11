@@ -65,7 +65,7 @@ export const useClients = (): Clients => {
     try {
       const { data, error } = await supabase
         .from('clients')
-        .select('id,name,last_name,email,phone,isForeign,client_type(type_name)')
+        .select('id,name,last_name,phone,isForeign,client_type(type_name)')
         .is('deleted_at', null)
       if (error) throw error
       const filteredClients = data.map((client) => {
@@ -73,7 +73,6 @@ export const useClients = (): Clients => {
           id: client.id,
           'nombre(s)': client.name,
           'apellido(s)': client.last_name,
-          correo: client.email,
           teléfono: client.phone,
           foráneo: client.isForeign ? 'Si' : 'No',
           tipo_cliente: client.client_type[0].type_name

@@ -29,10 +29,6 @@ export const ClientsPage = (): ReactElement => {
               </span>
             </p>
             <p className="text-lg flex gap-4">
-              <span className="font-medium text-nowrap w-1/3 text-start">Correo:</span>
-              <span className="bg-gray-100 px-2  rounded-md">{client.email}</span>
-            </p>
-            <p className="text-lg flex gap-4">
               <span className="font-medium text-nowrap w-1/3 text-start">Teléfono:</span>
               <span className="bg-gray-100 px-2  rounded-md">{client.phone}</span>
             </p>
