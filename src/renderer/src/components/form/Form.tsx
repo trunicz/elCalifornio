@@ -3,9 +3,12 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import { Button } from '../button'
-import { Fragment, ReactElement, ReactNode, isValidElement } from 'react'
+import { Fragment, ReactElement, ReactNode, isValidElement, useEffect } from 'react'
 import Input from '../input/Input'
 import { cn } from '@renderer/utils'
+import { LuUploadCloud } from 'react-icons/lu'
+import { useModal } from '../modal'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 
 const useCustomForm = (
   schema: Yup.AnyObjectSchema,
@@ -50,10 +53,11 @@ interface FormProps {
   formDirection?: 'col' | 'row'
   defaultValues?: FieldValues
   watchFields?: (formProps: object) => void
+  hasFiles: boolean
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type submitObject = { [x: string]: string }
+export type submitObject = { [x: string]: any }
 
 export const Form = ({
   onSubmit,
@@ -64,9 +68,19 @@ export const Form = ({
   formDirection = 'row',
   defaultValues,
   watchFields,
+  hasFiles = false,
   ...props
 }: FormProps): ReactElement => {
   const { handleSubmit, register, errors, watch } = useCustomForm(validationSchema, defaultValues)
+
+  const [parent] = useAutoAnimate()
+  const { Modal, openModal } = useModal()
+
+  const files = watch('files')
+
+  useEffect(() => {
+    console.log(files)
+  }, [files])
 
   if (watchFields) {
     const watchedFields = watch()
@@ -87,6 +101,7 @@ export const Form = ({
       <form
         className={cn('p-4 flex-1', className)}
         onSubmit={handleSubmit(submitHandler)}
+        ref={parent}
         {...props}
       >
         {fields.map((field: any, index) => {
@@ -109,7 +124,7 @@ export const Form = ({
                 <div
                   className={cn('', {
                     'w-1/3 max-w-[350px] min-w-[200px]': formDirection === 'row',
-                    'mt-2 flex items-center ': formDirection === 'col'
+                    'mt-2 flex flex-col items-center ': formDirection === 'col'
                   })}
                 >
                   <Input
@@ -124,7 +139,7 @@ export const Form = ({
                     {...register(field?.name)}
                   />
                   {errors[field?.name]?.message ? (
-                    <p className="text-red-600 font-medium text-xs mt-1">
+                    <p className="text-red-600 text-start w-full font-medium text-xs mt-1">
                       {errors[field.name].message}
                     </p>
                   ) : (
@@ -135,9 +150,79 @@ export const Form = ({
             )
           }
         })}
+        {hasFiles && (
+          <div ref={parent} className="flex flex-col">
+            <label
+              htmlFor="file-upload"
+              className="cursor-pointer mt-auto  hover:bg-purple-100 hover:text-purple-500 transition-all text-black outline-gray-200 font-bold  rounded-xl mb-5 p-4 text-sm py-6 flex flex-col justify-center items-center outline hover:outline-purple-500 "
+            >
+              <span className="text-xl mx-2">
+                <LuUploadCloud />
+              </span>
+              Subir Archivos
+            </label>
+            <input
+              multiple
+              id="file-upload"
+              type="file"
+              accept=".pdf, .png, .jpg"
+              {...register('files')}
+              className="hidden"
+            />
+          </div>
+        )}
+        {typeof files !== 'undefined' && (
+          <div ref={parent} className="col-span-full border-t pt-6 grid grid-cols-6 gap-4">
+            <Modal title="Vista Previa" />
+            {Array.from(files).map((file: any, index) => (
+              <div
+                className="border hover:bg-gray-100 transition-all rounded-xl overflow-hidden p-4"
+                key={file.size + index}
+              >
+                <div
+                  className="flex flex-col justify-center items-center"
+                  onClick={() => {
+                    openModal(
+                      <div className="overflow-y-auto w-auto flex justify-center">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt="img"
+                          className="h-[500px] object-cover"
+                          onError={(e: any) => {
+                            e.onError = null
+                            e.target.src = '/src/assets/noImage.jpeg'
+                          }}
+                        />
+                      </div>
+                    )
+                  }}
+                >
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="img"
+                    className="min-w-16 h-16 object-cover"
+                    onError={(e: any) => {
+                      e.onError = null
+                      e.target.src = '/src/assets/noImage.jpeg'
+                    }}
+                  />
+                  <p className="text-nowrap w-full overflow-x-clip text-xs text-center">
+                    {file.name}
+                  </p>
+                  <p className="text-nowrap w-full overflow-x-clip text-xs text-center">
+                    {file.size > 1024 * 1024
+                      ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+                      : `${Math.round(file.size / 1024)} KB`}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         {!children && (
           <Button
-            className="fixed z-10 end-4 bottom-4 bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
+            type="submit"
+            className="fixed z-[5] end-4 bottom-4 bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
             text="Continuar"
           />
         )}

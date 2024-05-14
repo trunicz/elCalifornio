@@ -155,13 +155,18 @@ export const CreateEditClientPage = (): ReactElement => {
   }, [])
 
   const onSubmit: SubmitHandler<submitObject> = (data) => {
+    console.log(data)
+
+    const files = data.files
+    delete data.files
+
     if (id) {
-      updateClient(id, data).then(() => {
+      updateClient(id, data, files).then(() => {
         setCanShowForm(false)
         setLocation('/clients')
       })
     } else {
-      createClient(data).then(() => setLocation('/clients'))
+      createClient(data, files).then(() => setLocation('/clients'))
     }
   }
 
@@ -181,6 +186,7 @@ export const CreateEditClientPage = (): ReactElement => {
               formDirection="col"
               fields={formFields}
               validationSchema={clientSchema}
+              hasFiles
             />
           </>
         ) : (

@@ -49,6 +49,7 @@ export const useModal = (): Modal => {
             <div className="border-b-2 flex justify-end pb-2">
               <span className="me-auto text-xl">{title}</span>
               <button
+                type="button"
                 onClick={closeModal}
                 className="px-2 active:scale-95 text-2xl text-gray-300 hover:text-red-300 transition-colors"
               >
