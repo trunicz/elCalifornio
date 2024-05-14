@@ -49,6 +49,7 @@ export const AuthPage = (): ReactElement => {
           validationSchema={validationSchema}
           fields={fields}
           formDirection="col"
+          hasRequiereMessage={false}
         >
           <Button
             className="border-0 bg-red-800 hover:bg-orange-600 hover:text-white text-white w-full"

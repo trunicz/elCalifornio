@@ -53,7 +53,8 @@ interface FormProps {
   formDirection?: 'col' | 'row'
   defaultValues?: FieldValues
   watchFields?: (formProps: object) => void
-  hasFiles: boolean
+  hasFiles?: boolean
+  hasRequiereMessage?: boolean
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,6 +70,7 @@ export const Form = ({
   defaultValues,
   watchFields,
   hasFiles = false,
+  hasRequiereMessage = true,
   ...props
 }: FormProps): ReactElement => {
   const { handleSubmit, register, errors, watch } = useCustomForm(validationSchema, defaultValues)
@@ -95,9 +97,11 @@ export const Form = ({
 
   return (
     <>
-      <p className=" p-4 text-slate-400">
-        El (<span className="text-red-500">*</span>) indica un campo obligatorio.
-      </p>
+      {hasRequiereMessage && (
+        <p className=" p-4 text-slate-400">
+          El (<span className="text-red-500">*</span>) indica un campo obligatorio.
+        </p>
+      )}
       <form
         className={cn('p-4 flex-1', className)}
         onSubmit={handleSubmit(submitHandler)}
