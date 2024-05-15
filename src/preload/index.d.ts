@@ -5,7 +5,7 @@ declare global {
   interface Window {
     electron: ElectronAPI
     api: {
-      saveFile: (blob: Blob, name: string) => Promise<any>
+      saveFile: (blob: Blob, name: string) => Promise<string>
     }
   }
 }

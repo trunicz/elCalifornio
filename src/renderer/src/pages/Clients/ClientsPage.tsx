@@ -2,6 +2,7 @@
 import { AppLayout, Button, SearchBar, Table, useModal } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useClients } from '@renderer/hooks'
+import { useAlert } from '@renderer/hooks/useAlert'
 import { ReactElement, useEffect, useState } from 'react'
 import { IoWarning } from 'react-icons/io5'
 import { LuCheckCircle2, LuDownload, LuFolder } from 'react-icons/lu'
@@ -13,6 +14,7 @@ export const ClientsPage = (): ReactElement => {
   const { clientList, getAllClients, deleteClient, getClientById, getAllFiles, download } =
     useClients()
   const { Modal, openModal, closeModal } = useModal()
+  const { Alert, emitAlert } = useAlert()
 
   useEffect(() => {
     getAllClients().then((response) => setClients(response))
@@ -76,7 +78,11 @@ export const ClientsPage = (): ReactElement => {
                 </div>
                 <button
                   className="w-24 text-center text-xl flex justify-center items-center hover:bg-gray-200 transition-all active:bg-gray-300/75"
-                  onClick={() => download(id, file.name)}
+                  onClick={() =>
+                    download(id, file.name).then((msg) => {
+                      emitAlert(`Archivo guardado en: ${msg}`, 'success', `${msg}`)
+                    })
+                  }
                 >
                   <LuDownload />
                 </button>
@@ -199,6 +205,7 @@ export const ClientsPage = (): ReactElement => {
           <SearchBar searchFunction={setClients} data={clientList} />
         </AppLayout.PageOptions>
         <Modal title="Cliente" className="w-auto min-w-[450px]" />
+        {Alert}
         {clientList ? (
           <Table
             data={clients}

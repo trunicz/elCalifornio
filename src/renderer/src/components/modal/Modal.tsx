@@ -42,7 +42,7 @@ export const useModal = (): Modal => {
         <div className="z-10 fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
           <div
             className={cn(
-              'z-20 animate-fade-up animate-duration-150 transform-gpu animate-ease-in-out flex flex-col w-[400px] h-auto p-4 bg-main rounded-xl text-center gap-4',
+              'z-20 animate-once animate-duration-150 transform-gpu animate-ease-in-out flex flex-col w-[400px] h-auto p-4 bg-main rounded-xl text-center gap-4',
               className
             )}
           >

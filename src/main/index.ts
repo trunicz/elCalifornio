@@ -24,21 +24,16 @@ function createWindow(): void {
     fs.mkdirSync(dir)
   }
 
-  ipcMain.handle(
-    'saveFile',
-    async (_event, buffer: Buffer, name: string): Promise<{ message: string }> => {
-      try {
-        const filePath = join(dir, name)
-        fs.writeFile(filePath, buffer, () => console.log('Archivo guardado:', filePath))
-        return {
-          message: 'Archivo guardado:' + filePath
-        }
-      } catch (error) {
-        console.error('Error al guardar el archivo:', error)
-        throw error
-      }
+  ipcMain.handle('saveFile', async (_event, buffer: Buffer, name: string): Promise<string> => {
+    try {
+      const filePath = join(dir, name)
+      fs.writeFile(filePath, buffer, () => console.log('Archivo guardado:', filePath))
+      return filePath
+    } catch (error) {
+      console.error('Error al guardar el archivo:', error)
+      throw error
     }
-  )
+  })
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()

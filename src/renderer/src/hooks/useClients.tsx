@@ -19,20 +19,17 @@ export const useClients = (): Clients => {
   const [clientList, setClientList] = useState<object[] | null>(null)
   const [localsClients, setLocalsClients] = useState<object[] | null>(null)
 
-  const download = async (id: any, name: string): Promise<string | null> => {
-    try {
-      const { data: blob } = await supabase.storage
-        .from('clients_storage')
-        .download(`clients/${id}/${name}`)
-      if (blob) {
-        await window.api.saveFile(blob, name).then((data: any) => {
-          return data.message
-        })
-      }
-    } catch (error) {
-      console.error(error)
-    }
-    return null
+  const download = async (id: any, name: string): Promise<string> => {
+    const message = await supabase.storage
+      .from('clients_storage')
+      .download(`clients/${id}/${name}`)
+      .then(async (res) => {
+        if (res.error) throw res.error
+        const blob: any = res.data
+        const message = await window.api.saveFile(blob, name)
+        return message
+      })
+    return message
   }
 
   const getAllFiles = async (id: any): Promise<any[]> => {
