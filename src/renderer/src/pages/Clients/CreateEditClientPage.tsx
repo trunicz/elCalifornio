@@ -161,10 +161,9 @@ export const CreateEditClientPage = (): ReactElement => {
   const onSubmit: SubmitHandler<submitObject> = (data) => {
     const files = data.files
     delete data.files
-
+    setCanShowForm(false)
     if (id) {
       updateClient(id, data, files).then(() => {
-        setCanShowForm(false)
         setLocation('/clients')
       })
     } else {
