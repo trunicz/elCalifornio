@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: rent_app
+productName: ElCalifornio
 directories:
   buildResources: build
 files:
@@ -12,7 +12,8 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: rent_app
+  executableName: ElCalifornio
+  icon: 'build/icon.ico'
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

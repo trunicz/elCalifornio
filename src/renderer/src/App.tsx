@@ -10,15 +10,15 @@ import {
   MainPage,
   RentPage,
   UsersPage,
-  CreateEditUserPage,
-  AuthPage
-} from './pages'
-import { useAuthStore } from './stores/useAuth'
-import { Loading } from './components/Loading'
-import { CreateEditClientPage } from './pages/Clients/CreateEditClientPage'
-import { CreateEditInventoryPage } from './pages/Inventory/CreateEditInventoryPage'
-import { CreateEditRentPage } from './pages/Rent/CreateEditRentPage'
-import { RentHistory } from './pages/Rent/RentHistory'
+  CreateEditUserPage
+} from '@renderer/pages'
+import { AuthPage } from '@renderer/pages/AuthPage'
+import { useAuthStore } from '@renderer/stores/useAuth'
+import { Loading } from '@renderer/components/Loading'
+import { CreateEditClientPage } from '@renderer/pages/Clients/CreateEditClientPage'
+import { CreateEditInventoryPage } from '@renderer/pages/Inventory/CreateEditInventoryPage'
+import { CreateEditRentPage } from '@renderer/pages/Rent/CreateEditRentPage'
+import { RentHistory } from '@renderer/pages/Rent/RentHistory'
 
 function App(): ReactElement {
   const { user, isLoading, initializeUser } = useAuthStore()
