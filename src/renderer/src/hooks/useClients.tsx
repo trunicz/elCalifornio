@@ -11,11 +11,42 @@ interface Clients {
   deleteClient: (id: string | number) => Promise<void>
   updateClient: (id: string | number, values: any, fileList: FileList) => Promise<void>
   getAllLocalClients: () => Promise<object[] | null>
+  getAllFiles: (id: any) => Promise<FileList[]>
+  download: (id: any, name: string) => Promise<string | null>
 }
 
 export const useClients = (): Clients => {
   const [clientList, setClientList] = useState<object[] | null>(null)
   const [localsClients, setLocalsClients] = useState<object[] | null>(null)
+
+  const download = async (id: any, name: string): Promise<string | null> => {
+    try {
+      const { data: blob } = await supabase.storage
+        .from('clients_storage')
+        .download(`clients/${id}/${name}`)
+      if (blob) {
+        await window.api.saveFile(blob, name).then((data: any) => {
+          return data.message
+        })
+      }
+    } catch (error) {
+      console.error(error)
+    }
+    return null
+  }
+
+  const getAllFiles = async (id: any): Promise<any[]> => {
+    try {
+      const response = await supabase.storage
+        .from('clients_storage')
+        .list(`clients/${id}`, { limit: 100 })
+      if (response.error) throw response.error
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+    return []
+  }
 
   const updateClient = async (
     id: string | number,
@@ -29,7 +60,7 @@ export const useClients = (): Clients => {
         files.map(async (file: any) => {
           const { data, error } = await supabase.storage
             .from('clients_storage')
-            .upload(`clients/${values.id}/${file.name}`, file)
+            .upload(`clients/${id}/${file.name}`, file)
           if (error) throw error
           console.log(data)
           return data.path
@@ -62,11 +93,16 @@ export const useClients = (): Clients => {
     try {
       const files = Array.from(filesList)
 
+      const { data } = await supabase.from('clients').select('id', { count: 'exact' })
+
+      const count = data?.length
+
       const urls = await Promise.all(
         files.map(async (file: any) => {
+          const filePath = `clients/${count}/${file.name}`
           const { data, error } = await supabase.storage
             .from('clients_storage')
-            .upload(`clients/${values.id}/${file.name}`, file)
+            .upload(filePath, file)
           if (error) throw error
           console.log(data)
           return data.path
@@ -154,6 +190,8 @@ export const useClients = (): Clients => {
     deleteClient,
     updateClient,
     getAllLocalClients,
-    localsClients
+    localsClients,
+    getAllFiles,
+    download
   }
 }

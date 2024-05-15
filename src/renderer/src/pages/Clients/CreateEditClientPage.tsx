@@ -155,8 +155,6 @@ export const CreateEditClientPage = (): ReactElement => {
   }, [])
 
   const onSubmit: SubmitHandler<submitObject> = (data) => {
-    console.log(data)
-
     const files = data.files
     delete data.files
 

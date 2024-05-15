@@ -2,6 +2,8 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import fs from 'node:fs'
+import os from 'os'
 
 function createWindow(): void {
   // Create the browser window.
@@ -15,6 +17,28 @@ function createWindow(): void {
       sandbox: false
     }
   })
+
+  const dir = join(os.homedir(), 'elCalifornio')
+
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir)
+  }
+
+  ipcMain.handle(
+    'saveFile',
+    async (_event, buffer: Buffer, name: string): Promise<{ message: string }> => {
+      try {
+        const filePath = join(dir, name)
+        fs.writeFile(filePath, buffer, () => console.log('Archivo guardado:', filePath))
+        return {
+          message: 'Archivo guardado:' + filePath
+        }
+      } catch (error) {
+        console.error('Error al guardar el archivo:', error)
+        throw error
+      }
+    }
+  )
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()

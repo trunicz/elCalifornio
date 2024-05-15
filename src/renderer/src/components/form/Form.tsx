@@ -3,7 +3,7 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import { Button } from '../button'
-import { Fragment, ReactElement, ReactNode, isValidElement, useEffect } from 'react'
+import { Fragment, ReactElement, ReactNode, isValidElement } from 'react'
 import Input from '../input/Input'
 import { cn } from '@renderer/utils'
 import { LuUploadCloud } from 'react-icons/lu'
@@ -80,10 +80,6 @@ export const Form = ({
 
   const files = watch('files')
 
-  useEffect(() => {
-    console.log(files)
-  }, [files])
-
   if (watchFields) {
     const watchedFields = watch()
     watchFields(watchedFields)
@@ -158,7 +154,7 @@ export const Form = ({
           <div ref={parent} className="flex flex-col">
             <label
               htmlFor="file-upload"
-              className="cursor-pointer mt-auto  hover:bg-purple-100 hover:text-purple-500 transition-all text-black outline-gray-200 font-bold  rounded-xl mb-5 p-4 text-sm py-6 flex flex-col justify-center items-center outline hover:outline-purple-500 "
+              className="cursor-pointer mt-auto  hover:bg-purple-100 hover:text-purple-500 transition-all text-black outline-gray-200 rounded-xl mb-5 p-4 text-sm py-6 font-normal flex flex-col justify-center items-center outline hover:outline-purple-500 "
             >
               <span className="text-xl mx-2">
                 <LuUploadCloud />
