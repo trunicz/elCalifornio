@@ -4,7 +4,7 @@ import { Loading } from '@renderer/components/Loading'
 import { useClients } from '@renderer/hooks'
 import { useAlert } from '@renderer/hooks/useAlert'
 import { ReactElement, useEffect, useState } from 'react'
-import { IoWarning } from 'react-icons/io5'
+import { IoLogoWhatsapp, IoWarning } from 'react-icons/io5'
 import { LuCheckCircle2, LuDownload, LuFolder } from 'react-icons/lu'
 import { useLocation } from 'wouter'
 
@@ -131,13 +131,14 @@ export const ClientsPage = (): ReactElement => {
                 color="warning"
                 onClick={() => seeFiles(id)}
               >
-                Archivos
                 <LuFolder />
+                Archivos
               </button>
               <a
-                className="bg-green-500 border-0 text-xl w-full rounded-lg px-4 p-2 transition-all active:scale-95 text-white  hover:bg-green-600"
+                className="bg-green-500 border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-green-600"
                 href={'whatsapp://send/?phone=' + client.phone}
               >
+                <IoLogoWhatsapp />
                 Contactar con el cliente
               </a>
             </div>

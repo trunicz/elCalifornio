@@ -40,7 +40,7 @@ export const useAlert = (): Alert => {
       {alert.visible && (
         <div
           className={cn(
-            `animate-jump duration-100 absolute bottom-4 px-4 right-4 z-10 p-2 rounded-md flex items-center justify-between`,
+            `animate-fade-up animate-duration-200 absolute bottom-4 px-4 right-4 z-10 p-2 rounded-md flex items-center justify-between`,
             getAlertClasses(alert.type),
             alert.className
           )}
