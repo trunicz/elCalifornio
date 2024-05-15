@@ -26,7 +26,7 @@ export const CreateEditClientPage = (): ReactElement => {
   const { id } = useParams()
   const [defaultValues, setDefaultValues] = useState<FieldValues | undefined>()
   const [canShowForm, setCanShowForm] = useState<boolean>(false)
-  const { getClientById, createClient, updateClient } = useClients()
+  const { getClientById, createClient, getAllFiles, updateClient } = useClients()
   const formFields: FormField[] = [
     {
       name: 'name',
@@ -130,24 +130,28 @@ export const CreateEditClientPage = (): ReactElement => {
 
   useEffect(() => {
     if (id) {
-      getClientById(id).then((res) => {
-        if (res) {
-          const tempClient = res[0]
-          setDefaultValues({
-            name: tempClient.name,
-            last_name: tempClient.last_name,
-            phone: tempClient.phone,
-            email: tempClient.email,
-            address: tempClient.address,
-            city: tempClient.city,
-            rfc: tempClient.rfc,
-            license: tempClient.license,
-            voter_code: tempClient.voter_code,
-            isForeign: tempClient.isForeign,
-            type: tempClient.type
-          })
-        }
-        setCanShowForm(true)
+      getClientById(id).then(async (res) => {
+        await getAllFiles(id).then((prom) => {
+          const files = Array.from(prom)
+          if (res) {
+            const tempClient = res[0]
+            setDefaultValues({
+              name: tempClient.name,
+              last_name: tempClient.last_name,
+              phone: tempClient.phone,
+              email: tempClient.email,
+              address: tempClient.address,
+              city: tempClient.city,
+              rfc: tempClient.rfc,
+              license: tempClient.license,
+              voter_code: tempClient.voter_code,
+              isForeign: tempClient.isForeign,
+              type: tempClient.type,
+              files: files
+            })
+            setCanShowForm(true)
+          }
+        })
       })
     } else {
       setCanShowForm(true)

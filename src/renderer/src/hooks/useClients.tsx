@@ -13,11 +13,20 @@ interface Clients {
   getAllLocalClients: () => Promise<object[] | null>
   getAllFiles: (id: any) => Promise<FileList[]>
   download: (id: any, name: string) => Promise<string | null>
+  removeFile: (id: any, name: string) => Promise<void>
 }
 
 export const useClients = (): Clients => {
   const [clientList, setClientList] = useState<object[] | null>(null)
   const [localsClients, setLocalsClients] = useState<object[] | null>(null)
+
+  const removeFile = async (id: any, name: string): Promise<void> => {
+    const { data, error } = await supabase.storage
+      .from('clients_storage')
+      .remove([`clients/${id}/${name}`])
+    if (error) throw error
+    console.log(data)
+  }
 
   const download = async (id: any, name: string): Promise<string> => {
     const message = await supabase.storage
@@ -189,6 +198,7 @@ export const useClients = (): Clients => {
     getAllLocalClients,
     localsClients,
     getAllFiles,
-    download
+    download,
+    removeFile
   }
 }

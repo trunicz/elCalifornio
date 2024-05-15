@@ -5,14 +5,21 @@ import { useClients } from '@renderer/hooks'
 import { useAlert } from '@renderer/hooks/useAlert'
 import { ReactElement, useEffect, useState } from 'react'
 import { IoLogoWhatsapp, IoWarning } from 'react-icons/io5'
-import { LuCheckCircle2, LuDownload, LuFolder } from 'react-icons/lu'
+import { LuCheckCircle2, LuDownload, LuFolder, LuX } from 'react-icons/lu'
 import { useLocation } from 'wouter'
 
 export const ClientsPage = (): ReactElement => {
   const [, setLocation] = useLocation()
   const [clients, setClients] = useState<unknown[] | null>([])
-  const { clientList, getAllClients, deleteClient, getClientById, getAllFiles, download } =
-    useClients()
+  const {
+    clientList,
+    getAllClients,
+    deleteClient,
+    getClientById,
+    getAllFiles,
+    download,
+    removeFile
+  } = useClients()
   const { Modal, openModal, closeModal } = useModal()
   const { Alert, emitAlert } = useAlert()
 
@@ -44,53 +51,115 @@ export const ClientsPage = (): ReactElement => {
   const seeFiles = (id: string | number): void => {
     getAllFiles(id).then((prom: object[]) => {
       const files = Array.from(prom)
-      openModal(
-        <div className="overflow-y-auto flex flex-col gap-4">
-          {files.map((file: any, index) => {
-            const imageURL =
-              import.meta.env.VITE_SUPABASE_URL +
-              '/storage/v1/object/public/clients_storage/clients/' +
-              id +
-              '/' +
-              file.name
+      if (files.length > 0) {
+        openModal(
+          <div className="overflow-y-auto flex flex-col gap-4">
+            {files.map((file: any, index) => {
+              const imageURL =
+                import.meta.env.VITE_SUPABASE_URL +
+                '/storage/v1/object/public/clients_storage/clients/' +
+                id +
+                '/' +
+                file.name
 
-            return (
-              <section
-                key={file.name + index}
-                className="transition-all flex border overflow-hidden rounded-xl hover:bg-gray-100"
-              >
-                <div
-                  className="flex flex-1 items-center h-[70px]"
-                  onClick={() => preview(id, imageURL)}
+              return (
+                <section
+                  key={file.name + index}
+                  className="transition-all flex border overflow-hidden rounded-xl hover:bg-gray-100"
                 >
-                  <div className="w-24 flex justify-center items-center border-r">
-                    <img
-                      className="object-cover h-full"
-                      src={imageURL}
-                      onError={(e: any) => {
-                        e.onError = null
-                        e.target.src = '/src/assets/noImage.jpeg'
-                      }}
-                      alt={file.name}
-                    />
+                  <div
+                    className="flex flex-1 items-center h-[70px]"
+                    onClick={() => preview(id, imageURL)}
+                  >
+                    <div className="w-24 flex justify-center items-center border-r">
+                      <img
+                        className="object-cover h-full"
+                        src={imageURL}
+                        onError={(e: any) => {
+                          e.onError = null
+                          e.target.src = '/src/assets/noImage.jpeg'
+                        }}
+                        alt={file.name}
+                      />
+                    </div>
+                    <h3 className="text-xl w-full p-2">{file.name}</h3>
                   </div>
-                  <h3 className="text-xl w-full p-2">{file.name}</h3>
-                </div>
-                <button
-                  className="w-24 text-center text-xl flex justify-center items-center hover:bg-gray-200 transition-all active:bg-gray-300/75"
-                  onClick={() =>
-                    download(id, file.name).then((msg) => {
-                      emitAlert(`Archivo guardado en: ${msg}`, 'success', `${msg}`)
-                    })
-                  }
-                >
-                  <LuDownload />
-                </button>
-              </section>
-            )
-          })}
-        </div>
-      )
+                  <button
+                    className="w-24 text-center text-xl flex justify-center items-center hover:bg-gray-200 transition-all active:bg-gray-300/75 hover:text-blue-600"
+                    onClick={() =>
+                      download(id, file.name).then((msg) => {
+                        emitAlert(`Archivo guardado en: ${msg}`, 'success', `${msg}`)
+                      })
+                    }
+                  >
+                    <LuDownload />
+                  </button>
+                  <button
+                    className="w-24 text-center text-xl flex justify-center items-center hover:bg-gray-200 transition-all active:bg-red-300/75 hover:text-red-600"
+                    onClick={() => {
+                      openModal(
+                        <>
+                          <div className="flex flex-col gap-4">
+                            <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
+                              <IoWarning />
+                            </div>
+                            <div>
+                              <p>Al realizar esta acción no se podrá deshacer</p>
+                              <p>¿Quiere continuar?</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                className="animate-fade animate-ease-out animate-duration-200"
+                                color="danger"
+                                text="cancelar"
+                                onClick={() => seeFiles(id)}
+                              />
+                              <Button
+                                className="animate-fade animate-ease-out animate-duration-200"
+                                color="success"
+                                text="aceptar"
+                                onClick={() => {
+                                  removeFile(id, file.name).then(() => {
+                                    openModal(
+                                      <div>
+                                        <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
+                                          <LuCheckCircle2 />
+                                        </span>
+                                        <h3>¡El cliente se elimino con éxito!</h3>
+                                        <Button
+                                          className="mt-4"
+                                          color="success"
+                                          text="Aceptar"
+                                          onClick={() => seeFiles(id)}
+                                        />
+                                      </div>
+                                    )
+                                  })
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )
+                    }}
+                  >
+                    <LuX />
+                  </button>
+                </section>
+              )
+            })}
+          </div>
+        )
+      } else {
+        openModal(
+          <>
+            <div className="flex items-center justify-center text-red-400 p-6 text-xl">
+              No hay Archivos
+            </div>
+            <Button color="danger" text="Cerrar" onClick={closeModal} />
+          </>
+        )
+      }
     })
   }
 

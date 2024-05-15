@@ -177,7 +177,7 @@ export const Form = ({
             {Array.from(files).map((file: any, index) => (
               <div
                 className="border hover:bg-gray-100 transition-all rounded-xl overflow-hidden p-4"
-                key={file.size + index}
+                key={file.name + index}
               >
                 <div
                   className="flex flex-col justify-center items-center"
@@ -185,7 +185,7 @@ export const Form = ({
                     openModal(
                       <div className="overflow-y-auto w-auto flex justify-center">
                         <img
-                          src={URL.createObjectURL(file)}
+                          src={file.name ? file.name : URL.createObjectURL(file)}
                           alt="img"
                           className="h-[500px] object-cover"
                           onError={(e: any) => {
@@ -198,7 +198,7 @@ export const Form = ({
                   }}
                 >
                   <img
-                    src={URL.createObjectURL(file)}
+                    src={file.name ? file.name : URL.createObjectURL(file)}
                     alt="img"
                     className="min-w-16 h-16 object-cover"
                     onError={(e: any) => {
@@ -209,11 +209,13 @@ export const Form = ({
                   <p className="text-nowrap w-full overflow-x-clip text-xs text-center">
                     {file.name}
                   </p>
-                  <p className="text-nowrap w-full overflow-x-clip text-xs text-center">
-                    {file.size > 1024 * 1024
-                      ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
-                      : `${Math.round(file.size / 1024)} KB`}
-                  </p>
+                  {files.size && (
+                    <p className="text-nowrap w-full overflow-x-clip text-xs text-center">
+                      {file.size > 1024 * 1024
+                        ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+                        : `${Math.round(file.size / 1024)} KB`}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
