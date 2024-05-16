@@ -1,6 +1,7 @@
 import { Button, Form, FormField, submitObject } from '@renderer/components'
+import { useAlert } from '@renderer/hooks/useAlert'
 import { useAuthStore } from '@renderer/stores/useAuth'
-import { ReactElement } from 'react'
+import { ReactElement, useEffect } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import * as Yup from 'yup'
 
@@ -15,7 +16,6 @@ const fields: FormField[] = [
     label: 'Correo',
     type: 'text',
     as: 'input',
-    value: 'techdreamscope@gmail.com',
     isRequired: true,
     placeholder: 'example@mail.com'
   },
@@ -24,7 +24,6 @@ const fields: FormField[] = [
     label: 'Contraseña',
     type: 'password',
     as: 'input',
-    value: 'checoperez11',
     isRequired: true,
     placeholder: '●●●●●●●●●●'
   }
@@ -32,10 +31,17 @@ const fields: FormField[] = [
 
 export const AuthPage = (): ReactElement => {
   const { isLoading, error, signIn } = useAuthStore()
+  const { Alert, emitAlert } = useAlert()
+
+  useEffect(() => {
+    if (typeof error === 'string') {
+      emitAlert('Credenciales de autenticación invalidas', 'danger')
+    }
+  }, [error])
+
   const onSubmit: SubmitHandler<submitObject> = (data) => {
     const { email, password } = data
     signIn(email, password)
-    if (error) console.log(error)
   }
   return (
     <main className="flex flex-col items-center h-full">
@@ -57,6 +63,7 @@ export const AuthPage = (): ReactElement => {
             isLoading={isLoading}
           />
         </Form>
+        {Alert}
       </section>
     </main>
   )

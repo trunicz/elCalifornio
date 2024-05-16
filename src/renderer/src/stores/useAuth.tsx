@@ -6,7 +6,7 @@ interface authState {
   user: User | null
   isLoading: boolean
   error: AuthError | unknown | null
-  signIn: (email: string, password: string) => void
+  signIn: (email: string, password: string) => Promise<void>
   createUser: (email: string, password: string, options: object) => Promise<void>
   signOut: () => void
   initializeUser: () => void
@@ -19,21 +19,28 @@ export const useAuthStore = create<authState>((set) => ({
   initializeUser: async (): Promise<void> => {
     try {
       set({ isLoading: true })
-      const auth = await supabase.auth.getUser()
-      set({ user: auth.data.user, isLoading: false })
+      const { data, error } = await supabase.auth.getUser()
+      if (error) {
+        set({ error, isLoading: false })
+      }
+      set({ user: data.user, isLoading: false })
     } catch (error) {
-      console.log(error)
-      set({ user: null, error, isLoading: false })
+      set({ user: null, isLoading: false })
+      throw error
     }
   },
   signIn: async (email, password): Promise<void> => {
     try {
       set({ isLoading: true })
       const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) throw error
+      if (error) {
+        set({ error: error.message })
+        throw error
+      }
       set({ user: data.user, isLoading: false })
     } catch (error) {
-      set({ error, isLoading: false })
+      set({ isLoading: false })
+      throw error
     }
   },
   createUser: async (email, password, user_metadata): Promise<void> => {
