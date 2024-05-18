@@ -47,7 +47,7 @@ export const CreateEditRentPage = (): ReactElement => {
   const { createRental } = useRentals()
   const { getAvailableInventory } = useInventory()
   const [clients, setClients] = useState<{ value: string; label: string }[]>()
-  const [localClients, setLocalClients] = useState<{ value: string; label: string }[]>()
+  const [localClients, setLocalClients] = useState<{ value: string; label: string }[] | null>()
   const [, setLocation] = useLocation()
   const [inv, setInv] = useState<{ value: string; label: string }[]>()
   const [showForeign, setShowForeign] = useState<boolean>(false)
@@ -136,9 +136,9 @@ export const CreateEditRentPage = (): ReactElement => {
           <form
             ref={parent}
             onSubmit={handleSubmit(onSubmit)}
-            className="overflow-y-auto overflow-x-hidden xl:w-1/3 w-1/2 px-8 flex-1 grid auto-rows-max  mx-auto"
+            className="overflow-y-auto overflow-x-hidden w-full px-8 flex-1 grid auto-rows-max  mx-auto"
           >
-            <div ref={parent}>
+            <div ref={parent} className="w-1/2 mx-auto">
               <Controller
                 name="client_id"
                 control={control}
@@ -168,11 +168,11 @@ export const CreateEditRentPage = (): ReactElement => {
               {showForeign && (
                 <>
                   <small className="m-4 flex gap-2 items-center p-2 mb-0 bg-blue-500 w-fu text-white rounded-lg">
-                    <LuAlertCircle />
+                    <LuAlertCircle className="text-2xl" />
                     Como el usuario es foráneo se necesita una cliente local de referencia:
                   </small>
                   <small className="m-4 flex gap-2 items-center p-2 mb-0 bg-amber-600 w-fu text-white rounded-lg">
-                    <LuAlertCircle />
+                    <LuAlertCircle className="text-2xl" />
                     Si aun no tiene cuenta el cliente de referencia, agrégalo y luego haz este
                     proceso:
                   </small>
@@ -184,7 +184,7 @@ export const CreateEditRentPage = (): ReactElement => {
                         <label className="block mb-2">Referencia:</label>
                         <Select
                           {...field}
-                          options={localClients}
+                          options={localClients ?? []}
                           isSearchable
                           styles={{
                             control: (provided) => ({
@@ -202,6 +202,13 @@ export const CreateEditRentPage = (): ReactElement => {
                       </div>
                     )}
                   />
+                  <div className="p-4 pt-0">
+                    <Button
+                      className="w-full bg-gray-200 border-gray-200 hover:bg-gray-300 transition-all hover:text-gray-500"
+                      onClick={() => setLocation('/clients/create')}
+                      text="Crear Cliente"
+                    />
+                  </div>
                 </>
               )}
               <div ref={parent} className="w-full p-4">
