@@ -1,77 +1,63 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppLayout, Form, SelectOptions, submitObject } from '@renderer/components'
-import { Loading } from '@renderer/components/Loading'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
+import { AppLayout, Button } from '@renderer/components'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { ReactElement, useEffect, useState } from 'react'
-import { FieldValues, SubmitHandler } from 'react-hook-form'
-import { useLocation, useParams } from 'wouter'
-import * as Yup from 'yup'
-
-const inventoryPage = Yup.object().shape({
-  type: Yup.number().required(''),
-  cost: Yup.number(),
-  reference: Yup.string()
-})
+import { LuDollarSign } from 'react-icons/lu'
+import Select from 'react-select'
+import { useLocation } from 'wouter'
 
 export const CreateEditInventoryPage = (): ReactElement => {
-  const [, setLocation] = useLocation()
-  const [defaultValues, setDefaultValues] = useState<FieldValues | undefined>()
-  const [equipmentTypes, setEquipmentTypes] = useState<SelectOptions>(null)
-  const [equipmentStatus, setEquipmentStatus] = useState<SelectOptions>(null)
-  const [showForm, setShowForm] = useState<boolean>(false)
-  const { getEquipmentTypes, getEquipmentStatus, createEquipment, getItem, updateEquipment } =
+  const { getEquipmentTypes, getItemDimension, getPricesBy, createEquipment, createPrices } =
     useInventory()
-  const { id } = useParams()
+  const [dimensions, setDimensions] = useState<{ value: string; label: string }[]>()
+  const [options, setOptions] = useState<{ value: string; label: string }[]>()
+  const [dimensionValue, setDimension] = useState<any>()
+  const [description, setDescription] = useState<any>()
+  const [selectedValue, setValue] = useState<any>()
+  const [prices, setPrices] = useState<any>()
+  const [, setLocation] = useLocation()
+  const [parent] = useAutoAnimate()
 
   useEffect(() => {
-    getEquipmentTypes().then((res: any) => {
-      setEquipmentTypes(
-        res.map((equipment: any) => {
-          return {
-            value: equipment.id,
-            label: equipment.type_name
-          }
-        })
-      )
+    setDimension(null)
+    setPrices({
+      price_days: 0,
+      price_week: 0
     })
-
-    getEquipmentStatus().then((res: any) => {
-      setEquipmentStatus(
-        res.map((equipment: any) => {
-          return {
-            value: equipment.id,
-            label: equipment.status_name
-          }
-        })
-      )
-    })
-
-    if (id) {
-      getItem(id).then((res) => {
-        if (res) {
-          const equipment = res[0]
-          console.log(equipment)
-
-          setDefaultValues({
-            type: equipment.tipo_id,
-            reference: equipment.referencia,
-            cost: equipment.costo
-          })
-          setShowForm(true)
-        }
+    if (selectedValue) {
+      getItemDimension(selectedValue.value).then((dimensions: any) => setDimensions(dimensions))
+      getPricesBy(selectedValue.value).then((prices: any) => {
+        setPrices(prices[0])
       })
-    } else {
-      setShowForm(true)
     }
+  }, [selectedValue])
+
+  useEffect(() => {
+    getEquipmentTypes().then((options: any) => {
+      if (options) {
+        setOptions(options)
+      }
+    })
   }, [])
 
-  const onSubmit: SubmitHandler<submitObject> = (data) => {
-    console.log(data)
+  const onSubmit = (e: any): void => {
+    e.preventDefault()
 
-    if (id) {
-      updateEquipment(id, data).then(() => setLocation('/inventory'))
-    } else {
-      createEquipment(data).then(() => setLocation('/inventory'))
+    if (selectedValue) {
+      const values = {
+        type: selectedValue.value,
+        dimension: dimensionValue ? dimensionValue.value : null,
+        reference: description
+      }
+      createEquipment(values).then((res: any) => {
+        const id = res[0].id
+        if (id) {
+          delete prices.id
+          const values = { ...prices, equipment_id: id, type_id: selectedValue.value }
+          createPrices(values).then(() => setLocation('/inventory'))
+        }
+      })
     }
   }
 
@@ -79,48 +65,123 @@ export const CreateEditInventoryPage = (): ReactElement => {
     <AppLayout>
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle="Agregar Equipo" hasAddButton={false} />
-        {equipmentTypes && equipmentStatus && showForm ? (
-          <Form
-            defaultValues={defaultValues}
-            className="grid grid-cols-2 w-3/4 auto-rows-max mx-auto gap-4"
-            onSubmit={onSubmit}
-            validationSchema={inventoryPage}
-            formDirection="col"
-            fields={[
-              {
-                name: 'type',
-                label: 'Tipo del Equipo y/o Herramienta',
-                as: 'select',
-                isRequired: true,
-                options: equipmentTypes
-              },
-              {
-                name: 'status',
-                label: 'Estado del Equipo y/o Herramienta',
-                as: 'select',
-                isRequired: true,
-                options: equipmentStatus,
-                isVisible: false
-              },
-              {
-                name: 'reference',
-                label: 'Referencia y/o Descripción del Equipo y/o Herramienta',
-                as: 'textarea',
-                isRequired: true,
-                className: 'flex'
-              },
-              {
-                name: 'cost',
-                label: 'Precio de la renta',
-                type: 'number',
-                as: 'input',
-                isRequired: true
-              }
-            ]}
+        <form
+          ref={parent}
+          onSubmit={(e) => onSubmit(e)}
+          className="grid w-full mx-auto auto-rows-max mt-4 flex-1 overflow-y-auto gap-4"
+        >
+          <div className="w-1/2 mx-auto">
+            <div ref={parent} className="col-span-full mb-4">
+              <label className="text-lg">Tipo de Equipo</label>
+              <Select
+                placeholder={'Selecciona el equipo a registrar'}
+                styles={{
+                  control(base) {
+                    return {
+                      ...base,
+                      borderRadius: '8px',
+                      borderColor: '#e5e7eb',
+                      borderWidth: '2px',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        borderColor: '#e5e7eb'
+                      }
+                    }
+                  }
+                }}
+                onChange={(e) => {
+                  setValue(e)
+                }}
+                value={selectedValue}
+                options={options}
+              />
+            </div>
+            {dimensions && dimensions?.length > 0 ? (
+              <div ref={parent} className="col-span-full">
+                <label className="text-lg">Dimensiones</label>
+                <Select
+                  placeholder={'Selecciona la dimension del ' + selectedValue?.label}
+                  styles={{
+                    control(base) {
+                      return {
+                        ...base,
+                        borderRadius: '8px',
+                        borderColor: '#e5e7eb',
+                        borderWidth: '2px',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#e5e7eb'
+                        }
+                      }
+                    }
+                  }}
+                  onChange={(e) => {
+                    setDimension(e)
+                  }}
+                  value={dimensionValue}
+                  options={dimensions}
+                />
+              </div>
+            ) : (
+              selectedValue && (
+                <div ref={parent} className="w-full grid">
+                  <label className="text-lg">Descripción (Unica para cada equipo)</label>
+                  <textarea
+                    name="reference"
+                    id="reference"
+                    placeholder={'Escribe una descripción para ' + selectedValue.label}
+                    onChange={(e) => setDescription(e.target.value)}
+                    value={description}
+                    rows={3}
+                    className="outline-0 border-2 px-2 rounded-lg p-1 text-lg focus:bg-gray-100"
+                  ></textarea>
+                </div>
+              )
+            )}
+            {selectedValue ? (
+              <div ref={parent} className="mt-8">
+                <p ref={parent} className="text-lg text-center col-span-full border-b">
+                  Precios
+                </p>
+                <div ref={parent} className="flex gap-4 mt-4">
+                  <div className="grid flex-1 relative">
+                    <label className="text-lg">Por Semana</label>
+                    <input
+                      type="number"
+                      className="ps-5 w-full focus:bg-gray-100 outline-0 border-2 px-2 rounded-lg p-1 text-lg"
+                      value={prices?.price_week}
+                      onChange={(e) => {
+                        setPrices({ ...prices, price_week: e.target.value })
+                      }}
+                      min={0}
+                    />
+                    <LuDollarSign className="text-gray-400 absolute bottom-3 start-1" />
+                  </div>
+                  <div className="grid flex-1 relative">
+                    <label className="text-lg">De 1 a 3 Dias</label>
+                    <input
+                      type="number"
+                      className="ps-5 w-full focus:bg-gray-100 outline-0 border-2 px-2 rounded-lg p-1 text-lg"
+                      value={prices?.price_days}
+                      onChange={(e) => {
+                        setPrices({ ...prices, price_days: e.target.value })
+                      }}
+                      min={0}
+                    />
+                    <LuDollarSign className="text-gray-400 absolute bottom-3 start-1" />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <></>
+            )}
+          </div>
+          <Button
+            type="submit"
+            className="fixed z-[5] end-4 bottom-4 bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
+            text="Continuar"
           />
-        ) : (
-          <Loading />
-        )}
+        </form>
       </AppLayout.Content>
     </AppLayout>
   )

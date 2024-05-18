@@ -14,7 +14,6 @@ export const InventoryPage = (): ReactElement => {
   const { getAllInventory, inventory, deleteEquipment, getAllInventoryView, getItem } =
     useInventory()
   const { Modal, openModal, closeModal } = useModal()
-  const [selectInv, setSelectInv] = useState<any>()
 
   useEffect(() => {
     getAllInventory().then((res) => {
@@ -42,12 +41,12 @@ export const InventoryPage = (): ReactElement => {
                   </div>
                 ))}
               <div className="flex gap-2 mt-4">
-                <Button
+                {/* <Button
                   className="bg-amber-500 hover:bg-amber-600 text-white"
                   color="warning"
                   text="Editar"
                   onClick={() => editFunction(item.id)}
-                />
+                /> */}
                 <Button
                   className="bg-red-500 hover:bg-red-600 text-white"
                   color="danger"
@@ -62,7 +61,6 @@ export const InventoryPage = (): ReactElement => {
     }
     if (inventoryListView && typeof id === 'object') {
       const filteredInv = inventoryListView.filter((inv: any) => id.includes(inv.id))
-      setSelectInv(id)
 
       openModal(
         <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-2">
@@ -82,16 +80,12 @@ export const InventoryPage = (): ReactElement => {
                 ))}
               <div className="flex gap-2 mt-4">
                 <Button
-                  className="bg-amber-500 hover:bg-amber-600 text-white"
-                  color="warning"
-                  text="Editar"
-                  onClick={() => editFunction(item.id)}
-                />
-                <Button
                   className="bg-red-500 hover:bg-red-600 text-white"
                   color="danger"
                   text="Eliminar"
-                  onClick={() => deleteFunction(item.id)}
+                  onClick={() => {
+                    deleteFunction(item.id)
+                  }}
                 />
               </div>
             </div>
@@ -104,7 +98,7 @@ export const InventoryPage = (): ReactElement => {
   const remove = (id: any): void => {
     setInventoryList(null)
     deleteEquipment(id).then(() => {
-      getAllInventory().then((res) => {
+      getAllInventoryView().then((res) => {
         setInventoryList(res)
         openModal(
           <>
@@ -142,7 +136,7 @@ export const InventoryPage = (): ReactElement => {
               className="animate-fade animate-ease-out animate-duration-200"
               color="danger"
               text="cancelar"
-              onClick={() => closeModal().then(() => moreInfo(selectInv))}
+              onClick={() => closeModal()}
             />
             <Button
               className="animate-fade animate-ease-out animate-duration-200"

@@ -98,6 +98,7 @@ export type Database = {
           status: number | null
           type: number
           updated_at: string
+          urls: string[] | null
           voter_code: string | null
         }
         Insert: {
@@ -116,6 +117,7 @@ export type Database = {
           status?: number | null
           type?: number
           updated_at?: string
+          urls?: string[] | null
           voter_code?: string | null
         }
         Update: {
@@ -134,6 +136,7 @@ export type Database = {
           status?: number | null
           type?: number
           updated_at?: string
+          urls?: string[] | null
           voter_code?: string | null
         }
         Relationships: [
@@ -240,9 +243,9 @@ export type Database = {
       }
       equipment: {
         Row: {
-          cost: number | null
           created_at: string
           deleted_at: string | null
+          dimension: number | null
           id: number
           reference: string | null
           status: number
@@ -250,9 +253,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          cost?: number | null
           created_at?: string
           deleted_at?: string | null
+          dimension?: number | null
           id?: number
           reference?: string | null
           status?: number
@@ -260,9 +263,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          cost?: number | null
           created_at?: string
           deleted_at?: string | null
+          dimension?: number | null
           id?: number
           reference?: string | null
           status?: number
@@ -270,6 +273,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "equipment_dimension_fkey"
+            columns: ["dimension"]
+            isOneToOne: false
+            referencedRelation: "equipment_dimension"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "equipment_status_fkey"
             columns: ["status"]
@@ -283,6 +293,46 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "equipment_type"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_type_fkey"
+            columns: ["type"]
+            isOneToOne: false
+            referencedRelation: "inventory_types"
+            referencedColumns: ["value"]
+          },
+        ]
+      }
+      equipment_dimension: {
+        Row: {
+          dimension_name: string
+          id: number
+          id_type: number
+        }
+        Insert: {
+          dimension_name: string
+          id?: number
+          id_type: number
+        }
+        Update: {
+          dimension_name?: string
+          id?: number
+          id_type?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipment_dimension_id_type_fkey"
+            columns: ["id_type"]
+            isOneToOne: false
+            referencedRelation: "equipment_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_dimension_id_type_fkey"
+            columns: ["id_type"]
+            isOneToOne: false
+            referencedRelation: "inventory_types"
+            referencedColumns: ["value"]
           },
         ]
       }
@@ -374,6 +424,13 @@ export type Database = {
             referencedRelation: "equipment_type"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "equipments_types_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_types"
+            referencedColumns: ["value"]
+          },
         ]
       }
       logs: {
@@ -426,6 +483,49 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "bills"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      prices: {
+        Row: {
+          equipment_id: number
+          price_days: number | null
+          price_week: number | null
+          type_id: number
+        }
+        Insert: {
+          equipment_id: number
+          price_days?: number | null
+          price_week?: number | null
+          type_id: number
+        }
+        Update: {
+          equipment_id?: number
+          price_days?: number | null
+          price_week?: number | null
+          type_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prices_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prices_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "equipment_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prices_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_types"
+            referencedColumns: ["value"]
           },
         ]
       }
@@ -684,11 +784,27 @@ export type Database = {
       all_inventory: {
         Row: {
           cantidad: number | null
+          dimensión: string | null
           disponibles: number | null
           en_renta: number | null
           id: number[] | null
           referencias: string[] | null
           tipo_herramienta: string | null
+        }
+        Relationships: []
+      }
+      inventory_types: {
+        Row: {
+          label: string | null
+          value: number | null
+        }
+        Insert: {
+          label?: string | null
+          value?: number | null
+        }
+        Update: {
+          label?: string | null
+          value?: number | null
         }
         Relationships: []
       }

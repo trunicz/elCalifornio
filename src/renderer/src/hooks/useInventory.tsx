@@ -9,14 +9,40 @@ interface InventoryMethods {
   getItem: (id: string | number) => Promise<object | null>
   getEquipmentTypes: () => Promise<object[] | null>
   getEquipmentStatus: () => Promise<object[] | null>
-  createEquipment: (values: object) => Promise<void>
+  createEquipment: (values: object) => Promise<object[] | null>
   deleteEquipment: (id: string | number) => Promise<void>
   updateEquipment: (id: string | number, values: object) => Promise<void>
   getAvailableInventory: () => Promise<object[] | null>
+  getItemDimension: (id: string | number) => Promise<object[] | null>
+  getPricesBy: (id: string | number) => Promise<object[] | null>
+  createPrices: (values: object) => Promise<void>
 }
 
 export const useInventory = (): InventoryMethods => {
   const [inventory, setInventory] = useState<object[] | null>(null)
+
+  const createPrices = async (values: any): Promise<void> => {
+    const { error } = await supabase.from('prices').insert(values)
+    if (error) throw error
+  }
+
+  const getPricesBy = async (id: string | number): Promise<object[] | null> => {
+    const { data, error } = await supabase.from('prices').select().eq('type_id', id)
+    if (error) throw error
+    return data
+  }
+
+  const getItemDimension = async (id: string | number): Promise<object[] | null> => {
+    const { data, error } = await supabase.from('equipment_dimension').select().eq('id_type', id)
+    if (error) throw error
+    const formatData = data.map((data) => {
+      return {
+        value: data.id,
+        label: data.dimension_name
+      }
+    })
+    return formatData
+  }
 
   const updateEquipment = async (id: string | number, values: object): Promise<void> => {
     try {
@@ -39,18 +65,20 @@ export const useInventory = (): InventoryMethods => {
     }
   }
 
-  const createEquipment = async (values: object): Promise<void> => {
+  const createEquipment = async (values: object): Promise<object[] | null> => {
     try {
-      const { error } = await supabase.from('equipment').insert(values)
+      const { data, error } = await supabase.from('equipment').insert(values).select()
       if (error) throw error
+      return data
     } catch (error) {
       console.log(error)
     }
+    return null
   }
 
   const getEquipmentTypes = async (): Promise<object[] | null> => {
     try {
-      const { data, error } = await supabase.from('equipment_type').select()
+      const { data, error } = await supabase.from('inventory_types').select()
       if (error) throw error
       return data
     } catch (error) {
@@ -74,7 +102,7 @@ export const useInventory = (): InventoryMethods => {
     try {
       const { data, error } = await supabase
         .from('equipment')
-        .select('id,type(id,type_name),reference,status(status_name),cost')
+        .select('id,type(id,type_name),reference,status(status_name)')
         .eq('id', id)
       if (error) throw error
       const filteredInventory = data.map((inv: any) => {
@@ -83,8 +111,7 @@ export const useInventory = (): InventoryMethods => {
           tipo: inv.type.type_name,
           tipo_id: inv.type.id,
           estado: inv.status.status_name,
-          referencia: inv.reference ? inv.reference : 'Sin Referencia',
-          costo: inv.cost
+          referencia: inv.reference ? inv.reference : 'Sin Referencia'
         }
       })
       return filteredInventory
@@ -125,7 +152,7 @@ export const useInventory = (): InventoryMethods => {
     try {
       const { data, error } = await supabase
         .from('equipment')
-        .select('id,type(type_name),reference,status(status_name),cost')
+        .select('id,type(type_name),reference,status(status_name)')
         .is('deleted_at', null)
       if (error) throw error
       const filteredInventory = data.map((inv: any) => {
@@ -133,11 +160,9 @@ export const useInventory = (): InventoryMethods => {
           id: inv.id,
           tipo: inv.type.type_name,
           referencia: inv.reference ? inv.reference : 'Sin Referencia',
-          estado: inv.status.status_name,
-          costo: `$${inv.cost ? inv.cost : 0}.00`
+          estado: inv.status.status_name
         }
       })
-      setInventory(filteredInventory)
       return filteredInventory
     } catch (error) {
       console.error(error)
@@ -155,6 +180,9 @@ export const useInventory = (): InventoryMethods => {
     deleteEquipment,
     updateEquipment,
     getAvailableInventory,
-    getAllInventoryView
+    getAllInventoryView,
+    getItemDimension,
+    getPricesBy,
+    createPrices
   }
 }
