@@ -95,7 +95,7 @@ export type Database = {
           name: string
           phone: string | null
           rfc: string | null
-          status: number | null
+          strikes: number | null
           type: number
           updated_at: string
           urls: string[] | null
@@ -114,7 +114,7 @@ export type Database = {
           name?: string
           phone?: string | null
           rfc?: string | null
-          status?: number | null
+          strikes?: number | null
           type?: number
           updated_at?: string
           urls?: string[] | null
@@ -133,21 +133,13 @@ export type Database = {
           name?: string
           phone?: string | null
           rfc?: string | null
-          status?: number | null
+          strikes?: number | null
           type?: number
           updated_at?: string
           urls?: string[] | null
           voter_code?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "clients_status_fkey"
-            columns: ["status"]
-            isOneToOne: false
-            referencedRelation: "client-status"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       clients_types: {
         Row: {
@@ -439,23 +431,34 @@ export type Database = {
           created_at: string
           id: number
           note: string | null
-          user_id: number
+          status: Database["public"]["Enums"]["log_status"] | null
+          user_id: string
         }
         Insert: {
           action?: string | null
           created_at?: string
           id?: number
           note?: string | null
-          user_id: number
+          status?: Database["public"]["Enums"]["log_status"] | null
+          user_id: string
         }
         Update: {
           action?: string | null
           created_at?: string
           id?: number
           note?: string | null
-          user_id?: number
+          status?: Database["public"]["Enums"]["log_status"] | null
+          user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {
@@ -569,7 +572,7 @@ export type Database = {
           end_date: string
           equipments_id: number[]
           id: number
-          total_cost: number | null
+          status: string
           updated_at: string
           user_id: string
         }
@@ -582,7 +585,7 @@ export type Database = {
           end_date: string
           equipments_id: number[]
           id?: number
-          total_cost?: number | null
+          status: string
           updated_at?: string
           user_id: string
         }
@@ -595,7 +598,7 @@ export type Database = {
           end_date?: string
           equipments_id?: number[]
           id?: number
-          total_cost?: number | null
+          status?: string
           updated_at?: string
           user_id?: string
         }
@@ -793,6 +796,27 @@ export type Database = {
         }
         Relationships: []
       }
+      all_logs: {
+        Row: {
+          acción: string | null
+          fecha: string | null
+          nota: string | null
+          user: string | null
+        }
+        Insert: {
+          acción?: string | null
+          fecha?: never
+          nota?: string | null
+          user?: never
+        }
+        Update: {
+          acción?: string | null
+          fecha?: never
+          nota?: string | null
+          user?: never
+        }
+        Relationships: []
+      }
       inventory_types: {
         Row: {
           label: string | null
@@ -810,10 +834,13 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      actualizar_rentas_vencidas: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      log_status: "COMPLETADO" | "INCOMPLETO"
     }
     CompositeTypes: {
       [_ in never]: never

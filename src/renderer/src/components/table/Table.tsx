@@ -49,7 +49,7 @@ export const Table = ({
 
   return (
     <TableContext.Provider value={{ data }}>
-      {data.length > 0 ? (
+      {data?.length > 0 ? (
         <section className="flex-1 overflow-x-auto">
           <table className={cn('w-full text-sm text-left', className)} {...props}>
             <thead className="uppercase sticky bg-white shadow-md top-0">
