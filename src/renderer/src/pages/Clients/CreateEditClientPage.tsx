@@ -17,6 +17,7 @@ const clientSchema = Yup.object().shape({
       'Por favor, introduce un número de teléfono válido.'
     ),
   address: Yup.string().required('La Dirección es Obligatoria'),
+  city: Yup.string().required('La Ciudad es Obligatoria'),
   isForeign: Yup.boolean().required('Este Campo es Obligatorio'),
   type: Yup.number().required('Este campo es obligatorio')
 })
