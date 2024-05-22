@@ -1,12 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppLayout, Button, SearchBar, Table, useModal } from '@renderer/components'
+import {
+  AppLayout,
+  Button,
+  Form,
+  SearchBar,
+  Table,
+  submitObject,
+  useModal
+} from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useClients } from '@renderer/hooks'
 import { useAlert } from '@renderer/hooks/useAlert'
+import { useAuthStore } from '@renderer/stores/useAuth'
+import supabase from '@renderer/utils/supabase'
 import { ReactElement, useEffect, useState } from 'react'
-import { IoLogoWhatsapp, IoWarning } from 'react-icons/io5'
+import { SubmitHandler } from 'react-hook-form'
+import { IoMegaphone, IoWarning } from 'react-icons/io5'
 import { LuCheckCircle2, LuDownload, LuFolder, LuX } from 'react-icons/lu'
 import { useLocation } from 'wouter'
+import * as Yup from 'yup'
 
 export const ClientsPage = (): ReactElement => {
   const [, setLocation] = useLocation()
@@ -22,6 +34,7 @@ export const ClientsPage = (): ReactElement => {
   } = useClients()
   const { Modal, openModal, closeModal } = useModal()
   const { Alert, emitAlert } = useAlert()
+  const { user } = useAuthStore()
 
   useEffect(() => {
     getAllClients().then((response) => setClients(response))
@@ -204,10 +217,11 @@ export const ClientsPage = (): ReactElement => {
                 Archivos
               </button>
               <a
-                className="bg-green-500 border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-green-600"
-                href={'whatsapp://send/?phone=' + client.phone}
+                className="bg-blue-500 border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-blue-600"
+                href={'tel:' + client.phone}
+                onClick={() => submitLog()}
               >
-                <IoLogoWhatsapp />
+                <IoMegaphone />
                 Contactar con el cliente
               </a>
             </div>
@@ -215,6 +229,75 @@ export const ClientsPage = (): ReactElement => {
         )
       }
     })
+  }
+  const submitLog = (): void => {
+    const logSchema = Yup.object().shape({
+      status: Yup.string(),
+      notes: Yup.string()
+    })
+
+    const submit: SubmitHandler<submitObject> = async (data: any): Promise<void> => {
+      const values: any = [
+        {
+          action: 'Contactar Cliente',
+          note: data.notes ? data.notes : 'Sin Descripción',
+          status: data.status,
+          user_id: user?.id
+        }
+      ]
+
+      await supabase
+        .from('logs')
+        .insert(values)
+        .then(({ error }) => {
+          if (error) {
+            throw error
+          }
+          openModal(
+            <div>
+              <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
+                <LuCheckCircle2 />
+              </span>
+              <h3>¡La acción se realizo con éxito!</h3>
+              <Button
+                className="mt-4"
+                color="success"
+                text="Aceptar"
+                onClick={() => closeModal()}
+              />
+            </div>
+          )
+        })
+    }
+
+    openModal(
+      <>
+        <p className="flex flex-start text-lg -mb-2">Intento de Contacto</p>
+        <Form
+          className=""
+          hasRequiereMessage={false}
+          formDirection="col"
+          onSubmit={submit}
+          validationSchema={logSchema}
+          fields={[
+            {
+              name: 'status',
+              label: 'Estado',
+              as: 'select',
+              options: [
+                { value: 'COMPLETADO', label: 'Completado' },
+                { value: 'INCOMPLETO', label: 'Incompleto' }
+              ]
+            },
+            {
+              name: 'notes',
+              label: 'Nota',
+              as: 'textarea'
+            }
+          ]}
+        />
+      </>
+    )
   }
 
   const editFunction = (id: string | number): void => {

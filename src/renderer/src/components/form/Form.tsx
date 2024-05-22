@@ -117,7 +117,7 @@ export const Form = ({
                   'flex-col': formDirection === 'col'
                 })}
               >
-                <label className="" htmlFor={field?.name}>
+                <label className="w-full text-start" htmlFor={field?.name}>
                   {field.label}
                   {field.isRequired && <span className="text-red-500 relative bottom-1">*</span>}:
                 </label>
@@ -130,7 +130,7 @@ export const Form = ({
                   <Input
                     as={field.as}
                     className={cn(
-                      'focus:bg-secondary w-full h-10 outline-none border-2 rounded-xl p-1 px-3'
+                      'focus:bg-secondary resize-none w-full h-10 outline-none border-2 rounded-xl p-1 px-3'
                     )}
                     type={field.type}
                     id={field?.name}
