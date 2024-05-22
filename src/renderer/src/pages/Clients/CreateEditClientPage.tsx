@@ -23,7 +23,7 @@ const clientSchema = Yup.object().shape({
 
 export const CreateEditClientPage = (): ReactElement => {
   const [, setLocation] = useLocation()
-  const { id } = useParams()
+  const { id, enable } = useParams()
   const [defaultValues, setDefaultValues] = useState<FieldValues | undefined>()
   const [canShowForm, setCanShowForm] = useState<boolean>(false)
   const { getClientById, createClient, getAllFiles, updateClient } = useClients()
@@ -164,10 +164,10 @@ export const CreateEditClientPage = (): ReactElement => {
     setCanShowForm(false)
     if (id) {
       updateClient(id, data, files).then(() => {
-        setLocation('/clients')
+        setLocation(enable ? '/rent/create' : '/clients')
       })
     } else {
-      createClient(data, files).then(() => setLocation('/clients'))
+      createClient(data, files).then(() => setLocation(enable ? '/rent/create' : '/clients'))
     }
   }
 

@@ -10,7 +10,7 @@ import * as Yup from 'yup'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { useRentals } from '@renderer/hooks/useRentals'
 import { useAuthStore } from '@renderer/stores/useAuth'
-import { LuAlertCircle } from 'react-icons/lu'
+import { LuAlertCircle, LuDollarSign } from 'react-icons/lu'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 
 const useCustomForm = (
@@ -42,19 +42,66 @@ const rentalSchema = Yup.object().shape({
 
 export const CreateEditRentPage = (): ReactElement => {
   const { handleSubmit, register, errors, control, watch, reset } = useCustomForm(rentalSchema)
-  const { user } = useAuthStore()
-  const { getAllClients, getClientById, getAllLocalClients } = useClients()
-  const { createRental } = useRentals()
-  const { getAvailableInventory } = useInventory()
-  const [clients, setClients] = useState<{ value: string; label: string }[]>()
   const [localClients, setLocalClients] = useState<{ value: string; label: string }[] | null>()
-  const [, setLocation] = useLocation()
+  const [inventory, setInventory] = useState<{ value: string; label: string }[]>()
+  const [clients, setClients] = useState<{ value: string; label: string }[]>()
+  const [endDate, setEndDate] = useState<{ value: string; label: string }>()
+  const [isEquipmentVisible, setEquipmentVisible] = useState<boolean>(false)
+  const { getAllClients, getClientById, getAllLocalClients } = useClients()
   const [inv, setInv] = useState<{ value: string; label: string }[]>()
   const [showForeign, setShowForeign] = useState<boolean>(false)
+  const [advicePayment, setAdvicePayment] = useState(0)
+  const { getAvailableInventory } = useInventory()
+  const { createRental } = useRentals()
+  const [, setLocation] = useLocation()
   const [parent] = useAutoAnimate()
+  const { user } = useAuthStore()
   const { id } = useParams()
 
+  const [currentCost, setCurrentCost] = useState(0)
+
   const client_id = watch('client_id')
+
+  const onChangeEndDate = (e: any): void => {
+    setEndDate(e)
+    setEquipmentVisible(true)
+  }
+
+  useEffect(() => {
+    if (currentCost < 0) {
+      setCurrentCost(0)
+    }
+  }, [currentCost, advicePayment])
+
+  const onchangeEquipments = (e: any[]): void => {
+    setInventory(e)
+  }
+
+  useEffect(() => {
+    console.log(endDate)
+  }, [endDate])
+
+  useEffect(() => {
+    const tempPrices = inventory?.map((val: any) => {
+      if (endDate?.label === '1 a 3 Dias') {
+        return val.value.prices[0].price_days
+      } else {
+        return val.value.prices[0].price_week
+      }
+    })
+    if (tempPrices?.length) {
+      const totalCost = tempPrices?.reduce((acc, cv) => {
+        return acc + cv
+      })
+      setCurrentCost(totalCost)
+    } else {
+      setCurrentCost(0)
+    }
+  }, [inventory, endDate])
+
+  const onChangeAdvicePayment = (e: any): void => {
+    setAdvicePayment(e)
+  }
 
   useEffect(() => {
     register('client_id')
@@ -87,7 +134,10 @@ export const CreateEditRentPage = (): ReactElement => {
     getAvailableInventory().then((res) => {
       setInv(
         res?.map((item: any) => {
-          return { value: item.id, label: `${item.type.type_name}: ${item.reference}` }
+          return {
+            value: item,
+            label: `${item.type.type_name}: ${item.reference ? item.reference : item.dimension.dimension_name}`
+          }
         })
       )
     })
@@ -99,7 +149,7 @@ export const CreateEditRentPage = (): ReactElement => {
     if (!id) {
       if (data.equipments) {
         const equipments = data.equipments.map((equip: any) => {
-          return equip.value
+          return equip.value.id
         })
         const values = {
           client_id: data.client_id.value,
@@ -211,43 +261,22 @@ export const CreateEditRentPage = (): ReactElement => {
                   </div>
                 </>
               )}
-              <div ref={parent} className="w-full p-4">
-                <label className="block mb-2">Fecha Termino:</label>
-                <input
-                  {...register('end_date')}
-                  type="date"
-                  className="border p-1.5  w-full outline-none rounded-lg"
-                />
-                {errors.end_date ? (
-                  <p className="text-red-500 mt-2">
-                    {errors.end_date ? 'Ingresa una fecha valida' : ''}
-                  </p>
-                ) : null}
-              </div>
-              <div className="w-full p-4">
-                <label className="block mb-2">Dirección de la obra:</label>
-                <input
-                  {...register('building_address')}
-                  type="text"
-                  className="border p-1.5  w-full outline-none rounded-lg"
-                />
-                {errors.end_date ? (
-                  <p className="text-red-500 mt-2">
-                    {errors.building_address ? 'Ingresa una fecha valida' : ''}
-                  </p>
-                ) : null}
-              </div>
               <Controller
-                name="equipments"
+                name="end_date"
                 control={control}
-                defaultValue={[]}
                 render={({ field }) => (
                   <div className="w-full p-4">
-                    <label className="block mb-2">Equipos y/o Herramientas:</label>
+                    <label className="block mb-2">Tiempo de renta:</label>
                     <Select
                       {...field}
-                      options={inv}
-                      isMulti
+                      placeholder="Tiempo de renta"
+                      options={[
+                        { value: getTimestampForThreeDays(), label: '1 a 3 Dias' },
+                        { value: getTimestampForOneWeek(), label: '1 Semana' }
+                      ]}
+                      onChange={(e) => onChangeEndDate(e)}
+                      value={endDate}
+                      isSearchable
                       styles={{
                         control: (provided) => ({
                           ...provided,
@@ -264,15 +293,99 @@ export const CreateEditRentPage = (): ReactElement => {
                   </div>
                 )}
               />
+              <div className="w-full p-4">
+                <label className="block mb-2">Dirección de la obra:</label>
+                <input
+                  {...register('building_address')}
+                  type="text"
+                  placeholder="Calle Ficticia #123, Colonia Falsa, 12345 Ciudad, Estado."
+                  className="border p-1.5  w-full outline-none rounded-lg"
+                />
+                {errors.end_date ? (
+                  <p className="text-red-500 mt-2">
+                    {errors.building_address ? 'Ingresa una fecha valida' : ''}
+                  </p>
+                ) : null}
+              </div>
+              {isEquipmentVisible && (
+                <>
+                  <div className="w-full p-4 relative">
+                    <label className="">Anticipo</label>
+                    <input
+                      {...register('advance_payment')}
+                      type="number"
+                      onChange={(e) => onChangeAdvicePayment(e.target.value)}
+                      value={advicePayment}
+                      className="ps-7 w-full focus:bg-gray-100 outline-0 border-2 rounded-lg p-1.5"
+                      min={0}
+                    />
+                    <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg" />
+                  </div>
+                  {currentCost < advicePayment && (
+                    <p className="px-4 text-red-400 text-sm -mt-2">
+                      El anticipo es mayor al costo, verifica que no sea un error.
+                    </p>
+                  )}
+                  <Controller
+                    name="equipments"
+                    control={control}
+                    defaultValue={[]}
+                    render={({ field }) => (
+                      <div className="w-full p-4">
+                        <label className="block mb-2">Equipos y/o Herramientas:</label>
+                        <Select
+                          {...field}
+                          options={inv}
+                          onChange={(e: any) => onchangeEquipments(e)}
+                          value={inventory}
+                          isMulti
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              borderColor: '#E5E7EB',
+                              borderRadius: '0.375rem',
+                              boxShadow: 'none',
+                              '&:hover': {
+                                borderColor: '#D1D5DB'
+                              }
+                            })
+                          }}
+                        />
+                        <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
+                      </div>
+                    )}
+                  />
+                </>
+              )}
             </div>
-            <Button
-              type="submit"
-              className="fixed z-10 end-4 bottom-4 bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
-              text="Continuar"
-            />
+            <div className="fixed z-10 end-4 bottom-4">
+              <p className="text-3xl flex flex-col pb-2">
+                <span className="text-lg">Total:</span>$
+                {currentCost > advicePayment && advicePayment >= 0
+                  ? `${(currentCost - Math.abs(advicePayment)).toFixed(2)}`
+                  : 0}
+              </p>
+              <Button
+                type="submit"
+                className=" bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
+                text="Continuar"
+              />
+            </div>
           </form>
         )}
       </AppLayout.Content>
     </AppLayout>
   )
+}
+
+function getTimestampForThreeDays(): string {
+  const currentDate = new Date()
+  const endDate = new Date(currentDate.getTime() + 3 * 24 * 60 * 60 * 1000)
+  return endDate.toISOString()
+}
+
+function getTimestampForOneWeek(): string {
+  const currentDate = new Date()
+  const endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+  return endDate.toISOString()
 }

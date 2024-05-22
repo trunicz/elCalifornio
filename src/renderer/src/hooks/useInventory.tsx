@@ -125,7 +125,9 @@ export const useInventory = (): InventoryMethods => {
     try {
       const { data, error } = await supabase
         .from('equipment')
-        .select('id,type(type_name),reference,status')
+        .select(
+          'id,type(type_name),reference,status,dimension(dimension_name),prices(price_week,price_days)'
+        )
         .eq('status', 1)
         .is('deleted_at', null)
       if (error) throw error

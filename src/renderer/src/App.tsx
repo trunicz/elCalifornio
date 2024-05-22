@@ -42,6 +42,7 @@ function App(): ReactElement {
             <Route path="/clients" component={ClientsPage} />
             <Route path="/clients/create" component={CreateEditClientPage} />
             <Route path="/clients/:id" component={CreateEditClientPage} />
+            <Route path="/clients/create/:enable" component={CreateEditClientPage} />
             <Route path="/inventory" component={InventoryPage} />
             <Route path="/inventory/add" component={CreateEditInventoryPage} />
             <Route path="/inventory/:id" component={CreateEditInventoryPage} />
