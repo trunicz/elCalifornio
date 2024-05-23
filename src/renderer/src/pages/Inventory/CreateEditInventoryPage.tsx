@@ -21,10 +21,6 @@ export const CreateEditInventoryPage = (): ReactElement => {
 
   useEffect(() => {
     setDimension(null)
-    setPrices({
-      price_days: 0,
-      price_week: 0
-    })
     if (selectedValue) {
       getItemDimension(selectedValue.value).then((dimensions: any) => setDimensions(dimensions))
       getPricesBy(selectedValue.value).then((prices: any) => {
