@@ -4,6 +4,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'node:fs'
 import os from 'os'
+import { PDFDocument } from 'pdf-lib'
+import axios from 'axios'
 
 function createWindow(): void {
   // Create the browser window.
@@ -34,6 +36,24 @@ function createWindow(): void {
     } catch (error) {
       console.error('Error al guardar el archivo:', error)
       throw error
+    }
+  })
+
+  ipcMain.handle('createContract', async (_event, formData): Promise<Uint8Array | void> => {
+    try {
+      const pdfUrl =
+        'https://kbwswwnpmbkmgzeqxyuv.supabase.co/storage/v1/object/public/pdfs/contract.pdf?t=2024-05-25T09%3A57%3A22.541Z'
+      const response = await axios.get(pdfUrl, { responseType: 'arraybuffer' })
+      const pdfBytes = new Uint8Array(response.data)
+      const pdfDoc = await PDFDocument.load(pdfBytes)
+      const contract = pdfDoc.getForm()
+
+      const name = contract.getTextField('name')
+      name.setText(formData.name)
+
+      return pdfDoc.save()
+    } catch (error) {
+      console.log('Error al llenar el PDF', error)
     }
   })
 

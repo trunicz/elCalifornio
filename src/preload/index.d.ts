@@ -6,6 +6,7 @@ declare global {
     electron: ElectronAPI
     api: {
       saveFile: (blob: Blob, name: string) => Promise<string>
+      createContract: (formData: object) => Promise<Uint8Array>
     }
   }
 }
