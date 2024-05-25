@@ -75,10 +75,14 @@ export const RentPage = (): ReactElement => {
 
   const watchRental = async (id: string | number): Promise<void> => {
     const rent: any = rentList?.filter((rent: any) => rent.id === id)
+    console.log(rent)
 
     if (rent) {
       console.log(rent)
-      await createContract(rent[0].formdata, 'kokoko')
+      await createContract(
+        rent[0].formdata,
+        `Contrato${rent[0].formdata.day}${rent[0].formdata.month}${rent[0].formdata.year}${rent[0].cliente[0]}${rent[0].id}`
+      )
     }
   }
 

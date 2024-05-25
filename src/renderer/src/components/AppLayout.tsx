@@ -7,7 +7,6 @@ import {
   LuUserCog,
   LuShapes,
   LuHeartHandshake,
-  LuFileEdit,
   LuLogOut,
   LuHome,
   LuBookOpenCheck,
@@ -38,7 +37,7 @@ export const AppLayout = ({
           <MenuButton icon={<LuHeartHandshake />} to="/rent" text="Rentar" />
           <MenuButton icon={<LuShapes />} to="/inventory" text="Inventario" />
           <Separator text="Historial" />
-          <MenuButton icon={<LuFileEdit />} to="/contracts" text="Contratos" />
+          {/* <MenuButton icon={<LuFileEdit />} to="/contracts" text="Contratos" /> */}
           <MenuButton icon={<LuSticker />} to="/bills" text="Recibos" />
           <MenuButton icon={<LuBookOpenCheck />} to="/audit" text="Auditoria" />
         </div>
