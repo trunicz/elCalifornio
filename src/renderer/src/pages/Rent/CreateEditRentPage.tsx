@@ -78,15 +78,13 @@ export const CreateEditRentPage = (): ReactElement => {
   }
 
   useEffect(() => {
-    console.log(endDate)
-  }, [endDate])
-
-  useEffect(() => {
     const tempPrices = inventory?.map((val: any) => {
-      if (endDate?.label === '1 a 3 Dias') {
-        return val.value.prices[0].price_days
-      } else {
-        return val.value.prices[0].price_week
+      if (val.value.prices) {
+        if (endDate?.label === '1 a 3 Dias') {
+          return val.value.prices[0].price_days
+        } else {
+          return val.value.prices[0].price_week
+        }
       }
     })
     if (tempPrices?.length) {
@@ -132,14 +130,13 @@ export const CreateEditRentPage = (): ReactElement => {
     })
 
     getAvailableInventory().then((res) => {
-      setInv(
-        res?.map((item: any) => {
-          return {
-            value: item,
-            label: `${item.type.type_name}: ${item.reference ? item.reference : item.dimension.dimension_name}`
-          }
-        })
-      )
+      const filteredInventory = (res || []).map((item: any) => {
+        return {
+          value: item,
+          label: `${item.type.type_name}: ${item.reference ? item.reference : item.dimension.dimension_name}`
+        }
+      })
+      setInv(filteredInventory)
     })
   }, [])
 
