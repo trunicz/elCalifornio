@@ -48,8 +48,27 @@ function createWindow(): void {
       const pdfDoc = await PDFDocument.load(pdfBytes)
       const contract = pdfDoc.getForm()
 
-      const name = contract.getTextField('name')
-      name.setText(formData.name)
+      for (const fieldName of Object.keys(formData)) {
+        if (typeof formData[fieldName] === 'boolean') {
+          const checkBoxField = contract.getCheckBox(fieldName)
+          if (checkBoxField) {
+            if (formData[fieldName]) {
+              checkBoxField.check()
+            } else {
+              checkBoxField.uncheck()
+            }
+          } else {
+            console.log(`Campo "${fieldName}" no encontrado como casilla de verificación en el PDF`)
+          }
+        } else {
+          const field = contract.getTextField(fieldName)
+          if (field) {
+            field.setText(`${formData[fieldName]}`)
+          } else {
+            console.log(`Campo "${fieldName}" no encontrado en el PDF`)
+          }
+        }
+      }
 
       return pdfDoc.save()
     } catch (error) {

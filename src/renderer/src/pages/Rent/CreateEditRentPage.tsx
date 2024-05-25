@@ -50,7 +50,7 @@ export const CreateEditRentPage = (): ReactElement => {
   const { getAllClients, getClientById, getAllLocalClients } = useClients()
   const [inv, setInv] = useState<{ value: string; label: string }[]>()
   const [showForeign, setShowForeign] = useState<boolean>(false)
-  const [advicePayment, setAdvicePayment] = useState(0)
+  const [advicePayment, setAdvicePayment] = useState()
   const { getAvailableInventory } = useInventory()
   const { createRental } = useRentals()
   const [, setLocation] = useLocation()
@@ -66,12 +66,6 @@ export const CreateEditRentPage = (): ReactElement => {
     setEndDate(e)
     setEquipmentVisible(true)
   }
-
-  useEffect(() => {
-    if (currentCost < 0) {
-      setCurrentCost(0)
-    }
-  }, [currentCost, advicePayment])
 
   const onchangeEquipments = (e: any[]): void => {
     setInventory(e)
@@ -92,8 +86,6 @@ export const CreateEditRentPage = (): ReactElement => {
         return acc + cv
       })
       setCurrentCost(totalCost)
-    } else {
-      setCurrentCost(0)
     }
   }, [inventory, endDate])
 
@@ -142,18 +134,23 @@ export const CreateEditRentPage = (): ReactElement => {
 
   const onSubmit = (data: any): void => {
     console.log(data)
-
     if (!id) {
-      if (data.equipments) {
-        const equipments = data.equipments.map((equip: any) => {
+      if (inventory) {
+        const equipments = inventory.map((equip: any) => {
           return equip.value.id
         })
         const values = {
           client_id: data.client_id.value,
+          advance_payment: advicePayment,
+          building_address: data.building_address,
           user_id: user?.id,
-          end_date: data.end_date,
-          equipments_id: equipments
+          end_date: endDate?.value,
+          equipments_id: equipments,
+          total_cost: currentCost,
+          status: 'ACTIVO'
         }
+        console.log(values)
+
         const clientReferenceId = !showForeign ? null : data.client_reference_id?.value || null
 
         createRental({ ...values, client_reference_id: clientReferenceId }).then(() =>
@@ -318,7 +315,7 @@ export const CreateEditRentPage = (): ReactElement => {
                     />
                     <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg" />
                   </div>
-                  {currentCost < advicePayment && (
+                  {advicePayment && currentCost < advicePayment && (
                     <p className="px-4 text-red-400 text-sm -mt-2">
                       El anticipo es mayor al costo, verifica que no sea un error.
                     </p>
@@ -358,7 +355,7 @@ export const CreateEditRentPage = (): ReactElement => {
             <div className="fixed z-10 end-4 bottom-4">
               <p className="text-3xl flex flex-col pb-2">
                 <span className="text-lg">Total:</span>$
-                {currentCost > advicePayment && advicePayment >= 0
+                {advicePayment && currentCost > advicePayment && advicePayment >= 0
                   ? `${(currentCost - Math.abs(advicePayment)).toFixed(2)}`
                   : 0}
               </p>

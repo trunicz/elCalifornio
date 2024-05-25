@@ -84,43 +84,9 @@ export const useRentals = (): RentalsMethods => {
 
   const getAllRentals = async (): Promise<any[] | null> => {
     try {
-      const response = await supabase
-        .from('rentals')
-        .select(
-          'id,clients!rentals_client_id_fkey(name,last_name,id),user_id,end_date,equipment(type(type_name),reference)'
-        )
-        .is('deleted_at', null)
+      const response = await supabase.from('all_rentals').select()
 
-      const rentals = response.data
-
-      if (response.error) {
-        throw response.error
-      }
-
-      if (rentals) {
-        const filteredRentalsPromises = rentals.map(async (rental) => {
-          const response = await supabase.auth.admin.getUserById(rental.user_id)
-          const user = response.data.user?.user_metadata
-          if (user) {
-            return {
-              id: rental.id,
-              client_id: rental.clients?.id,
-              cliente: `${rental.clients?.name} ${rental.clients?.last_name}`,
-              user_id: rental.user_id,
-              fecha_final: new Date(rental.end_date).toLocaleDateString(),
-              arrendatario: `${user.name} ${user.lastname}`,
-              alquilado: rental.equipment.map(
-                (item: any) => `${item.type.type_name}: ${item.reference}`
-              )
-            }
-          } else {
-            return null
-          }
-        })
-        const filteredRentals = await Promise.all(filteredRentalsPromises)
-        setRentals(filteredRentals)
-        return filteredRentals
-      }
+      return response.data
     } catch (error) {
       console.error(error)
     }

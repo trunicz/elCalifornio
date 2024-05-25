@@ -2,16 +2,18 @@
 import { AppLayout, Button, SearchBar, Table, useModal } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useRentals } from '@renderer/hooks/useRentals'
-import { ReactElement, ReactNode, useEffect, useState } from 'react'
-import { LuCheckCircle } from 'react-icons/lu'
+import { ReactElement, useEffect, useState } from 'react'
+import { LuCheckCircle, LuFileSignature } from 'react-icons/lu'
 import { FiWatch } from 'react-icons/fi'
 import { Link } from 'wouter'
 import { IoWarning } from 'react-icons/io5'
+import { useContracts } from '@renderer/hooks/useContracts'
 
 export const RentPage = (): ReactElement => {
-  const { getAllRentals, rentals, deleteRental, getRental } = useRentals()
+  const { getAllRentals, rentals, deleteRental } = useRentals()
   const [rentList, setRentList] = useState<unknown[] | null>(null)
   const { Modal, openModal, closeModal } = useModal()
+  const { createContract } = useContracts()
 
   useEffect(() => {
     getAllRentals().then((res) => setRentList(res))
@@ -71,28 +73,13 @@ export const RentPage = (): ReactElement => {
     )
   }
 
-  const watchRental = (id: string | number): void => {
-    getRental(id).then((response: any) => {
-      if (response) {
-        const rental = response[0]
-        openModal(
-          <>
-            {Object.keys(rental)
-              .filter((k) => !['id', 'client_id', 'user_id'].includes(k))
-              .map((key: string, index: number) => (
-                <div key={index + key} className="text-lg flex gap-2 overflow-y-auto">
-                  <div className="w-1/3 text-start text-nowrap">
-                    {key[0].toUpperCase() + key.slice(1).replaceAll('_', ' ')}:
-                  </div>
-                  <div className="bg-gray-100 flex-1 p-2 rounded-lg">
-                    {renderNestedObject(rental[key])}
-                  </div>
-                </div>
-              ))}
-          </>
-        )
-      }
-    })
+  const watchRental = async (id: string | number): Promise<void> => {
+    const rent: any = rentList?.filter((rent: any) => rent.id === id)
+
+    if (rent) {
+      console.log(rent)
+      await createContract(rent[0].formdata, 'kokoko')
+    }
   }
 
   return (
@@ -111,11 +98,12 @@ export const RentPage = (): ReactElement => {
         {rentList ? (
           <Table
             data={rentList}
-            hiddenKeys={['id', 'client_id', 'user_id']}
+            hiddenKeys={['id', 'arrendatario', 'formdata', 'dirección', 'costo_total', 'anticipo']}
             deleteFunction={endRent}
             watchFunction={watchRental}
             customDeleteBtn={{ icon: <FiWatch />, title: 'Terminar Renta' }}
             canSeeEdit={false}
+            customMoreBtn={{ icon: <LuFileSignature />, title: 'Descargar Contrato' }}
           />
         ) : (
           <Loading />
@@ -125,28 +113,28 @@ export const RentPage = (): ReactElement => {
   )
 }
 
-interface NestedObject {
-  [key: string]: string | NestedObject
-}
+// interface NestedObject {
+//   [key: string]: string | NestedObject
+// }
 
-function renderNestedObject(obj: any): ReactNode {
-  if (obj === null || typeof obj !== 'object') return obj
+// function renderNestedObject(obj: any): ReactNode {
+//   if (obj === null || typeof obj !== 'object') return obj
 
-  const _obj = obj as NestedObject
+//   const _obj = obj as NestedObject
 
-  return (
-    <div className="grid auto-cols-fr overflow-hidden auto-rows-min gap-1">
-      {Object.values(_obj).map((value, index) => {
-        if (typeof value === 'object') {
-          return <div key={index}>{renderNestedObject(value)}</div>
-        } else {
-          return (
-            <span key={index} className="bg-gray-200 p-2 rounded-lg">
-              {value}
-            </span>
-          )
-        }
-      })}
-    </div>
-  )
-}
+//   return (
+//     <div className="grid auto-cols-fr overflow-hidden auto-rows-min gap-1">
+//       {Object.values(_obj).map((value, index) => {
+//         if (typeof value === 'object') {
+//           return <div key={index}>{renderNestedObject(value)}</div>
+//         } else {
+//           return (
+//             <span key={index} className="bg-gray-200 p-2 rounded-lg">
+//               {value}
+//             </span>
+//           )
+//         }
+//       })}
+//     </div>
+//   )
+// }

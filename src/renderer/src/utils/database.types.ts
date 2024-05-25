@@ -89,6 +89,7 @@ export type Database = {
           deleted_at: string | null
           email: string | null
           id: number
+          isBanned: boolean | null
           isForeign: boolean
           last_name: string
           license: string | null
@@ -108,6 +109,7 @@ export type Database = {
           deleted_at?: string | null
           email?: string | null
           id?: number
+          isBanned?: boolean | null
           isForeign?: boolean
           last_name?: string
           license?: string | null
@@ -127,6 +129,7 @@ export type Database = {
           deleted_at?: string | null
           email?: string | null
           id?: number
+          isBanned?: boolean | null
           isForeign?: boolean
           last_name?: string
           license?: string | null
@@ -564,6 +567,7 @@ export type Database = {
       }
       rentals: {
         Row: {
+          advance_payment: string
           building_address: string | null
           client_id: number
           client_reference_id: number | null
@@ -573,10 +577,12 @@ export type Database = {
           equipments_id: number[]
           id: number
           status: string
+          total_cost: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          advance_payment: string
           building_address?: string | null
           client_id: number
           client_reference_id?: number | null
@@ -586,10 +592,12 @@ export type Database = {
           equipments_id: number[]
           id?: number
           status: string
+          total_cost: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          advance_payment?: string
           building_address?: string | null
           client_id?: number
           client_reference_id?: number | null
@@ -599,6 +607,7 @@ export type Database = {
           equipments_id?: number[]
           id?: number
           status?: string
+          total_cost?: string
           updated_at?: string
           user_id?: string
         }
@@ -799,21 +808,38 @@ export type Database = {
       all_logs: {
         Row: {
           acción: string | null
+          estado: Database["public"]["Enums"]["log_status"] | null
           fecha: string | null
           nota: string | null
-          user: string | null
+          usuario: string | null
         }
         Insert: {
           acción?: string | null
+          estado?: Database["public"]["Enums"]["log_status"] | null
           fecha?: never
           nota?: string | null
-          user?: never
+          usuario?: never
         }
         Update: {
           acción?: string | null
+          estado?: Database["public"]["Enums"]["log_status"] | null
           fecha?: never
           nota?: string | null
-          user?: never
+          usuario?: never
+        }
+        Relationships: []
+      }
+      all_rentals: {
+        Row: {
+          address: string | null
+          anticipo: string | null
+          arrendatario: string | null
+          cliente: string | null
+          costo_total: string | null
+          estado_actual: string | null
+          fecha_final: string | null
+          fecha_inicial: string | null
+          formdata: Json | null
         }
         Relationships: []
       }
@@ -837,6 +863,20 @@ export type Database = {
       actualizar_rentas_vencidas: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      check_equipment_dimension: {
+        Args: {
+          rental_id: number
+          dimension_id: number
+        }
+        Returns: boolean
+      }
+      count_equipment_type: {
+        Args: {
+          rental_id: number
+          type_text: string
+        }
+        Returns: number
       }
     }
     Enums: {
