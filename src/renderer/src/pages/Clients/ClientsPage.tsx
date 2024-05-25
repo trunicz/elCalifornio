@@ -10,7 +10,6 @@ import {
 } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useClients } from '@renderer/hooks'
-import { useAlert } from '@renderer/hooks/useAlert'
 import { useAuthStore } from '@renderer/stores/useAuth'
 import supabase from '@renderer/utils/supabase'
 import { ReactElement, useEffect, useState } from 'react'
@@ -33,7 +32,6 @@ export const ClientsPage = (): ReactElement => {
     removeFile
   } = useClients()
   const { Modal, openModal, closeModal } = useModal()
-  const { Alert, emitAlert } = useAlert()
   const { user } = useAuthStore()
 
   useEffect(() => {
@@ -87,6 +85,7 @@ export const ClientsPage = (): ReactElement => {
                     <div className="w-24 flex justify-center items-center border-r">
                       <img
                         className="object-cover h-full"
+                        draggable={false}
                         src={imageURL}
                         onError={(e: any) => {
                           e.onError = null
@@ -100,8 +99,19 @@ export const ClientsPage = (): ReactElement => {
                   <button
                     className="w-24 text-center text-xl flex justify-center items-center hover:bg-gray-200 transition-all active:bg-gray-300/75 hover:text-blue-600"
                     onClick={() =>
-                      download(id, file.name).then((msg) => {
-                        emitAlert(`Archivo guardado en: ${msg}`, 'success', `${msg}`)
+                      download(id, file.name).then((blob) => {
+                        try {
+                          const url = window.URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.style.display = 'none'
+                          a.href = url
+                          a.download = file.name
+                          document.body.appendChild(a)
+                          a.click()
+                          window.URL.revokeObjectURL(url)
+                        } catch (error) {
+                          console.log(error)
+                        }
                       })
                     }
                   >
@@ -358,7 +368,6 @@ export const ClientsPage = (): ReactElement => {
           <SearchBar searchFunction={setClients} data={clientList} />
         </AppLayout.PageOptions>
         <Modal title="Cliente" className="w-auto min-w-[450px]" />
-        {Alert}
         {clientList ? (
           <Table
             data={clients}

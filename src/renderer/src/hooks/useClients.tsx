@@ -12,7 +12,7 @@ interface Clients {
   updateClient: (id: string | number, values: any, fileList: FileList) => Promise<void>
   getAllLocalClients: () => Promise<object[] | null>
   getAllFiles: (id: any) => Promise<FileList[]>
-  download: (id: any, name: string) => Promise<string | null>
+  download: (id: any, name: string) => Promise<Blob | MediaSource>
   removeFile: (id: any, name: string) => Promise<void>
 }
 
@@ -28,17 +28,16 @@ export const useClients = (): Clients => {
     console.log(data)
   }
 
-  const download = async (id: any, name: string): Promise<string> => {
-    const message = await supabase.storage
+  const download = async (id: any, name: string): Promise<Blob | MediaSource> => {
+    const BLOB = await supabase.storage
       .from('clients_storage')
       .download(`clients/${id}/${name}`)
       .then(async (res) => {
         if (res.error) throw res.error
         const blob: any = res.data
-        const message = await window.api.saveFile(blob, name)
-        return message
+        return blob
       })
-    return message
+    return BLOB
   }
 
   const getAllFiles = async (id: any): Promise<any[]> => {
