@@ -42,7 +42,7 @@ function createWindow(): void {
   ipcMain.handle('createContract', async (_event, formData): Promise<Uint8Array | void> => {
     try {
       const pdfUrl =
-        'https://kbwswwnpmbkmgzeqxyuv.supabase.co/storage/v1/object/public/pdfs/contract.pdf?t=2024-05-25T09%3A57%3A22.541Z'
+        'https://kbwswwnpmbkmgzeqxyuv.supabase.co/storage/v1/object/public/pdfs/contract.pdf?t=2024-05-27T07%3A07%3A17.578Z'
       const response = await axios.get(pdfUrl, { responseType: 'arraybuffer' })
       const pdfBytes = new Uint8Array(response.data)
       const pdfDoc = await PDFDocument.load(pdfBytes)

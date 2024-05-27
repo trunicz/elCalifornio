@@ -10,23 +10,33 @@ import {
   LuLogOut,
   LuHome,
   LuBookOpenCheck,
-  LuSticker
+  LuSticker,
+  LuLoader
 } from 'react-icons/lu'
 import { Separator } from './separator'
 import { Link } from 'wouter'
 import { useAuthStore } from '@renderer/stores/useAuth'
+import { useLoadingStore } from '@renderer/stores/useLoading'
 
 export const AppLayout = ({
   className,
   children,
   ...props
 }: ComponentProps<'main'>): ReactElement => {
+  const { loading } = useLoadingStore()
   const { signOut } = useAuthStore()
   return (
     <main className={cn('bg-main theme-light h-full flex', className)} {...props}>
+      {loading && (
+        <div className="absolute bg-secondary text-primary rounded-t-xl animate-fade text-3xl bottom-0 right-8 p-4">
+          <div className="animate-spin">
+            <LuLoader />
+          </div>
+        </div>
+      )}
       <AppMenu>
         <div className="flex items-center justify-center gap-2">
-          <img src="/src/assets/frame.png?asset" className="w-[100px]  p-3" />
+          <img src="/src/assets/frame.png?asset" draggable={false} className="w-[100px]  p-3" />
         </div>
         <div className="flex-1 flex flex-col gap-1">
           <MenuButton icon={<LuHome />} to="/" text="Inicio" />

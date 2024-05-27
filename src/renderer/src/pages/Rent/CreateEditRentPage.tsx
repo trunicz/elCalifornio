@@ -287,39 +287,8 @@ export const CreateEditRentPage = (): ReactElement => {
                   </div>
                 )}
               />
-              <div className="w-full p-4">
-                <label className="block mb-2">Dirección de la obra:</label>
-                <input
-                  {...register('building_address')}
-                  type="text"
-                  placeholder="Calle Ficticia #123, Colonia Falsa, 12345 Ciudad, Estado."
-                  className="border p-1.5  w-full outline-none rounded-lg"
-                />
-                {errors.end_date ? (
-                  <p className="text-red-500 mt-2">
-                    {errors.building_address ? 'Ingresa una fecha valida' : ''}
-                  </p>
-                ) : null}
-              </div>
               {isEquipmentVisible && (
                 <>
-                  <div className="w-full p-4 relative">
-                    <label className="">Anticipo</label>
-                    <input
-                      {...register('advance_payment')}
-                      type="number"
-                      onChange={(e) => onChangeAdvicePayment(e.target.value)}
-                      value={advicePayment}
-                      className="ps-7 w-full focus:bg-gray-100 outline-0 border-2 rounded-lg p-1.5"
-                      min={0}
-                    />
-                    <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg" />
-                  </div>
-                  {advicePayment && currentCost < advicePayment && (
-                    <p className="px-4 text-red-400 text-sm -mt-2">
-                      El anticipo es mayor al costo, verifica que no sea un error.
-                    </p>
-                  )}
                   <Controller
                     name="equipments"
                     control={control}
@@ -349,6 +318,37 @@ export const CreateEditRentPage = (): ReactElement => {
                       </div>
                     )}
                   />
+                  <div className="w-full p-4 relative">
+                    <label className="">Anticipo</label>
+                    <input
+                      {...register('advance_payment')}
+                      type="number"
+                      onChange={(e) => onChangeAdvicePayment(e.target.value)}
+                      value={advicePayment}
+                      className="ps-7 w-full focus:bg-gray-100 outline-0 border-2 rounded-lg p-1.5"
+                      min={0}
+                    />
+                    <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg" />
+                  </div>
+                  {advicePayment && currentCost < advicePayment && (
+                    <p className="px-4 text-red-400 text-sm -mt-2">
+                      El anticipo es mayor al costo, verifica que no sea un error.
+                    </p>
+                  )}
+                  <div className="w-full p-4">
+                    <label className="block mb-2">Dirección de la obra:</label>
+                    <input
+                      {...register('building_address')}
+                      type="text"
+                      placeholder="Calle Ficticia #123, Colonia Falsa, 12345 Ciudad, Estado."
+                      className="border p-1.5  w-full outline-none rounded-lg"
+                    />
+                    {errors.end_date ? (
+                      <p className="text-red-500 mt-2">
+                        {errors.building_address ? 'Ingresa una fecha valida' : ''}
+                      </p>
+                    ) : null}
+                  </div>
                 </>
               )}
             </div>

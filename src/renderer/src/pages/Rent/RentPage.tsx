@@ -1,19 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppLayout, Button, SearchBar, Table, useModal } from '@renderer/components'
+import {
+  AppLayout,
+  Button,
+  Form,
+  SearchBar,
+  Table,
+  submitObject,
+  useModal
+} from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useRentals } from '@renderer/hooks/useRentals'
 import { ReactElement, useEffect, useState } from 'react'
-import { LuCheckCircle, LuFileSignature } from 'react-icons/lu'
+import { LuCheckCircle, LuCheckCircle2, LuFileSignature, LuPhoneCall } from 'react-icons/lu'
 import { FiWatch } from 'react-icons/fi'
 import { Link } from 'wouter'
 import { IoWarning } from 'react-icons/io5'
 import { useContracts } from '@renderer/hooks/useContracts'
+import supabase from '@renderer/utils/supabase'
+import * as Yup from 'yup'
+import { SubmitHandler } from 'react-hook-form'
+import { useAuthStore } from '@renderer/stores/useAuth'
+import { useLoadingStore } from '@renderer/stores/useLoading'
 
 export const RentPage = (): ReactElement => {
   const { getAllRentals, rentals, deleteRental } = useRentals()
   const [rentList, setRentList] = useState<unknown[] | null>(null)
   const { Modal, openModal, closeModal } = useModal()
   const { createContract } = useContracts()
+  const { user } = useAuthStore()
+  const { setLoading } = useLoadingStore()
 
   useEffect(() => {
     getAllRentals().then((res) => setRentList(res))
@@ -74,16 +89,98 @@ export const RentPage = (): ReactElement => {
   }
 
   const watchRental = async (id: string | number): Promise<void> => {
+    setLoading(true)
     const rent: any = rentList?.filter((rent: any) => rent.id === id)
-    console.log(rent)
 
     if (rent) {
-      console.log(rent)
       await createContract(
         rent[0].formdata,
         `Contrato${rent[0].formdata.day}${rent[0].formdata.month}${rent[0].formdata.year}${rent[0].cliente[0]}${rent[0].id}`
-      )
+      ).then(() => {
+        setLoading(false)
+      })
     }
+  }
+
+  const callRentalUser = async (id: string | number): Promise<void> => {
+    const rent: any = rentList?.filter((rent: any) => rent.id === id)
+
+    if (rent) {
+      const data = rent[0]
+      const a = document.createElement('a')
+      a.href = 'tel:' + data.cliente_tel
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      submitLog()
+    }
+  }
+  const submitLog = (): void => {
+    const logSchema = Yup.object().shape({
+      status: Yup.string(),
+      notes: Yup.string()
+    })
+    const submit: SubmitHandler<submitObject> = async (data: any): Promise<void> => {
+      const values: any = [
+        {
+          action: 'Contactar Cliente',
+          note: data.notes ? data.notes : 'Sin Descripción',
+          status: data.status,
+          user_id: user?.id
+        }
+      ]
+
+      await supabase
+        .from('logs')
+        .insert(values)
+        .then(({ error }) => {
+          if (error) {
+            throw error
+          }
+          openModal(
+            <div>
+              <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
+                <LuCheckCircle2 />
+              </span>
+              <h3>¡La acción se realizo con éxito!</h3>
+              <Button
+                className="mt-4"
+                color="success"
+                text="Aceptar"
+                onClick={() => closeModal()}
+              />
+            </div>
+          )
+        })
+    }
+    openModal(
+      <>
+        <p className="flex flex-start text-lg -mb-2">Intento de Contacto</p>
+        <Form
+          className=""
+          hasRequiereMessage={false}
+          formDirection="col"
+          onSubmit={submit}
+          validationSchema={logSchema}
+          fields={[
+            {
+              name: 'status',
+              label: 'Estado',
+              as: 'select',
+              options: [
+                { value: 'COMPLETADO', label: 'Completado' },
+                { value: 'INCOMPLETO', label: 'Incompleto' }
+              ]
+            },
+            {
+              name: 'notes',
+              label: 'Nota',
+              as: 'textarea'
+            }
+          ]}
+        />
+      </>
+    )
   }
 
   return (
@@ -102,12 +199,13 @@ export const RentPage = (): ReactElement => {
         {rentList ? (
           <Table
             data={rentList}
-            hiddenKeys={['id', 'arrendatario', 'formdata', 'dirección', 'costo_total', 'anticipo']}
+            hiddenKeys={['id', 'arrendatario', 'cliente_tel', 'formdata', 'dirección', 'anticipo']}
             deleteFunction={endRent}
             watchFunction={watchRental}
+            editFunction={callRentalUser}
             customDeleteBtn={{ icon: <FiWatch />, title: 'Terminar Renta' }}
-            canSeeEdit={false}
             customMoreBtn={{ icon: <LuFileSignature />, title: 'Descargar Contrato' }}
+            customEditBtn={{ icon: <LuPhoneCall />, title: 'Llamar a cliente' }}
           />
         ) : (
           <Loading />
