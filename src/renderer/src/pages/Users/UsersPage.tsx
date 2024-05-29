@@ -114,6 +114,7 @@ export const UsersPage = (): ReactElement => {
         {data ? (
           <Table
             data={data}
+            canSeeMore={false}
             editFunction={editUser}
             deleteFunction={onDeleteUser}
             watchFunction={watchUser}

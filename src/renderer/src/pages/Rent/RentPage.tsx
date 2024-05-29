@@ -199,7 +199,7 @@ export const RentPage = (): ReactElement => {
         {rentList ? (
           <Table
             data={rentList}
-            hiddenKeys={['id', 'arrendatario', 'cliente_tel', 'formdata', 'dirección', 'anticipo']}
+            hiddenKeys={['id', 'arrendatario', 'cliente_tel', 'formdata', 'dirección']}
             deleteFunction={endRent}
             watchFunction={watchRental}
             editFunction={callRentalUser}
