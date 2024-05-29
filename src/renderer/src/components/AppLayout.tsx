@@ -92,7 +92,13 @@ const AppMenu = ({ className, children, ...props }: ComponentProps<'section'>): 
 const AppContent = ({ className, children, ...props }: ComponentProps<'section'>): ReactElement => {
   const { user } = useAuthStore()
   return (
-    <section className={cn('bg-main flex-1 flex flex-col overflow-hidden', className)} {...props}>
+    <section
+      className={cn(
+        'bg-main flex-1 flex flex-col overflow-hidden animate-fade animate-duration-300',
+        className
+      )}
+      {...props}
+    >
       {user && (
         <AppHeader title={Object.keys(user).map((key) => (key === 'email' ? user[key] : ''))} />
       )}
