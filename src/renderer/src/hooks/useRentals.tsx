@@ -85,7 +85,7 @@ export const useRentals = (): RentalsMethods => {
   const getAllRentals = async (): Promise<any[] | null> => {
     try {
       const response = await supabase.from('all_rentals').select()
-
+      setRentals(response.data)
       return response.data
     } catch (error) {
       console.error(error)

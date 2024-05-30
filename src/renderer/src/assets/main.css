@@ -21,11 +21,11 @@
   }
 }
 .theme-light {
-  --color-primary: #7a6d6a;
+  --color-primary: #e5e7eb;
   --color-secondary: #e5e7eb;
   --color-accent: #972f34;
   --color-hover: #f06123;
-  --color-stroke: #7a6d6a;
+  --color-stroke: #555;
   --color-main: #fffffe;
 }
 

@@ -13,7 +13,7 @@ import { useRentals } from '@renderer/hooks/useRentals'
 import { ReactElement, useEffect, useState } from 'react'
 import { LuCheckCircle, LuCheckCircle2, LuFileSignature, LuPhoneCall } from 'react-icons/lu'
 import { FiWatch } from 'react-icons/fi'
-import { Link } from 'wouter'
+import { Link, useParams } from 'wouter'
 import { IoWarning } from 'react-icons/io5'
 import { useContracts } from '@renderer/hooks/useContracts'
 import supabase from '@renderer/utils/supabase'
@@ -29,9 +29,12 @@ export const RentPage = (): ReactElement => {
   const { createContract } = useContracts()
   const { user } = useAuthStore()
   const { setLoading } = useLoadingStore()
+  const { search } = useParams()
 
   useEffect(() => {
-    getAllRentals().then((res) => setRentList(res))
+    getAllRentals().then((res) => {
+      setRentList(res)
+    })
   }, [])
 
   const deleteFunction = (id: string | number): void => {
@@ -187,7 +190,11 @@ export const RentPage = (): ReactElement => {
     <AppLayout>
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle="Rentas" hasAddButton={true} addRoute="/rent/create">
-          <SearchBar searchFunction={setRentList} data={rentals} />
+          <SearchBar
+            searchFunction={setRentList}
+            data={rentals}
+            initialValue={search ? search : ''}
+          />
           <Link
             to="/rentals/history"
             className="ms-4 flex items-center justify-center hover:bg-gray-500 px-4 w-auto rounded-xl h-full bg-gray-400 text-nowrap text-white font-medium active:scale-95 transition-all gap-1"

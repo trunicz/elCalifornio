@@ -787,6 +787,18 @@ export type Database = {
         }
         Relationships: []
       }
+      total_rentas: {
+        Row: {
+          count: number | null
+        }
+        Insert: {
+          count?: number | null
+        }
+        Update: {
+          count?: number | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

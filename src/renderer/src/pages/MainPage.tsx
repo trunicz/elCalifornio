@@ -53,6 +53,7 @@ export const MainPage = (): ReactElement => {
               icon={<LuHeartHandshake />}
               title="Rentas"
               className="col-span-1 row-span-1"
+              href="/rent"
             >
               {home.rentalcount}
             </Widget>
@@ -61,6 +62,7 @@ export const MainPage = (): ReactElement => {
               icon={<LuCalendarOff />}
               title="Rentas Vencidas"
               className="col-span-1 row-span-1"
+              href="/rent/VENCIDO"
             >
               {home.timeoutcount}
             </Widget>
@@ -69,6 +71,7 @@ export const MainPage = (): ReactElement => {
               icon={<LuUser2 />}
               title="Usuarios"
               className="col-span-1 row-span-1"
+              href="/users"
             >
               {home.usercount}
             </Widget>
@@ -77,20 +80,28 @@ export const MainPage = (): ReactElement => {
               icon={<LuUserSquare />}
               title="Clientes"
               className="col-span-1 row-span-1"
+              href="/clients"
             >
               {home.clientcount}
             </Widget>
             <Widget
               color="origin"
               icon={<LuBadgeDollarSign />}
-              title="Ganancias"
+              title="Pagos Pendientes"
               className="col-span-1 row-span-1"
+              hasGoTo={false}
+              clickable={false}
             >
               <div className="text-4xl xl:text-5xl overflow-hidden">
                 <span className="pe-2">$</span>
-                {home.rentals_info
-                  .reduce((acc: any, rent: any) => acc + Number(rent.total), 0)
-                  .toFixed(2)}
+                {(
+                  home.rentals_info
+                    .reduce((acc: any, rent: any) => acc + Number(rent.total), 0)
+                    .toFixed(2) -
+                  home.rentals_info
+                    .reduce((acc: any, rent: any) => acc + Number(rent.pendientes), 0)
+                    .toFixed(2)
+                ).toFixed(2)}
               </div>
             </Widget>
             <Widget
@@ -98,6 +109,7 @@ export const MainPage = (): ReactElement => {
               icon={<LuPhoneOutgoing />}
               title="Llamadas"
               className="col-span-1 row-span-1"
+              href="/audit"
             >
               {home.calls}
             </Widget>

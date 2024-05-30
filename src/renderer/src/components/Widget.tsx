@@ -1,6 +1,7 @@
 import { cn } from '@renderer/utils'
 import { ReactElement, ReactNode, useState } from 'react'
 import { LuActivitySquare, LuArrowUpRight } from 'react-icons/lu'
+import { Link } from 'wouter'
 
 interface WidgetProps {
   icon?: ReactElement
@@ -11,6 +12,7 @@ interface WidgetProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl'
   hasGoTo?: boolean
   clickable?: boolean
+  href?: string
 }
 
 export const Widget = ({
@@ -21,18 +23,24 @@ export const Widget = ({
   color = 'none',
   size = 'md',
   hasGoTo = true,
-  clickable = true
+  clickable = true,
+  href = ''
 }: WidgetProps): ReactElement => {
   const [goTo, setGoTo] = useState<boolean>(false)
 
   const bgColor = {
-    none: 'bg-transparent border text-black',
-    danger: 'bg-red-100 text-red-400 border border-red-500',
-    success: 'bg-green-100 text-green-500 border border-green-500',
-    warning: 'bg-amber-100 text-amber-400 border border-amber-500',
-    info: 'bg-blue-100 text-blue-500 border border-blue-500',
-    origin: 'bg-orange-100 text-orange-500 border border-orange-500',
-    sadness: 'bg-fuchsia-100 text-fuchsia-500 border border-fuchsia-500'
+    none: 'border text-black',
+    danger:
+      'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-100 from-0% to-transparent to-70% text-red-400 border border-red-500/30',
+    success:
+      'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-100 from-0% to-transparent to-70% text-green-500 border border-green-500/30',
+    warning:
+      'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-100 from-0% to-transparent to-70% text-amber-400 border border-amber-500/30',
+    info: 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-100 from-0% to-transparent to-70% text-blue-500 border border-blue-500/30',
+    origin:
+      'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-100 from-0% to-transparent to-70% text-orange-500 border border-orange-500/30',
+    sadness:
+      'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-fuchsia-100 from-0% to-transparent to-70% text-fuchsia-500 border border-fuchsia-500/30'
   }
 
   const titleFontSize = {
@@ -61,15 +69,19 @@ export const Widget = ({
           <LuArrowUpRight />
         </div>
       )}
-      <header className="w-full flex items-center p-2 gap-2 ">
-        <section className="flex">
-          <article className="text-2xl p-1 rounded-full">
-            {icon ? icon : <LuActivitySquare />}
-          </article>
-        </section>
-        <section className={`${titleFontSize[size]}`}>{title}</section>
-      </header>
-      <main className="text-6xl flex items-center justify-center p-6">{children}</main>
+      <Link to={href}>
+        <header className="w-full flex items-center p-2 gap-1 ">
+          <section className="flex">
+            <article className="text-2xl p-1 rounded-full">
+              {icon ? icon : <LuActivitySquare />}
+            </article>
+          </section>
+          <section className={`${titleFontSize[size]}`}>{title}</section>
+        </header>
+        <main className="text-6xl flex items-center justify-center p-6 2xl:pt-6 pt-4">
+          {children}
+        </main>
+      </Link>
     </div>
   )
 }
