@@ -43,9 +43,11 @@ export const MainPage = (): ReactElement => {
                     <LuDollarSign />
                   </div>
                 </header>
-                {home.rentals_info.map((rent: any, index: number) => (
-                  <RentalRow rent={rent} key={index} />
-                ))}
+                {home.rentals_info
+                  .sort((a: any, b: any) => b.total - a.total)
+                  .map((rent: any, index: number) => (
+                    <RentalRow rent={rent} key={index} />
+                  ))}
               </div>
             </Widget>
             <Widget

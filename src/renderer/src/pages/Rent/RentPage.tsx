@@ -189,7 +189,7 @@ export const RentPage = (): ReactElement => {
   return (
     <AppLayout>
       <AppLayout.Content>
-        <AppLayout.PageOptions pageTitle="Rentas" hasAddButton={true} addRoute="/rent/create">
+        <AppLayout.PageOptions pageTitle="Rentas" hasAddButton={true} addRoute="/rents/create">
           <SearchBar
             searchFunction={setRentList}
             data={rentals}

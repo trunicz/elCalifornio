@@ -158,7 +158,7 @@ export const CreateEditRentPage = (): ReactElement => {
     if (!id) {
       if (inventory) {
         const equipments = inventory.map((equip: any) => {
-          return equip.value.id
+          return equip.value
         })
         const values = {
           client_id: data.client_id.value,

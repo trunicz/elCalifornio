@@ -69,7 +69,7 @@ export const Widget = ({
           <LuArrowUpRight />
         </div>
       )}
-      <Link to={href}>
+      <Link to={href} className="h-full">
         <header className="w-full flex items-center p-2 gap-1 ">
           <section className="flex">
             <article className="text-2xl p-1 rounded-full">
@@ -78,7 +78,7 @@ export const Widget = ({
           </section>
           <section className={`${titleFontSize[size]}`}>{title}</section>
         </header>
-        <main className="text-6xl flex items-center justify-center p-6 2xl:pt-6 pt-4">
+        <main className="text-6xl flex items-center justify-center p-6 2xl:pt-6 pt-2">
           {children}
         </main>
       </Link>
