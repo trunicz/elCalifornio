@@ -12,6 +12,7 @@ import { useRentals } from '@renderer/hooks/useRentals'
 import { useAuthStore } from '@renderer/stores/useAuth'
 import { LuAlertCircle, LuDollarSign } from 'react-icons/lu'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
+import { Loading } from '@renderer/components/Loading'
 
 const useCustomForm = (
   schema: Yup.AnyObjectSchema,
@@ -50,17 +51,44 @@ export const CreateEditRentPage = (): ReactElement => {
   const { getAllClients, getClientById, getAllLocalClients } = useClients()
   const [inv, setInv] = useState<{ value: string; label: string }[]>()
   const [showForeign, setShowForeign] = useState<boolean>(false)
+  const [canShowForm, setCanShowForm] = useState<boolean>(false)
   const [advicePayment, setAdvicePayment] = useState<number | null>(null)
+  const [selectClientID, setSelectClientID] = useState<{
+    value: string | number
+    label: string
+  } | null>(null)
   const { getAvailableInventory, getPricesByItemId } = useInventory()
-  const { createRental } = useRentals()
+  const [endDateValue, setEndDateValue] = useState<string>()
+  const { createRental, getRentalForEdit, updateRental } = useRentals()
+  const [currentCost, setCurrentCost] = useState(0)
   const [, setLocation] = useLocation()
   const [parent] = useAutoAnimate()
   const { user } = useAuthStore()
   const { id } = useParams()
 
-  const [currentCost, setCurrentCost] = useState(0)
-
   const client_id = watch('client_id')
+
+  const updateSelectClientId = (e: any): void => {
+    setSelectClientID(e)
+  }
+
+  useEffect(() => {
+    if (id) {
+      getRentalForEdit(id)
+        .then((res: any) => {
+          const rest = clients?.filter((c) => c.value === res.client_id)
+          if (rest) {
+            setSelectClientID(rest[0])
+          }
+          setEndDateValue(formatDate(new Date(res.end_date)))
+        })
+        .then(() => {
+          setCanShowForm(true)
+        })
+    } else {
+      setCanShowForm(true)
+    }
+  }, [id])
 
   const onChangeEndDate = (e: any): void => {
     setEndDate(e)
@@ -161,7 +189,7 @@ export const CreateEditRentPage = (): ReactElement => {
           return equip.value
         })
         const values = {
-          client_id: data.client_id.value,
+          client_id: selectClientID,
           advance_payment: advicePayment,
           building_address: data.building_address,
           user_id: user?.id,
@@ -178,6 +206,10 @@ export const CreateEditRentPage = (): ReactElement => {
           setLocation('/rent')
         )
       }
+    } else {
+      updateRental(id, { end_date: endDateValue }).then(() => {
+        setLocation('/rent')
+      })
     }
   }
 
@@ -197,39 +229,45 @@ export const CreateEditRentPage = (): ReactElement => {
     <AppLayout>
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle={id ? 'Modificar Renta' : 'Rentar'} hasAddButton={false} />
-        {clients && (
+        {canShowForm && clients ? (
           <form
             ref={parent}
             onSubmit={handleSubmit(onSubmit)}
             className="overflow-y-auto overflow-x-hidden w-full px-8 flex-1 grid auto-rows-max  mx-auto"
           >
             <div ref={parent} className="w-1/2 mx-auto">
-              <Controller
-                name="client_id"
-                control={control}
-                render={({ field }) => (
-                  <div className="w-full p-4">
-                    <label className="block mb-2">Seleccionar Cliente:</label>
-                    <Select
-                      {...field}
-                      options={clients}
-                      isSearchable
-                      styles={{
-                        control: (provided) => ({
-                          ...provided,
-                          borderColor: '#E5E7EB',
-                          borderRadius: '0.375rem',
-                          boxShadow: 'none',
-                          '&:hover': {
-                            borderColor: '#D1D5DB'
-                          }
-                        })
-                      }}
-                    />
-                    <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
-                  </div>
-                )}
-              />
+              {!id ? (
+                <Controller
+                  name="client_id"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="w-full p-4">
+                      <label className="block mb-2">Seleccionar Cliente:</label>
+                      <Select
+                        {...field}
+                        options={clients}
+                        isSearchable
+                        onChange={(e) => updateSelectClientId(e)}
+                        value={selectClientID}
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            borderColor: '#E5E7EB',
+                            borderRadius: '0.375rem',
+                            boxShadow: 'none',
+                            '&:hover': {
+                              borderColor: '#D1D5DB'
+                            }
+                          })
+                        }}
+                      />
+                      <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
+                    </div>
+                  )}
+                />
+              ) : (
+                ''
+              )}
               {showForeign && (
                 <>
                   <small className="m-4 flex gap-2 items-center p-2 mb-0 bg-blue-500 w-fu text-white rounded-lg">
@@ -276,38 +314,54 @@ export const CreateEditRentPage = (): ReactElement => {
                   </div>
                 </>
               )}
-              <Controller
-                name="end_date"
-                control={control}
-                render={({ field }) => (
-                  <div className="w-full p-4">
-                    <label className="block mb-2">Tiempo de renta:</label>
-                    <Select
-                      {...field}
-                      placeholder="Tiempo de renta"
-                      options={[
-                        { value: getTimestampForThreeDays(), label: '1 a 3 Dias' },
-                        { value: getTimestampForOneWeek(), label: '1 Semana' }
-                      ]}
-                      onChange={(e) => onChangeEndDate(e)}
-                      value={endDate}
-                      isSearchable
-                      styles={{
-                        control: (provided) => ({
-                          ...provided,
-                          borderColor: '#E5E7EB',
-                          borderRadius: '0.375rem',
-                          boxShadow: 'none',
-                          '&:hover': {
-                            borderColor: '#D1D5DB'
-                          }
-                        })
-                      }}
-                    />
-                    <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
-                  </div>
-                )}
-              />
+              {!id ? (
+                <Controller
+                  name="end_date"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="w-full p-4">
+                      <label className="block mb-2">Tiempo de renta:</label>
+                      <Select
+                        {...field}
+                        placeholder="Tiempo de renta"
+                        options={[
+                          { value: getTimestampForThreeDays(), label: '1 a 3 Dias' },
+                          { value: getTimestampForOneWeek(), label: '1 Semana' }
+                        ]}
+                        onChange={(e) => onChangeEndDate(e)}
+                        value={endDate}
+                        isSearchable
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            borderColor: '#E5E7EB',
+                            borderRadius: '0.375rem',
+                            boxShadow: 'none',
+                            '&:hover': {
+                              borderColor: '#D1D5DB'
+                            }
+                          })
+                        }}
+                      />
+                      <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
+                    </div>
+                  )}
+                />
+              ) : (
+                <div className="mt-10 flex flex-col gap-4">
+                  <div>Agrega mas tiempo a la renta</div>
+                  <input
+                    className="ps-7 w-full focus:bg-gray-100 outline-0 border-2 rounded-lg p-1.5"
+                    type="date"
+                    onChange={(event) => {
+                      const dateValue = event.target.value
+                      setEndDateValue(dateValue ? dateValue : undefined)
+                    }}
+                    value={endDateValue}
+                    min={formatDate(new Date())}
+                  />
+                </div>
+              )}
               {isEquipmentVisible && (
                 <>
                   <Controller
@@ -375,9 +429,13 @@ export const CreateEditRentPage = (): ReactElement => {
               )}
             </div>
             <div className="fixed z-10 end-4 bottom-4">
-              <p ref={parent} className="text-3xl flex flex-col pb-2">
-                <span className="text-lg">Total:</span>${printPrices(currentCost, advicePayment)}
-              </p>
+              {!id ? (
+                <p ref={parent} className="text-3xl flex flex-col pb-2">
+                  <span className="text-lg">Total:</span>${printPrices(currentCost, advicePayment)}
+                </p>
+              ) : (
+                ''
+              )}
               <Button
                 type="submit"
                 className=" bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
@@ -385,6 +443,8 @@ export const CreateEditRentPage = (): ReactElement => {
               />
             </div>
           </form>
+        ) : (
+          <Loading />
         )}
       </AppLayout.Content>
     </AppLayout>
@@ -411,4 +471,11 @@ function printPrices(currentCost: any, advicePayment: any): string {
   } else {
     return `0`
   }
+}
+
+function formatDate(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Months are zero-indexed
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }

@@ -2,7 +2,7 @@ import { cn } from '@renderer/utils'
 import { ComponentProps, ReactElement } from 'react'
 
 export interface ButtonProps extends ComponentProps<'button'> {
-  color?: 'danger' | 'success' | 'warning'
+  color?: 'danger' | 'success' | 'warning' | 'info' | 'accent'
   icon?: ReactElement
   text?: string
   isIconOnly?: boolean
@@ -24,7 +24,9 @@ export const Button = ({
   const colorStyle: { [x: string]: string } = {
     danger: 'hover:bg-red-600 text-white border bg-red-500',
     success: 'hover:bg-green-600 text-white border bg-green-500',
-    warning: 'hover:bg-amber-600 text-white border bg-amber-500'
+    warning: 'hover:bg-amber-600 text-white border bg-amber-500',
+    info: 'hover:bg-blue-600 text-white border bg-blue-500',
+    accent: 'hover:bg-fuchsia-600 text-white border bg-fuchsia-500'
   }
   return (
     <button

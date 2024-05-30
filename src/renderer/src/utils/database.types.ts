@@ -577,6 +577,13 @@ export type Database = {
             foreignKeyName: "rentals_equipments_rental_id_fkey"
             columns: ["rental_id"]
             isOneToOne: false
+            referencedRelation: "rental_to_edit"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rentals_equipments_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
             referencedRelation: "rentals"
             referencedColumns: ["id"]
           },
@@ -684,6 +691,13 @@ export type Database = {
             foreignKeyName: "rentals_clients_rental_id_fkey"
             columns: ["rental_id"]
             isOneToOne: false
+            referencedRelation: "rental_to_edit"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rentals_clients_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
             referencedRelation: "rentals"
             referencedColumns: ["id"]
           },
@@ -721,6 +735,13 @@ export type Database = {
             foreignKeyName: "rentals_references_clients_rental_id_fkey"
             columns: ["rental_id"]
             isOneToOne: false
+            referencedRelation: "rental_to_edit"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rentals_references_clients_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
             referencedRelation: "rentals"
             referencedColumns: ["id"]
           },
@@ -745,6 +766,13 @@ export type Database = {
             columns: ["rental_id"]
             isOneToOne: false
             referencedRelation: "all_rentals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rentals_users_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
+            referencedRelation: "rental_to_edit"
             referencedColumns: ["id"]
           },
           {
@@ -924,6 +952,41 @@ export type Database = {
           value?: number | null
         }
         Relationships: []
+      }
+      rental_to_edit: {
+        Row: {
+          advance_payment: string | null
+          building_address: string | null
+          client_id: number | null
+          end_date: string | null
+          equipments_id: number[] | null
+          id: number | null
+        }
+        Insert: {
+          advance_payment?: string | null
+          building_address?: string | null
+          client_id?: number | null
+          end_date?: string | null
+          equipments_id?: number[] | null
+          id?: number | null
+        }
+        Update: {
+          advance_payment?: string | null
+          building_address?: string | null
+          client_id?: number | null
+          end_date?: string | null
+          equipments_id?: number[] | null
+          id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rentals_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {

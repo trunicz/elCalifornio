@@ -11,9 +11,16 @@ import {
 import { Loading } from '@renderer/components/Loading'
 import { useRentals } from '@renderer/hooks/useRentals'
 import { ReactElement, useEffect, useState } from 'react'
-import { LuCheckCircle, LuCheckCircle2, LuFileSignature, LuPhoneCall } from 'react-icons/lu'
+import {
+  LuCheckCircle,
+  LuCheckCircle2,
+  LuFileDown,
+  LuPencilLine,
+  LuPhoneCall,
+  LuSettings2
+} from 'react-icons/lu'
 import { FiWatch } from 'react-icons/fi'
-import { Link, useParams } from 'wouter'
+import { Link, useLocation, useParams } from 'wouter'
 import { IoWarning } from 'react-icons/io5'
 import { useContracts } from '@renderer/hooks/useContracts'
 import supabase from '@renderer/utils/supabase'
@@ -30,6 +37,7 @@ export const RentPage = (): ReactElement => {
   const { user } = useAuthStore()
   const { setLoading } = useLoadingStore()
   const { search } = useParams()
+  const [, setLocation] = useLocation()
 
   useEffect(() => {
     getAllRentals().then((res) => {
@@ -91,7 +99,7 @@ export const RentPage = (): ReactElement => {
     )
   }
 
-  const watchRental = async (id: string | number): Promise<void> => {
+  const downloadRentalContract = async (id: string | number): Promise<void> => {
     setLoading(true)
     const rent: any = rentList?.filter((rent: any) => rent.id === id)
 
@@ -118,6 +126,7 @@ export const RentPage = (): ReactElement => {
       submitLog()
     }
   }
+
   const submitLog = (): void => {
     const logSchema = Yup.object().shape({
       status: Yup.string(),
@@ -186,6 +195,37 @@ export const RentPage = (): ReactElement => {
     )
   }
 
+  const openMore = (id: string | number): void => {
+    openModal(
+      <div className="grid grid-cols-3 grid-rows-1 gap-4">
+        <Button
+          color="warning"
+          icon={<LuPencilLine className="text-6xl" />}
+          isIconOnly
+          text="gola"
+          className="animate-fade animate-duration-100 w-full p-12 flex items-center justify-center "
+          onClick={() => setLocation('/rent/edit/' + id)}
+        />
+        <Button
+          color="info"
+          icon={<LuFileDown className="text-6xl" />}
+          isIconOnly
+          text="gola"
+          className="animate-fade animate-duration-100 w-full p-12 flex items-center justify-center "
+          onClick={() => downloadRentalContract(id)}
+        />
+        <Button
+          color="success"
+          icon={<LuPhoneCall className="text-6xl" />}
+          isIconOnly
+          text="gola"
+          className="animate-fade animate-duration-100 w-full p-12 flex items-center justify-center "
+          onClick={() => callRentalUser(id)}
+        />
+      </div>
+    )
+  }
+
   return (
     <AppLayout>
       <AppLayout.Content>
@@ -208,11 +248,10 @@ export const RentPage = (): ReactElement => {
             data={rentList}
             hiddenKeys={['id', 'arrendatario', 'cliente_tel', 'formdata', 'dirección']}
             deleteFunction={endRent}
-            watchFunction={watchRental}
-            editFunction={callRentalUser}
+            watchFunction={openMore}
+            canSeeEdit={false}
             customDeleteBtn={{ icon: <FiWatch />, title: 'Terminar Renta' }}
-            customMoreBtn={{ icon: <LuFileSignature />, title: 'Descargar Contrato' }}
-            customEditBtn={{ icon: <LuPhoneCall />, title: 'Llamar a cliente' }}
+            customMoreBtn={{ icon: <LuSettings2 />, title: 'Opciones' }}
           />
         ) : (
           <Loading />

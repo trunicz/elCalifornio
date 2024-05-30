@@ -9,10 +9,25 @@ interface RentalsMethods {
   createRental: (values: any) => Promise<void>
   getRental: (id: string | number) => Promise<object | null>
   getRentalHistory: () => Promise<any[] | null>
+  getRentalForEdit: (id: string | number) => Promise<object>
+  updateRental: (id: string | number, values: any) => Promise<void>
 }
 
 export const useRentals = (): RentalsMethods => {
   const [rentals, setRentals] = useState<any[] | null>(null)
+
+  const updateRental = async (id: string | number, values: any): Promise<void> => {
+    const { error } = await supabase.from('rentals').update(values).eq('id', id)
+    if (error) throw error
+    const { data } = await supabase.rpc('actualizar_rentas_vencidas')
+    console.log(data)
+  }
+
+  const getRentalForEdit = async (id: string | number): Promise<object> => {
+    const { data, error } = await supabase.from('rental_to_edit').select().eq('id', Number(id))
+    if (error) throw error
+    return data[0]
+  }
 
   const deleteRental = async (id: string | number): Promise<void> => {
     try {
@@ -138,5 +153,14 @@ export const useRentals = (): RentalsMethods => {
     return null
   }
 
-  return { getAllRentals, rentals, deleteRental, createRental, getRental, getRentalHistory }
+  return {
+    getAllRentals,
+    rentals,
+    deleteRental,
+    createRental,
+    getRental,
+    getRentalHistory,
+    getRentalForEdit,
+    updateRental
+  }
 }

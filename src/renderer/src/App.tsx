@@ -50,7 +50,7 @@ function App(): ReactElement {
             <Route path="/rent" component={RentPage} />
             <Route path="/rent/:search" component={RentPage} />
             <Route path="/rents/create" component={CreateEditRentPage} />
-            <Route path="/rent/:id" component={CreateEditRentPage} />
+            <Route path="/rent/edit/:id" component={CreateEditRentPage} />
             <Route path="/rentals/history" component={RentHistory} />
             <Route path="/contracts" component={ContractsPage} />
             <Route path="/bills" component={BillsPage} />
