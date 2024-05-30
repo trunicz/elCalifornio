@@ -18,9 +18,10 @@ import {
 
 export const MainPage = (): ReactElement => {
   const { home, getHomeInfo } = useHomeStore()
+
   useEffect(() => {
     getHomeInfo()
-  }, [])
+  }, [getHomeInfo])
 
   return (
     <AppLayout>
@@ -33,6 +34,7 @@ export const MainPage = (): ReactElement => {
               className="row-span-full col-span-2"
               size="xl"
               hasGoTo={false}
+              clickable={false}
             >
               <div className="h-auto w-full">
                 <header className="flex border-b mb-4 pb-2 text-xl items-center justify-between">
@@ -41,38 +43,9 @@ export const MainPage = (): ReactElement => {
                     <LuDollarSign />
                   </div>
                 </header>
-                {home.rentals_info.map((rent: any, index: number) => {
-                  const [showIcon, setShowIcon] = useState(false)
-
-                  return (
-                    <>
-                      <button
-                        className="flex relative w-full text-xl mb-2  items-center justify-between p-2 py-4 text-purple-500 bg-purple-100 rounded-xl active:bg-purple-200 transition-all active:scale-[99%]"
-                        key={index}
-                        onMouseEnter={() => setShowIcon(true)}
-                        onMouseLeave={() => setShowIcon(false)}
-                      >
-                        {showIcon && (
-                          <div className="text-3xl ps-4 animate animate-fade-up animate-duration-150 absolute ">
-                            <LuReply />
-                          </div>
-                        )}
-                        <div
-                          className={cn(
-                            'ms-4 w-full text-lg text-start text-wrap transition-all',
-                            showIcon ? 'ps-12' : ''
-                          )}
-                        >
-                          {rent.nombre}
-                        </div>
-                        <div className="text-white p-2 bg-purple-300 rounded-xl">
-                          <span className="pe-1">$</span>
-                          {parseFloat(rent.total).toFixed(2)}
-                        </div>
-                      </button>
-                    </>
-                  )
-                })}
+                {home.rentals_info.map((rent: any, index: number) => (
+                  <RentalRow rent={rent} key={index} />
+                ))}
               </div>
             </Widget>
             <Widget
@@ -116,9 +89,7 @@ export const MainPage = (): ReactElement => {
               <div className="text-4xl xl:text-5xl overflow-hidden">
                 <span className="pe-2">$</span>
                 {home.rentals_info
-                  .reduce((acc: any, rent: any) => {
-                    return acc + Number(rent.total)
-                  }, 0)
+                  .reduce((acc: any, rent: any) => acc + Number(rent.total), 0)
                   .toFixed(2)}
               </div>
             </Widget>
@@ -136,5 +107,35 @@ export const MainPage = (): ReactElement => {
         )}
       </AppLayout.Content>
     </AppLayout>
+  )
+}
+
+const RentalRow = ({ rent }: { rent: { nombre: string; total: string } }): ReactElement => {
+  const [showIcon, setShowIcon] = useState(false)
+
+  return (
+    <button
+      className="flex relative w-full text-xl mb-2 items-center justify-between p-2 py-4 text-purple-500 bg-purple-100 rounded-xl active:bg-purple-200 transition-all active:scale-[99%]"
+      onMouseEnter={() => setShowIcon(true)}
+      onMouseLeave={() => setShowIcon(false)}
+    >
+      {showIcon && (
+        <div className="text-3xl ps-4 animate animate-fade-up animate-duration-150 absolute ">
+          <LuReply />
+        </div>
+      )}
+      <div
+        className={cn(
+          'ms-4 w-full text-lg text-start text-wrap transition-all',
+          showIcon ? 'ps-12' : ''
+        )}
+      >
+        {rent.nombre}
+      </div>
+      <div className="text-white p-2 bg-purple-300 rounded-xl">
+        <span className="pe-1">$</span>
+        {parseFloat(rent.total).toFixed(2)}
+      </div>
+    </button>
   )
 }

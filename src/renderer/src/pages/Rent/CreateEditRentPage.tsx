@@ -50,8 +50,8 @@ export const CreateEditRentPage = (): ReactElement => {
   const { getAllClients, getClientById, getAllLocalClients } = useClients()
   const [inv, setInv] = useState<{ value: string; label: string }[]>()
   const [showForeign, setShowForeign] = useState<boolean>(false)
-  const [advicePayment, setAdvicePayment] = useState()
-  const { getAvailableInventory } = useInventory()
+  const [advicePayment, setAdvicePayment] = useState<number | null>(null)
+  const { getAvailableInventory, getPricesByItemId } = useInventory()
   const { createRental } = useRentals()
   const [, setLocation] = useLocation()
   const [parent] = useAutoAnimate()
@@ -72,25 +72,45 @@ export const CreateEditRentPage = (): ReactElement => {
   }
 
   useEffect(() => {
-    const tempPrices = inventory?.map((val: any) => {
-      if (val.value.prices) {
-        if (endDate?.label === '1 a 3 Dias') {
-          return val.value.prices[0].price_days
+    const fetchPrices = async (): Promise<void> => {
+      try {
+        const tempPricesPromises =
+          inventory?.map(async (val: any) => {
+            try {
+              const res: any = await getPricesByItemId(val.value)
+              if (res[0]) {
+                return endDate?.label === '1 a 3 Dias' ? res[0].price_days : res[0].price_week
+              }
+              return 0
+            } catch (err) {
+              console.log(err)
+              return 0
+            }
+          }) || []
+
+        const tempPrices = await Promise.all(tempPricesPromises)
+
+        if (tempPrices?.length) {
+          const totalCost = tempPrices.reduce((acc, cv) => {
+            return acc + cv
+          }, 0) // Asegúrate de tener un valor inicial para el reduce
+          console.log(totalCost)
+
+          setCurrentCost(totalCost)
         } else {
-          return val.value.prices[0].price_week
+          setCurrentCost(0)
         }
+      } catch (err) {
+        console.log(err)
       }
-    })
-    if (tempPrices?.length) {
-      const totalCost = tempPrices?.reduce((acc, cv) => {
-        return acc + cv
-      })
-      setCurrentCost(totalCost)
     }
+
+    fetchPrices()
   }, [inventory, endDate])
 
   const onChangeAdvicePayment = (e: any): void => {
-    setAdvicePayment(e)
+    const value = parseFloat(e.target.value)
+    setAdvicePayment(!isNaN(value) ? value : null)
   }
 
   useEffect(() => {
@@ -123,9 +143,10 @@ export const CreateEditRentPage = (): ReactElement => {
 
     getAvailableInventory().then((res) => {
       const filteredInventory = (res || []).map((item: any) => {
+        const label = `${item.type.type_name}: ${item.reference ? item.reference : item.dimension.dimension_name}`
         return {
-          value: item,
-          label: `${item.type.type_name}: ${item.reference ? item.reference : item.dimension.dimension_name}`
+          value: item.id, // Usa un ID único aquí
+          label
         }
       })
       setInv(filteredInventory)
@@ -313,6 +334,7 @@ export const CreateEditRentPage = (): ReactElement => {
                               }
                             })
                           }}
+                          getOptionValue={(option) => option.value} // Esta línea asegura que cada key sea única
                         />
                         <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
                       </div>
@@ -323,14 +345,14 @@ export const CreateEditRentPage = (): ReactElement => {
                     <input
                       {...register('advance_payment')}
                       type="number"
-                      onChange={(e) => onChangeAdvicePayment(e.target.value)}
-                      value={advicePayment}
+                      onChange={(e) => onChangeAdvicePayment(e)}
+                      value={advicePayment ?? ''}
                       className="ps-7 w-full focus:bg-gray-100 outline-0 border-2 rounded-lg p-1.5"
                       min={0}
                     />
                     <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg" />
                   </div>
-                  {advicePayment && currentCost < advicePayment && (
+                  {typeof advicePayment === 'number' && currentCost < advicePayment && (
                     <p className="px-4 text-red-400 text-sm -mt-2">
                       El anticipo es mayor al costo, verifica que no sea un error.
                     </p>
@@ -353,11 +375,8 @@ export const CreateEditRentPage = (): ReactElement => {
               )}
             </div>
             <div className="fixed z-10 end-4 bottom-4">
-              <p className="text-3xl flex flex-col pb-2">
-                <span className="text-lg">Total:</span>$
-                {advicePayment && currentCost > advicePayment && advicePayment >= 0
-                  ? `${(currentCost - Math.abs(advicePayment)).toFixed(2)}`
-                  : 0}
+              <p ref={parent} className="text-3xl flex flex-col pb-2">
+                <span className="text-lg">Total:</span>${printPrices(currentCost, advicePayment)}
               </p>
               <Button
                 type="submit"
@@ -382,4 +401,14 @@ function getTimestampForOneWeek(): string {
   const currentDate = new Date()
   const endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000)
   return endDate.toISOString()
+}
+
+function printPrices(currentCost: any, advicePayment: any): string {
+  if (advicePayment && currentCost > advicePayment) {
+    return `${(currentCost - Math.abs(advicePayment)).toFixed(2)}`
+  } else if (!advicePayment && currentCost) {
+    return `${currentCost.toFixed(2)}`
+  } else {
+    return `0`
+  }
 }

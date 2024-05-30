@@ -10,6 +10,7 @@ interface WidgetProps {
   color?: 'none' | 'danger' | 'success' | 'warning' | 'info' | 'origin' | 'sadness'
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl'
   hasGoTo?: boolean
+  clickable?: boolean
 }
 
 export const Widget = ({
@@ -19,7 +20,8 @@ export const Widget = ({
   className,
   color = 'none',
   size = 'md',
-  hasGoTo = true
+  hasGoTo = true,
+  clickable = true
 }: WidgetProps): ReactElement => {
   const [goTo, setGoTo] = useState<boolean>(false)
 
@@ -46,8 +48,9 @@ export const Widget = ({
   return (
     <div
       className={cn(
-        'rounded-xl text-xl relative overflow-hidden active:scale-[96%] transition-all',
+        'rounded-xl text-xl relative overflow-hidden transition-all',
         bgColor[color],
+        clickable ? 'active:scale-[96%]' : '',
         className
       )}
       onMouseEnter={() => setGoTo(true)}

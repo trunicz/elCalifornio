@@ -16,6 +16,7 @@ interface InventoryMethods {
   getItemDimension: (id: string | number) => Promise<object[] | null>
   getPricesBy: (id: string | number) => Promise<object[] | null>
   createPrices: (values: object) => Promise<void>
+  getPricesByItemId: (id: string | number) => Promise<object[]>
 }
 
 export const useInventory = (): InventoryMethods => {
@@ -24,6 +25,12 @@ export const useInventory = (): InventoryMethods => {
   const createPrices = async (values: any): Promise<void> => {
     const { error } = await supabase.from('prices').insert(values)
     if (error) throw error
+  }
+
+  const getPricesByItemId = async (id: string | number): Promise<object[]> => {
+    const { data, error } = await supabase.from('prices').select().eq('equipment_id', id)
+    if (error) throw error
+    return data
   }
 
   const getPricesBy = async (id: string | number): Promise<object[] | null> => {
@@ -185,6 +192,7 @@ export const useInventory = (): InventoryMethods => {
     getAllInventoryView,
     getItemDimension,
     getPricesBy,
-    createPrices
+    createPrices,
+    getPricesByItemId
   }
 }
