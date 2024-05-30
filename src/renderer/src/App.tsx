@@ -1,5 +1,6 @@
 import { ReactElement, useEffect } from 'react'
-import { Redirect, Route, Switch } from 'wouter'
+import { Redirect, Route, Switch, Router } from 'wouter'
+import { useHashLocation } from 'wouter/use-hash-location'
 import {
   AuditPage,
   BillsPage,
@@ -30,7 +31,7 @@ function App(): ReactElement {
     return <Loading />
   }
   return (
-    <>
+    <Router hook={useHashLocation}>
       <Switch>
         <Route path="/login">{!user ? <AuthPage /> : <Redirect to="/" />}</Route>
         {user ? (
@@ -59,7 +60,7 @@ function App(): ReactElement {
           <Redirect to="/login" />
         )}
       </Switch>
-    </>
+    </Router>
   )
 }
 
