@@ -14,11 +14,37 @@ interface Clients {
   getAllFiles: (id: any) => Promise<FileList[]>
   download: (id: any, name: string) => Promise<Blob | MediaSource>
   removeFile: (id: any, name: string) => Promise<void>
+  getBannedClients: () => Promise<any[]>
+  unBanClientById: (id: string | number) => Promise<void>
 }
 
 export const useClients = (): Clients => {
   const [clientList, setClientList] = useState<object[] | null>(null)
   const [localsClients, setLocalsClients] = useState<object[] | null>(null)
+
+  const unBanClientById = async (id: string | number): Promise<void> => {
+    const { error } = await supabase.from('clients').update({ strikes: 2 }).eq('id', id)
+    if (error) throw error
+  }
+
+  const getBannedClients = async (): Promise<any[]> => {
+    const { data, error } = await supabase
+      .from('clients')
+      .select('id,name,last_name,phone,strikes')
+      .gt('strikes', 2)
+    if (error) throw error
+    const filteredData = data.map((r) => {
+      return {
+        id: r.id,
+        nombre: r.name,
+        apellido: r.last_name,
+        teléfono: r.phone,
+        strikes: r.strikes
+      }
+    })
+    setClientList(filteredData)
+    return filteredData
+  }
 
   const removeFile = async (id: any, name: string): Promise<void> => {
     const { data, error } = await supabase.storage
@@ -141,6 +167,7 @@ export const useClients = (): Clients => {
         .from('clients')
         .select('id,name,last_name,phone,isForeign,client_type(type_name),strikes')
         .is('deleted_at', null)
+        .lt('strikes', 3)
       if (error) throw error
       const filteredClients = data.map((client) => {
         return {
@@ -199,6 +226,8 @@ export const useClients = (): Clients => {
     localsClients,
     getAllFiles,
     download,
-    removeFile
+    removeFile,
+    getBannedClients,
+    unBanClientById
   }
 }

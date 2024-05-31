@@ -20,6 +20,7 @@ import { CreateEditClientPage } from '@renderer/pages/Clients/CreateEditClientPa
 import { CreateEditInventoryPage } from '@renderer/pages/Inventory/CreateEditInventoryPage'
 import { CreateEditRentPage } from '@renderer/pages/Rent/CreateEditRentPage'
 import { RentHistory } from '@renderer/pages/Rent/RentHistory'
+import { ClientsBLPages } from './pages/Clients/ClientsBLPages'
 
 function App(): ReactElement {
   const { user, isLoading, initializeUser } = useAuthStore()
@@ -41,6 +42,7 @@ function App(): ReactElement {
             <Route path="/users/create" component={CreateEditUserPage} />
             <Route path="/users/:id" component={CreateEditUserPage} />
             <Route path="/clients" component={ClientsPage} />
+            <Route path="/client/blacklist" component={ClientsBLPages} />
             <Route path="/clients/create" component={CreateEditClientPage} />
             <Route path="/clients/:id" component={CreateEditClientPage} />
             <Route path="/clients/create/:enable" component={CreateEditClientPage} />

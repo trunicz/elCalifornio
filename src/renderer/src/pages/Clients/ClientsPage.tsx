@@ -15,8 +15,8 @@ import supabase from '@renderer/utils/supabase'
 import { ReactElement, useEffect, useState } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import { IoMegaphone, IoWarning } from 'react-icons/io5'
-import { LuCheckCircle2, LuDownload, LuFolder, LuX } from 'react-icons/lu'
-import { useLocation } from 'wouter'
+import { LuCheckCircle2, LuDownload, LuFolder, LuSkull, LuX } from 'react-icons/lu'
+import { Link, useLocation } from 'wouter'
 import * as Yup from 'yup'
 
 export const ClientsPage = (): ReactElement => {
@@ -366,6 +366,15 @@ export const ClientsPage = (): ReactElement => {
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle="Clientes" addRoute="/clients/create">
           <SearchBar searchFunction={setClients} data={clientList} />
+          <Link
+            to="/client/blacklist"
+            className="ms-4 flex items-center justify-center hover:bg-gray-500 px-4 w-auto rounded-xl h-full bg-gray-400 text-nowrap text-white font-medium active:scale-95 transition-all gap-1"
+          >
+            <span className="text-xl">
+              <LuSkull />
+            </span>
+            Lista Negra
+          </Link>
         </AppLayout.PageOptions>
         <Modal title="Cliente" className="w-auto min-w-[450px]" />
         {clientList ? (
