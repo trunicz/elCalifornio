@@ -45,6 +45,7 @@ export const MainPage = (): ReactElement => {
                 </header>
                 {home.rentals_info
                   .sort((a: any, b: any) => b.total - a.total)
+                  .slice(0, 6)
                   .map((rent: any, index: number) => (
                     <RentalRow rent={rent} key={index} />
                   ))}

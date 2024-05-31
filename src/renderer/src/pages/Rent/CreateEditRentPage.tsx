@@ -189,7 +189,7 @@ export const CreateEditRentPage = (): ReactElement => {
           return equip.value
         })
         const values = {
-          client_id: selectClientID,
+          client_id: selectClientID?.value,
           advance_payment: advicePayment,
           building_address: data.building_address,
           user_id: user?.id,
