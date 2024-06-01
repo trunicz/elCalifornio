@@ -188,7 +188,6 @@ export const CreateEditClientPage = (): ReactElement => {
               formDirection="col"
               fields={formFields}
               validationSchema={clientSchema}
-              hasFiles
             />
           </>
         ) : (

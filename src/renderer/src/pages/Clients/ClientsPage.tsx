@@ -11,11 +11,12 @@ import {
 import { Loading } from '@renderer/components/Loading'
 import { useClients } from '@renderer/hooks'
 import { useAuthStore } from '@renderer/stores/useAuth'
+import { useLoadingStore } from '@renderer/stores/useLoading'
 import supabase from '@renderer/utils/supabase'
 import { ReactElement, useEffect, useState } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import { IoMegaphone, IoWarning } from 'react-icons/io5'
-import { LuCheckCircle2, LuDownload, LuFolder, LuSkull, LuX } from 'react-icons/lu'
+import { LuCheckCircle2, LuDownload, LuFolder, LuSkull, LuUpload, LuX } from 'react-icons/lu'
 import { Link, useLocation } from 'wouter'
 import * as Yup from 'yup'
 
@@ -29,10 +30,12 @@ export const ClientsPage = (): ReactElement => {
     getClientById,
     getAllFiles,
     download,
-    removeFile
+    removeFile,
+    uploadFiles
   } = useClients()
   const { Modal, openModal, closeModal } = useModal()
   const { user } = useAuthStore()
+  const { setLoading } = useLoadingStore()
 
   useEffect(() => {
     getAllClients().then((response) => setClients(response))
@@ -58,130 +61,218 @@ export const ClientsPage = (): ReactElement => {
       </div>
     )
   }
+  const openFiles = (id: string | number): void => {
+    openModal(
+      <>
+        <div className="flex items-center justify-center text-red-400 p-6 text-xl">
+          No hay Archivos
+        </div>
+        <div className="flex gap-4">
+          <Button color="danger" text="Cerrar" onClick={closeModal} />
+          <Button
+            color="success"
+            text="Subir Archivo"
+            icon={<LuUpload />}
+            onClick={() => {
+              const input = document.createElement('input')
+              input.type = 'file'
+              input.click()
+              input.addEventListener('change', async (e) => {
+                const target = e.target as HTMLInputElement
+                const file = target.files
+
+                if (file && file.length > 0) {
+                  try {
+                    setLoading(true)
+                    await uploadFiles(file, String(id)).then(() => {
+                      setLoading(false)
+                      openModal(
+                        <div>
+                          <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
+                            <LuCheckCircle2 />
+                          </span>
+                          <h3>¡El cliente se elimino con éxito!</h3>
+                          <Button
+                            className="mt-4"
+                            color="success"
+                            text="Aceptar"
+                            onClick={() => {
+                              seeFiles(id)
+                            }}
+                          />
+                        </div>
+                      )
+                    })
+                  } catch (error) {
+                    console.error(error)
+                  }
+                }
+              })
+            }}
+          />
+        </div>
+      </>
+    )
+  }
 
   const seeFiles = (id: string | number): void => {
     getAllFiles(id).then((prom: object[]) => {
       const files = Array.from(prom)
       if (files.length > 0) {
         openModal(
-          <div className="overflow-y-auto flex flex-col gap-4">
-            {files.map((file: any, index) => {
-              const imageURL =
-                import.meta.env.VITE_SUPABASE_URL +
-                '/storage/v1/object/public/clients_storage/clients/' +
-                id +
-                '/' +
-                file.name
+          <div className="flex flex-col gap-4 h-auto">
+            <div className="overflow-y-auto flex flex-col gap-4">
+              {files.map((file: any, index) => {
+                const imageURL =
+                  import.meta.env.VITE_SUPABASE_URL +
+                  '/storage/v1/object/public/clients_storage/clients/' +
+                  id +
+                  '/' +
+                  file.name
 
-              return (
-                <section
-                  key={file.name + index}
-                  className="transition-all flex border overflow-hidden rounded-xl hover:bg-gray-100"
-                >
-                  <div
-                    className="flex flex-1 items-center h-[70px]"
-                    onClick={() => preview(id, imageURL)}
+                return (
+                  <section
+                    key={file.name + index}
+                    className="transition-all flex border overflow-hidden rounded-xl hover:bg-gray-100"
                   >
-                    <div className="w-24 flex justify-center items-center border-r">
-                      <img
-                        className="object-cover h-full"
-                        draggable={false}
-                        src={imageURL}
-                        onError={(e: any) => {
-                          e.onError = null
-                          e.target.src = '/src/assets/noImage.jpeg'
-                        }}
-                        alt={file.name}
-                      />
+                    <div
+                      className="flex flex-1 items-center h-[70px]"
+                      onClick={() => preview(id, imageURL)}
+                    >
+                      <div className="w-24 flex justify-center items-center border-r">
+                        <img
+                          className="object-cover h-full"
+                          draggable={false}
+                          src={imageURL}
+                          onError={(e: any) => {
+                            e.onError = null
+                            e.target.src = '/src/assets/noImage.jpeg'
+                          }}
+                          alt={file.name}
+                        />
+                      </div>
+                      <h3 className="text-xl w-full p-2">{file.name}</h3>
                     </div>
-                    <h3 className="text-xl w-full p-2">{file.name}</h3>
-                  </div>
-                  <button
-                    className="w-24 text-center text-xl flex justify-center items-center hover:bg-gray-200 transition-all active:bg-gray-300/75 hover:text-blue-600"
-                    onClick={() =>
-                      download(id, file.name).then((blob) => {
-                        try {
-                          const url = window.URL.createObjectURL(blob)
-                          const a = document.createElement('a')
-                          a.style.display = 'none'
-                          a.href = url
-                          a.download = file.name
-                          document.body.appendChild(a)
-                          a.click()
-                          window.URL.revokeObjectURL(url)
-                        } catch (error) {
-                          console.log(error)
-                        }
-                      })
-                    }
-                  >
-                    <LuDownload />
-                  </button>
-                  <button
-                    className="w-24 text-center text-xl flex justify-center items-center hover:bg-gray-200 transition-all active:bg-red-300/75 hover:text-red-600"
-                    onClick={() => {
-                      openModal(
-                        <>
-                          <div className="flex flex-col gap-4">
-                            <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
-                              <IoWarning />
+                    <button
+                      className="w-24 text-center text-xl flex justify-center items-center hover:bg-gray-200 transition-all active:bg-gray-300/75 hover:text-blue-600"
+                      onClick={() =>
+                        download(id, file.name).then((blob) => {
+                          try {
+                            const url = window.URL.createObjectURL(blob)
+                            const a = document.createElement('a')
+                            a.style.display = 'none'
+                            a.href = url
+                            a.download = file.name
+                            document.body.appendChild(a)
+                            a.click()
+                            window.URL.revokeObjectURL(url)
+                          } catch (error) {
+                            console.log(error)
+                          }
+                        })
+                      }
+                    >
+                      <LuDownload />
+                    </button>
+                    <button
+                      className="w-24 text-center text-xl flex justify-center items-center hover:bg-gray-200 transition-all active:bg-red-300/75 hover:text-red-600"
+                      onClick={() => {
+                        openModal(
+                          <>
+                            <div className="flex flex-col gap-4">
+                              <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
+                                <IoWarning />
+                              </div>
+                              <div>
+                                <p>Al realizar esta acción no se podrá deshacer</p>
+                                <p>¿Quiere continuar?</p>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  className="animate-fade animate-ease-out animate-duration-200"
+                                  color="danger"
+                                  text="cancelar"
+                                  onClick={() => seeFiles(id)}
+                                />
+                                <Button
+                                  className="animate-fade animate-ease-out animate-duration-200"
+                                  color="success"
+                                  text="aceptar"
+                                  onClick={() => {
+                                    removeFile(id, file.name).then(() => {
+                                      openModal(
+                                        <div>
+                                          <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
+                                            <LuCheckCircle2 />
+                                          </span>
+                                          <h3>¡El cliente se elimino con éxito!</h3>
+                                          <Button
+                                            className="mt-4"
+                                            color="success"
+                                            text="Aceptar"
+                                            onClick={() => seeFiles(id)}
+                                          />
+                                        </div>
+                                      )
+                                    })
+                                  }}
+                                />
+                              </div>
                             </div>
-                            <div>
-                              <p>Al realizar esta acción no se podrá deshacer</p>
-                              <p>¿Quiere continuar?</p>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button
-                                className="animate-fade animate-ease-out animate-duration-200"
-                                color="danger"
-                                text="cancelar"
-                                onClick={() => seeFiles(id)}
-                              />
-                              <Button
-                                className="animate-fade animate-ease-out animate-duration-200"
-                                color="success"
-                                text="aceptar"
-                                onClick={() => {
-                                  removeFile(id, file.name).then(() => {
-                                    openModal(
-                                      <div>
-                                        <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
-                                          <LuCheckCircle2 />
-                                        </span>
-                                        <h3>¡El cliente se elimino con éxito!</h3>
-                                        <Button
-                                          className="mt-4"
-                                          color="success"
-                                          text="Aceptar"
-                                          onClick={() => seeFiles(id)}
-                                        />
-                                      </div>
-                                    )
-                                  })
-                                }}
-                              />
-                            </div>
+                          </>
+                        )
+                      }}
+                    >
+                      <LuX />
+                    </button>
+                  </section>
+                )
+              })}
+            </div>
+            <Button
+              color="success"
+              text="Subir Archivo"
+              onClick={() => {
+                const input = document.createElement('input')
+                input.type = 'file'
+                input.click()
+                input.addEventListener('change', async (e) => {
+                  const target = e.target as HTMLInputElement
+                  const file = target.files
+
+                  if (file && file.length > 0) {
+                    try {
+                      setLoading(true)
+                      await uploadFiles(file, String(id)).then(() => {
+                        setLoading(false)
+                        openModal(
+                          <div>
+                            <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
+                              <LuCheckCircle2 />
+                            </span>
+                            <h3>¡El cliente se elimino con éxito!</h3>
+                            <Button
+                              className="mt-4"
+                              color="success"
+                              text="Aceptar"
+                              onClick={() => {
+                                seeFiles(id)
+                              }}
+                            />
                           </div>
-                        </>
-                      )
-                    }}
-                  >
-                    <LuX />
-                  </button>
-                </section>
-              )
-            })}
+                        )
+                      })
+                    } catch (error) {
+                      console.error(error)
+                    }
+                  }
+                })
+              }}
+            />
           </div>
         )
       } else {
-        openModal(
-          <>
-            <div className="flex items-center justify-center text-red-400 p-6 text-xl">
-              No hay Archivos
-            </div>
-            <Button color="danger" text="Cerrar" onClick={closeModal} />
-          </>
-        )
+        openFiles(id)
       }
     })
   }

@@ -24,7 +24,7 @@ export const useModal = (): Modal => {
     })
   }
 
-  const closeModal = (): Promise<void> => {
+  const closeModal = async (): Promise<void> => {
     return new Promise((resolve, reject) => {
       try {
         setShowModal(false)

@@ -16,6 +16,7 @@ interface Clients {
   removeFile: (id: any, name: string) => Promise<void>
   getBannedClients: () => Promise<any[]>
   unBanClientById: (id: string | number) => Promise<void>
+  uploadFiles: (files: FileList, id: string) => Promise<string[]>
 }
 
 export const useClients = (): Clients => {
@@ -77,6 +78,24 @@ export const useClients = (): Clients => {
       console.error(error)
     }
     return []
+  }
+
+  const uploadFiles = (files: FileList, id: string): Promise<string[]> => {
+    const uploadPromises = Array.from(files).map(async (file) => {
+      const { data, error } = await supabase.storage
+        .from('clients_storage')
+        .upload(`clients/${id}/${file.name}`, file)
+
+      if (error) {
+        console.error('Error uploading file:', error)
+        throw error
+      }
+
+      console.log('File uploaded:', data)
+      return data.path
+    })
+
+    return Promise.all(uploadPromises)
   }
 
   const updateClient = async (
@@ -228,6 +247,7 @@ export const useClients = (): Clients => {
     download,
     removeFile,
     getBannedClients,
-    unBanClientById
+    unBanClientById,
+    uploadFiles
   }
 }

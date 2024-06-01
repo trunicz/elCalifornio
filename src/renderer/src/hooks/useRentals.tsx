@@ -17,10 +17,23 @@ export const useRentals = (): RentalsMethods => {
   const [rentals, setRentals] = useState<any[] | null>(null)
 
   const updateRental = async (id: string | number, values: any): Promise<void> => {
-    const { error } = await supabase.from('rentals').update(values).eq('id', id)
-    if (error) throw error
-    const { data } = await supabase.rpc('actualizar_rentas_vencidas')
-    console.log(data)
+    const updates = [
+      await supabase.from('rentals').update(values).eq('id', id),
+      await supabase
+        .from('rentals')
+        .update({ status: 'ACTIVO' })
+        .gt('end_date', new Date().toISOString)
+    ]
+
+    const results = await Promise.all(updates)
+
+    results.forEach(({ data, error }) => {
+      if (error) {
+        throw error
+      } else if (data) {
+        console.log('fetched Successful')
+      }
+    })
   }
 
   const getRentalForEdit = async (id: string | number): Promise<object> => {

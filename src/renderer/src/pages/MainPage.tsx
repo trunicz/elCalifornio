@@ -43,12 +43,14 @@ export const MainPage = (): ReactElement => {
                     <LuDollarSign />
                   </div>
                 </header>
-                {home.rentals_info
-                  .sort((a: any, b: any) => b.total - a.total)
-                  .slice(0, 6)
-                  .map((rent: any, index: number) => (
-                    <RentalRow rent={rent} key={index} />
-                  ))}
+                {home.rentals_info ? (
+                  home.rentals_info
+                    .sort((a: any, b: any) => b.total - a.total)
+                    .slice(0, 6)
+                    .map((rent: any, index: number) => <RentalRow rent={rent} key={index} />)
+                ) : (
+                  <div className="text-center p-4 text-3xl text-red-500">Sin rentas</div>
+                )}
               </div>
             </Widget>
             <Widget
@@ -97,14 +99,16 @@ export const MainPage = (): ReactElement => {
             >
               <div className="text-4xl xl:text-5xl overflow-hidden">
                 <span className="pe-2">$</span>
-                {(
-                  home.rentals_info
-                    .reduce((acc: any, rent: any) => acc + Number(rent.total), 0)
-                    .toFixed(2) -
-                  home.rentals_info
-                    .reduce((acc: any, rent: any) => acc + Number(rent.pendientes), 0)
-                    .toFixed(2)
-                ).toFixed(2)}
+                {home.rentals_info
+                  ? (
+                      home.rentals_info
+                        .reduce((acc: any, rent: any) => acc + Number(rent.total), 0)
+                        .toFixed(2) -
+                      home.rentals_info
+                        .reduce((acc: any, rent: any) => acc + Number(rent.pendientes), 0)
+                        .toFixed(2)
+                    ).toFixed(2)
+                  : '0'}
               </div>
             </Widget>
             <Widget

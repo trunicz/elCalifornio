@@ -1,5 +1,6 @@
 import { cn } from '@renderer/utils'
 import { ComponentProps, ReactElement } from 'react'
+import { LuLoader } from 'react-icons/lu'
 
 export interface ButtonProps extends ComponentProps<'button'> {
   color?: 'danger' | 'success' | 'warning' | 'info' | 'accent'
@@ -31,7 +32,7 @@ export const Button = ({
   return (
     <button
       className={cn(
-        'flex items-center px-3 text-white w-full py-2 hover:text-main text-stroke hover:bg-hover  active:scale-95 transition-all max-h-10 rounded-lg  border-2 border-base hover:border-transparent duration-150 font-normal',
+        'flex items-center px-3 text-white w-full py-2 hover:text-main text-stroke hover:bg-hover  active:scale-[98%] transition-all max-h-10 rounded-lg  border-2 border-base hover:border-transparent duration-150 font-normal',
         color ? colorStyle[color] : '',
         {
           '': icon,
@@ -41,11 +42,15 @@ export const Button = ({
       )}
       {...props}
     >
-      {iconLeft && <span className="text-xl">{icon}</span>}
-      {!isIconOnly && text && <span className="w-full">{text}</span>}
-      {icon && !iconLeft && <span className="text-xl">{icon}</span>}
-      {children}
-      {isLoading && <span>loading...</span>}
+      {!isLoading && iconLeft && <span className="text-xl">{icon}</span>}
+      {!isLoading && !isIconOnly && text && <span className="w-full">{text}</span>}
+      {!isLoading && icon && !iconLeft && <span className="text-xl">{icon}</span>}
+      {!isLoading && children}
+      {isLoading && (
+        <span className="text-3xl mx-auto animate-spin">
+          <LuLoader />
+        </span>
+      )}
     </button>
   )
 }

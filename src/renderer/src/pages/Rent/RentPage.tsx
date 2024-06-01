@@ -28,6 +28,7 @@ import * as Yup from 'yup'
 import { SubmitHandler } from 'react-hook-form'
 import { useAuthStore } from '@renderer/stores/useAuth'
 import { useLoadingStore } from '@renderer/stores/useLoading'
+import { useUpdater } from '@renderer/hooks/useUpdater'
 
 export const RentPage = (): ReactElement => {
   const { getAllRentals, rentals, deleteRental } = useRentals()
@@ -38,11 +39,13 @@ export const RentPage = (): ReactElement => {
   const { setLoading } = useLoadingStore()
   const { search } = useParams()
   const [, setLocation] = useLocation()
+  const { updateDueRents } = useUpdater()
 
   useEffect(() => {
     getAllRentals().then((res) => {
       setRentList(res)
     })
+    updateDueRents()
   }, [])
 
   const deleteFunction = (id: string | number): void => {
