@@ -3,7 +3,8 @@ import { TableType } from '@renderer/types'
 
 interface SearchBarType extends ComponentProps<'input'> {
   data: TableType
-  searchFunction: Dispatch<SetStateAction<unknown[] | null>>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  searchFunction: Dispatch<SetStateAction<any>>
   initialValue?: string
 }
 

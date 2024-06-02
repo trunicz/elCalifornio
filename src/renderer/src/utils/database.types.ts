@@ -917,7 +917,9 @@ export type Database = {
           cliente: string | null
           cliente_tel: string | null
           costo_total: string | null
+          deleted_at: string | null
           dirección: string | null
+          equipo: Json | null
           estado_actual: string | null
           fecha_final: string | null
           fecha_inicial: string | null

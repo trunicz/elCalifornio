@@ -133,13 +133,16 @@ function renderNestedObject(obj: unknown): ReactNode {
   const _obj = obj as NestedObject
 
   return (
-    <div className="flex flex-col overflow-y-auto gap-2 max-h-[70px]">
+    <div className="flex flex-col overflow-y-auto mt-1 me-4 h-auto">
       {Object.values(_obj).map((value, index) => {
         if (typeof value === 'object') {
           return <div key={index}>{renderNestedObject(value)}</div>
         } else {
           return (
-            <span key={index} className="px-2 overflow-ellipsis py-1 rounded-xl bg-red-800/10">
+            <span
+              key={index}
+              className="px-2 overflow-ellipsis text-base rounded-md bg-blue-500 text-white"
+            >
               {value}
             </span>
           )

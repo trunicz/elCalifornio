@@ -11,6 +11,7 @@ export const useUpdater = (): Updater => {
         .from('rentals')
         .update({ status: 'VENCIDO' })
         .lt('end_date', new Date().toISOString())
+        .is('deleted_at', null)
     ]
 
     const promises = await Promise.all(updates)

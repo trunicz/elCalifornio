@@ -40,12 +40,13 @@ export const RentPage = (): ReactElement => {
   const { search } = useParams()
   const [, setLocation] = useLocation()
   const { updateDueRents } = useUpdater()
+  const [isLoaded, setLoaded] = useState<boolean>(false)
 
   useEffect(() => {
     getAllRentals().then((res) => {
       setRentList(res)
     })
-    updateDueRents()
+    updateDueRents().then(() => setLoaded(true))
   }, [])
 
   const deleteFunction = (id: string | number): void => {
@@ -246,10 +247,17 @@ export const RentPage = (): ReactElement => {
           </Link>
         </AppLayout.PageOptions>
         <Modal title="Renta" className="w-[500px]" />
-        {rentList ? (
+        {isLoaded && rentList ? (
           <Table
             data={rentList}
-            hiddenKeys={['id', 'arrendatario', 'cliente_tel', 'formdata', 'dirección']}
+            hiddenKeys={[
+              'id',
+              'arrendatario',
+              'cliente_tel',
+              'formdata',
+              'dirección',
+              'deleted_at'
+            ]}
             deleteFunction={endRent}
             watchFunction={openMore}
             canSeeEdit={false}

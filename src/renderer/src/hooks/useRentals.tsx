@@ -23,6 +23,7 @@ export const useRentals = (): RentalsMethods => {
         .from('rentals')
         .update({ status: 'ACTIVO' })
         .gt('end_date', new Date().toISOString)
+        .is('deleted_at', null)
     ]
 
     const results = await Promise.all(updates)
@@ -112,7 +113,8 @@ export const useRentals = (): RentalsMethods => {
 
   const getAllRentals = async (): Promise<any[] | null> => {
     try {
-      const response = await supabase.from('all_rentals').select()
+      const response = await supabase.from('all_rentals').select().is('deleted_at', null)
+      console.log(response.data)
       setRentals(response.data)
       return response.data
     } catch (error) {
@@ -123,43 +125,9 @@ export const useRentals = (): RentalsMethods => {
 
   const getRentalHistory = async (): Promise<any[] | null> => {
     try {
-      const response = await supabase
-        .from('rentals')
-        .select(
-          'id,clients!rentals_client_id_fkey(name,last_name,id),user_id,end_date,equipment(type(type_name),reference)'
-        )
-        .not('deleted_at', 'is', null)
-
-      const rentals = response.data
-
-      if (response.error) {
-        throw response.error
-      }
-
-      if (rentals) {
-        const filteredRentalsPromises = rentals.map(async (rental) => {
-          const response = await supabase.auth.admin.getUserById(rental.user_id)
-          const user = response.data.user?.user_metadata
-          if (user) {
-            return {
-              id: rental.id,
-              client_id: rental.clients?.id,
-              cliente: `${rental.clients?.name} ${rental.clients?.last_name}`,
-              user_id: rental.user_id,
-              fecha_final: new Date(rental.end_date).toLocaleDateString(),
-              usuario: `${user.name} ${user.lastname}`,
-              alquilado: rental.equipment.map(
-                (item: any) => `${item.type.type_name}: ${item.reference}`
-              )
-            }
-          } else {
-            return null
-          }
-        })
-        const filteredRentals = await Promise.all(filteredRentalsPromises)
-        setRentals(filteredRentals)
-        return filteredRentals
-      }
+      const response = await supabase.from('all_rentals').select().not('deleted_at', 'is', null)
+      setRentals(response.data)
+      return response.data
     } catch (error) {
       console.error(error)
     }
