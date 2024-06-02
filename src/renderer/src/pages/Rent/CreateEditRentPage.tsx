@@ -44,7 +44,8 @@ const rentalSchema = Yup.object().shape({
 export const CreateEditRentPage = (): ReactElement => {
   const { handleSubmit, register, errors, control, watch, reset } = useCustomForm(rentalSchema)
   const [localClients, setLocalClients] = useState<{ value: string; label: string }[] | null>()
-  const [inventory, setInventory] = useState<{ value: string; label: string }[]>()
+  const [inventory, setInventory] =
+    useState<{ value: string; label: string; isFixed?: boolean }[]>()
   const [clients, setClients] = useState<{ value: string; label: string }[]>()
   const [endDate, setEndDate] = useState<{ value: string; label: string }>()
   const [isEquipmentVisible, setEquipmentVisible] = useState<boolean>(false)
@@ -65,30 +66,13 @@ export const CreateEditRentPage = (): ReactElement => {
   const [parent] = useAutoAnimate()
   const { user } = useAuthStore()
   const { id } = useParams()
+  const [buildAddress, setBuildAddress] = useState<any>()
 
   const client_id = watch('client_id')
 
   const updateSelectClientId = (e: any): void => {
     setSelectClientID(e)
   }
-
-  useEffect(() => {
-    if (id) {
-      getRentalForEdit(id)
-        .then((res: any) => {
-          const rest = clients?.filter((c) => c.value === res.client_id)
-          if (rest) {
-            setSelectClientID(rest[0])
-          }
-          setEndDateValue(formatDate(new Date(res.end_date)))
-        })
-        .then(() => {
-          setCanShowForm(true)
-        })
-    } else {
-      setCanShowForm(true)
-    }
-  }, [id])
 
   const onChangeEndDate = (e: any): void => {
     setEndDate(e)
@@ -111,8 +95,7 @@ export const CreateEditRentPage = (): ReactElement => {
               }
               return 0
             } catch (err) {
-              console.log(err)
-              return 0
+              if (err) throw err
             }
           }) || []
 
@@ -121,15 +104,14 @@ export const CreateEditRentPage = (): ReactElement => {
         if (tempPrices?.length) {
           const totalCost = tempPrices.reduce((acc, cv) => {
             return acc + cv
-          }, 0) // Asegúrate de tener un valor inicial para el reduce
-          console.log(totalCost)
+          }, 0)
 
           setCurrentCost(totalCost)
         } else {
           setCurrentCost(0)
         }
       } catch (err) {
-        console.log(err)
+        if (err) throw err
       }
     }
 
@@ -181,8 +163,26 @@ export const CreateEditRentPage = (): ReactElement => {
     })
   }, [])
 
+  useEffect(() => {
+    if (id) {
+      getRentalForEdit(id).then((res: any) => {
+        const rest = clients?.filter((c) => c.value === res.client_id)
+
+        if (res && rest && rest.length > 0) {
+          setSelectClientID(rest[0])
+          setEndDateValue(formatDate(new Date(res.end_date)))
+          setInventory(res.equipments)
+          setAdvicePayment(res.advance_payment)
+          setBuildAddress(res.building_address)
+          setCanShowForm(true)
+        }
+      })
+    } else {
+      setCanShowForm(true)
+    }
+  }, [id, clients])
+
   const onSubmit = (data: any): void => {
-    console.log(data)
     if (!id) {
       if (inventory) {
         const equipments = inventory.map((equip: any) => {
@@ -198,7 +198,6 @@ export const CreateEditRentPage = (): ReactElement => {
           total_cost: currentCost,
           status: 'ACTIVO'
         }
-        console.log(values)
 
         const clientReferenceId = !showForeign ? null : data.client_reference_id?.value || null
 
@@ -207,9 +206,25 @@ export const CreateEditRentPage = (): ReactElement => {
         )
       }
     } else {
-      updateRental(id, { end_date: endDateValue }).then(() => {
-        setLocation('/rent')
-      })
+      if (inventory) {
+        const equipments = inventory.map((equip: any) => {
+          return equip.value
+        })
+        const values = {
+          client_id: selectClientID?.value,
+          advance_payment: advicePayment,
+          building_address: data.building_address,
+          user_id: user?.id,
+          end_date: endDateValue ? new Date(endDateValue).toISOString() : new Date(),
+          equipments_id: equipments,
+          total_cost: currentCost,
+          status: 'ACTIVO'
+        }
+
+        updateRental(id, values).then(() => {
+          setLocation('/rent')
+        })
+      }
     }
   }
 
@@ -236,38 +251,34 @@ export const CreateEditRentPage = (): ReactElement => {
             className="overflow-y-auto overflow-x-hidden w-full px-8 flex-1 grid auto-rows-max  mx-auto"
           >
             <div ref={parent} className="w-1/2 mx-auto">
-              {!id ? (
-                <Controller
-                  name="client_id"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="w-full p-4">
-                      <label className="block mb-2">Seleccionar Cliente:</label>
-                      <Select
-                        {...field}
-                        options={clients}
-                        isSearchable
-                        onChange={(e) => updateSelectClientId(e)}
-                        value={selectClientID}
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            borderColor: '#E5E7EB',
-                            borderRadius: '0.375rem',
-                            boxShadow: 'none',
-                            '&:hover': {
-                              borderColor: '#D1D5DB'
-                            }
-                          })
-                        }}
-                      />
-                      <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
-                    </div>
-                  )}
-                />
-              ) : (
-                ''
-              )}
+              <Controller
+                name="client_id"
+                control={control}
+                render={({ field }) => (
+                  <div className="w-full p-4">
+                    <label className="block mb-2">Seleccionar Cliente:</label>
+                    <Select
+                      {...field}
+                      options={clients}
+                      isSearchable
+                      onChange={(e) => updateSelectClientId(e)}
+                      value={selectClientID}
+                      styles={{
+                        control: (provided) => ({
+                          ...provided,
+                          borderColor: '#E5E7EB',
+                          borderRadius: '0.375rem',
+                          boxShadow: 'none',
+                          '&:hover': {
+                            borderColor: '#D1D5DB'
+                          }
+                        })
+                      }}
+                    />
+                    <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
+                  </div>
+                )}
+              />
               {showForeign && (
                 <>
                   <small className="m-4 flex gap-2 items-center p-2 mb-0 bg-blue-500 w-fu text-white rounded-lg">
@@ -348,10 +359,10 @@ export const CreateEditRentPage = (): ReactElement => {
                   )}
                 />
               ) : (
-                <div className="mt-10 flex flex-col gap-4">
+                <div className="w-full p-4 relative">
                   <div>Agrega mas tiempo a la renta</div>
                   <input
-                    className="ps-7 w-full focus:bg-gray-100 outline-0 border-2 rounded-lg p-1.5"
+                    className="px-2 w-full focus:bg-gray-100 mt-2 outline-0 border rounded-lg p-1.5"
                     type="date"
                     onChange={(event) => {
                       const dateValue = event.target.value
@@ -362,7 +373,7 @@ export const CreateEditRentPage = (): ReactElement => {
                   />
                 </div>
               )}
-              {isEquipmentVisible && (
+              {isEquipmentVisible || id ? (
                 <>
                   <Controller
                     name="equipments"
@@ -377,6 +388,7 @@ export const CreateEditRentPage = (): ReactElement => {
                           onChange={(e: any) => onchangeEquipments(e)}
                           value={inventory}
                           isMulti
+                          isClearable={inventory?.some((v) => !v.isFixed)}
                           styles={{
                             control: (provided) => ({
                               ...provided,
@@ -386,9 +398,12 @@ export const CreateEditRentPage = (): ReactElement => {
                               '&:hover': {
                                 borderColor: '#D1D5DB'
                               }
-                            })
+                            }),
+                            multiValueRemove: (base, state) => {
+                              return state.data.isFixed ? { ...base, display: 'none' } : base
+                            }
                           }}
-                          getOptionValue={(option) => option.value} // Esta línea asegura que cada key sea única
+                          getOptionValue={(option) => option.value}
                         />
                         <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
                       </div>
@@ -401,7 +416,7 @@ export const CreateEditRentPage = (): ReactElement => {
                       type="number"
                       onChange={(e) => onChangeAdvicePayment(e)}
                       value={advicePayment ?? ''}
-                      className="ps-7 w-full focus:bg-gray-100 outline-0 border-2 rounded-lg p-1.5"
+                      className="ps-7 w-full focus:bg-gray-100 outline-0 border rounded-lg p-1.5"
                       min={0}
                     />
                     <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg" />
@@ -416,6 +431,8 @@ export const CreateEditRentPage = (): ReactElement => {
                     <input
                       {...register('building_address')}
                       type="text"
+                      onChange={(e) => setBuildAddress(e.target.value)}
+                      value={buildAddress}
                       placeholder="Calle Ficticia #123, Colonia Falsa, 12345 Ciudad, Estado."
                       className="border p-1.5  w-full outline-none rounded-lg"
                     />
@@ -426,16 +443,14 @@ export const CreateEditRentPage = (): ReactElement => {
                     ) : null}
                   </div>
                 </>
-              )}
-            </div>
-            <div className="fixed z-10 end-4 bottom-4">
-              {!id ? (
-                <p ref={parent} className="text-3xl flex flex-col pb-2">
-                  <span className="text-lg">Total:</span>${printPrices(currentCost, advicePayment)}
-                </p>
               ) : (
                 ''
               )}
+            </div>
+            <div className="fixed z-10 end-4 bottom-4">
+              <p ref={parent} className="text-3xl flex flex-col pb-2">
+                <span className="text-lg">Total:</span>${printPrices(currentCost, advicePayment)}
+              </p>
               <Button
                 type="submit"
                 className=" bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"

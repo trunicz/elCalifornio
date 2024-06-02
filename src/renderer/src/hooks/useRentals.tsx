@@ -22,7 +22,7 @@ export const useRentals = (): RentalsMethods => {
       await supabase
         .from('rentals')
         .update({ status: 'ACTIVO' })
-        .gt('end_date', new Date().toISOString)
+        .gt('end_date', new Date().toISOString())
         .is('deleted_at', null)
     ]
 
@@ -114,7 +114,6 @@ export const useRentals = (): RentalsMethods => {
   const getAllRentals = async (): Promise<any[] | null> => {
     try {
       const response = await supabase.from('all_rentals').select().is('deleted_at', null)
-      console.log(response.data)
       setRentals(response.data)
       return response.data
     } catch (error) {

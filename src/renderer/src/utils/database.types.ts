@@ -961,7 +961,7 @@ export type Database = {
           building_address: string | null
           client_id: number | null
           end_date: string | null
-          equipments_id: number[] | null
+          equipments: Json | null
           id: number | null
         }
         Insert: {
@@ -969,7 +969,7 @@ export type Database = {
           building_address?: string | null
           client_id?: number | null
           end_date?: string | null
-          equipments_id?: number[] | null
+          equipments?: never
           id?: number | null
         }
         Update: {
@@ -977,7 +977,7 @@ export type Database = {
           building_address?: string | null
           client_id?: number | null
           end_date?: string | null
-          equipments_id?: number[] | null
+          equipments?: never
           id?: number | null
         }
         Relationships: [

@@ -20,7 +20,7 @@ export const useUpdater = (): Updater => {
       if (error) {
         throw error
       } else {
-        console.log(data)
+        if (data) throw data
       }
     })
   }
