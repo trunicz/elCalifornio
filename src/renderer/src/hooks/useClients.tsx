@@ -17,11 +17,44 @@ interface Clients {
   getBannedClients: () => Promise<any[]>
   unBanClientById: (id: string | number) => Promise<void>
   uploadFiles: (files: FileList, id: string) => Promise<string[]>
+  addStrikes: (id: string | number) => Promise<void>
+  banClientById: (id: string | number) => Promise<void>
 }
 
 export const useClients = (): Clients => {
   const [clientList, setClientList] = useState<object[] | null>(null)
   const [localsClients, setLocalsClients] = useState<object[] | null>(null)
+
+  const banClientById = async (id: string | number): Promise<void> => {
+    const { error } = await supabase.from('clients').update({ strikes: 3 }).eq('id', id)
+    if (error) throw error
+  }
+
+  const addStrikes = async (id: string | number): Promise<void> => {
+    try {
+      const { data: client, error: fetchError } = await supabase
+        .from('clients')
+        .select('strikes')
+        .eq('id', id)
+        .single()
+
+      if (fetchError) throw new Error(`Error fetching strikes: ${fetchError.message}`)
+      if (!client || typeof client.strikes !== 'number')
+        throw new Error('Invalid data received for strikes')
+
+      const newStrikes = client.strikes + 1
+
+      const { error: updateError } = await supabase
+        .from('clients')
+        .update({ strikes: newStrikes })
+        .eq('id', id)
+
+      if (updateError) throw new Error(`Error updating strikes: ${updateError.message}`)
+    } catch (error) {
+      console.error('Failed to add strikes:', error)
+      throw error
+    }
+  }
 
   const unBanClientById = async (id: string | number): Promise<void> => {
     const { error } = await supabase.from('clients').update({ strikes: 2 }).eq('id', id)
@@ -248,6 +281,8 @@ export const useClients = (): Clients => {
     removeFile,
     getBannedClients,
     unBanClientById,
-    uploadFiles
+    uploadFiles,
+    addStrikes,
+    banClientById
   }
 }

@@ -16,7 +16,15 @@ import supabase from '@renderer/utils/supabase'
 import { ReactElement, useEffect, useState } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import { IoMegaphone, IoWarning } from 'react-icons/io5'
-import { LuCheckCircle2, LuDownload, LuFolder, LuSkull, LuUpload, LuX } from 'react-icons/lu'
+import {
+  LuCheckCircle2,
+  LuDownload,
+  LuFolder,
+  LuSkull,
+  LuUpload,
+  LuUserX,
+  LuX
+} from 'react-icons/lu'
 import { Link, useLocation } from 'wouter'
 import * as Yup from 'yup'
 
@@ -31,15 +39,18 @@ export const ClientsPage = (): ReactElement => {
     getAllFiles,
     download,
     removeFile,
-    uploadFiles
+    uploadFiles,
+    banClientById,
+    addStrikes
   } = useClients()
   const { Modal, openModal, closeModal } = useModal()
   const { user } = useAuthStore()
   const { setLoading } = useLoadingStore()
+  const [reloadPage, setReloadPage] = useState<boolean>()
 
   useEffect(() => {
     getAllClients().then((response) => setClients(response))
-  }, [])
+  }, [reloadPage])
 
   const preview = (id: string | number, src: string): void => {
     openModal(
@@ -68,7 +79,7 @@ export const ClientsPage = (): ReactElement => {
           No hay Archivos
         </div>
         <div className="flex gap-4">
-          <Button color="danger" text="Cerrar" onClick={closeModal} />
+          <Button color="danger" text="Cerrar" onClick={() => watchFunction(id)} />
           <Button
             color="success"
             text="Subir Archivo"
@@ -308,9 +319,9 @@ export const ClientsPage = (): ReactElement => {
               <span className="font-medium text-nowrap w-1/3 text-start">Dirección:</span>
               <span className="bg-gray-100 px-2  rounded-md">{client.address}</span>
             </p>
-            <div className="flex gap-2 border-t-2 items-center pt-4 text-xl">
+            <div className="grid grid-cols-3 gap-2 border-t-2  pt-4 text-xl ">
               <button
-                className="bg-gray-400 border-0 text-xl w-auto p-2 px-7 rounded-lg transition-all active:scale-95 flex items-center gap-2 text-white  hover:bg-gray-500/80"
+                className="bg-blue-500 border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-blue-600 col-span-1"
                 color="warning"
                 onClick={() => seeFiles(id)}
               >
@@ -318,23 +329,100 @@ export const ClientsPage = (): ReactElement => {
                 Archivos
               </button>
               <a
-                className="bg-blue-500 border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-blue-600"
+                className="bg-green-500 border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-green-600 col-span-2"
                 href={'tel:' + client.phone}
-                onClick={() => submitLog()}
+                onClick={() => submitLog(id)}
               >
                 <IoMegaphone />
                 Contactar con el cliente
               </a>
+              <button
+                className="bg-red-500 border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-red-600 col-span-1"
+                onClick={() => {
+                  openModal(
+                    <>
+                      <div className="flex flex-col gap-4">
+                        <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
+                          <IoWarning />
+                        </div>
+                        <div>
+                          <p>¿Esta seguro de realizar esta acción?</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            className="animate-fade animate-ease-out animate-duration-200"
+                            color="danger"
+                            text="cancelar"
+                            onClick={() => watchFunction(id)}
+                          />
+                          <Button
+                            className="animate-fade animate-ease-out animate-duration-200"
+                            color="success"
+                            text="aceptar"
+                            onClick={() =>
+                              addStrikes(id).then(() =>
+                                closeModal().then(() => setReloadPage(!reloadPage))
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )
+                }}
+              >
+                <LuUserX />
+                Dar Strike
+              </button>
+              <button
+                className="bg-black border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-gray-800 col-span-2"
+                onClick={() => {
+                  openModal(
+                    <>
+                      <div className="flex flex-col gap-4">
+                        <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
+                          <IoWarning />
+                        </div>
+                        <div>
+                          <p>¿Esta seguro de realizar esta acción?</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            className="animate-fade animate-ease-out animate-duration-200"
+                            color="danger"
+                            text="cancelar"
+                            onClick={() => watchFunction(id)}
+                          />
+                          <Button
+                            className="animate-fade animate-ease-out animate-duration-200"
+                            color="success"
+                            text="aceptar"
+                            onClick={() =>
+                              banClientById(id).then(() =>
+                                closeModal().then(() => setReloadPage(!reloadPage))
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )
+                }}
+              >
+                <LuSkull />
+                Enviar a lista negra
+              </button>
             </div>
           </>
         )
       }
     })
   }
-  const submitLog = (): void => {
+  const submitLog = (id: string | number): void => {
     const logSchema = Yup.object().shape({
       status: Yup.string(),
-      notes: Yup.string()
+      notes: Yup.string(),
+      client_id: Yup.number()
     })
 
     const submit: SubmitHandler<submitObject> = async (data: any): Promise<void> => {
@@ -343,7 +431,8 @@ export const ClientsPage = (): ReactElement => {
           action: 'Contactar Cliente',
           note: data.notes ? data.notes : 'Sin Descripción',
           status: data.status,
-          user_id: user?.id
+          user_id: user?.id,
+          client_id: Number(id)
         }
       ]
 
@@ -396,7 +485,23 @@ export const ClientsPage = (): ReactElement => {
               as: 'textarea'
             }
           ]}
-        />
+        >
+          <div className="flex gap-4">
+            <button
+              type="button"
+              className="bg-red-500 flex justify-center border-0 text-xl w-full rounded-lg items-center gap-2  px-4 p-2 transition-all active:scale-[98%] text-white  hover:bg-red-600 col-span-1"
+              onClick={() => watchFunction(id)}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="bg-green-500 flex justify-center border-0 text-xl w-full rounded-lg items-center gap-2  px-4 p-2 transition-all active:scale-[98%] text-white  hover:bg-green-600 col-span-1"
+            >
+              Continuar
+            </button>
+          </div>
+        </Form>
       </>
     )
   }
