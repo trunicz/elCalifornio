@@ -30,17 +30,12 @@ export const Widget = ({
 
   const bgColor = {
     none: 'border text-black',
-    danger:
-      'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-100 from-0% to-transparent to-70% text-red-400 border border-red-500/30',
-    success:
-      'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-100 from-0% to-transparent to-70% text-green-500 border border-green-500/30',
-    warning:
-      'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-100 from-0% to-transparent to-70% text-amber-400 border border-amber-500/30',
-    info: 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-100 from-0% to-transparent to-70% text-blue-500 border border-blue-500/30',
-    origin:
-      'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-100 from-0% to-transparent to-70% text-orange-500 border border-orange-500/30',
-    sadness:
-      'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-fuchsia-100 from-0% to-transparent to-70% text-fuchsia-500 border border-fuchsia-500/30'
+    danger: 'bg-red-50  text-red-400 border border-red-500/30',
+    success: 'bg-green-50  text-green-500 border border-green-500/30',
+    warning: 'bg-yellow-50  text-amber-400 border border-amber-500/30',
+    info: 'bg-blue-50  text-blue-500 border border-blue-500/30',
+    origin: 'bg-orange-50  text-orange-500 border border-orange-500/30',
+    sadness: 'bg-purple-50  text-fuchsia-500 border border-fuchsia-500/30'
   }
 
   const titleFontSize = {
@@ -78,7 +73,7 @@ export const Widget = ({
           </section>
           <section className={`${titleFontSize[size]}`}>{title}</section>
         </header>
-        <main className="text-6xl flex items-center justify-center p-6 2xl:pt-6 pt-2">
+        <main className="text-6xl h-full flex items-start justify-center p-6 2xl:pt-6 pt-2">
           {children}
         </main>
       </Link>

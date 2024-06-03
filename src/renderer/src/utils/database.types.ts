@@ -931,12 +931,13 @@ export type Database = {
       home_view: {
         Row: {
           calls: number | null
-          clientcount: number | null
+          client_count: number | null
           clients: string[] | null
-          rentalcount: number | null
+          pending_payments: Json | null
+          rental_count: number | null
           rentals_info: Json | null
-          timeoutcount: number | null
-          usercount: number | null
+          timeout_count: number | null
+          user_count: number | null
         }
         Relationships: []
       }

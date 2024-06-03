@@ -25,7 +25,7 @@ import {
   LuUserX,
   LuX
 } from 'react-icons/lu'
-import { Link, useLocation } from 'wouter'
+import { Link, useLocation, useParams } from 'wouter'
 import * as Yup from 'yup'
 
 export const ClientsPage = (): ReactElement => {
@@ -47,6 +47,7 @@ export const ClientsPage = (): ReactElement => {
   const { user } = useAuthStore()
   const { setLoading } = useLoadingStore()
   const [reloadPage, setReloadPage] = useState<boolean>()
+  const { search } = useParams()
 
   useEffect(() => {
     getAllClients().then((response) => setClients(response))
@@ -561,9 +562,13 @@ export const ClientsPage = (): ReactElement => {
     <AppLayout>
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle="Clientes" addRoute="/clients/create">
-          <SearchBar searchFunction={setClients} data={clientList} />
+          <SearchBar
+            searchFunction={setClients}
+            data={clientList}
+            initialValue={search ? search : ''}
+          />
           <Link
-            to="/client/blacklist"
+            to="/client/bl/blacklist"
             className="ms-4 flex items-center justify-center hover:bg-gray-500 px-4 w-auto rounded-xl h-full bg-gray-400 text-nowrap text-white font-medium active:scale-95 transition-all gap-1"
           >
             <span className="text-xl">

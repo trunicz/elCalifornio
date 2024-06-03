@@ -42,7 +42,8 @@ function App(): ReactElement {
             <Route path="/users/create" component={CreateEditUserPage} />
             <Route path="/users/:id" component={CreateEditUserPage} />
             <Route path="/clients" component={ClientsPage} />
-            <Route path="/client/blacklist" component={ClientsBLPages} />
+            <Route path="/client/:search" component={ClientsPage} />
+            <Route path="/client/bl/blacklist" component={ClientsBLPages} />
             <Route path="/clients/create" component={CreateEditClientPage} />
             <Route path="/clients/:id" component={CreateEditClientPage} />
             <Route path="/clients/create/:enable" component={CreateEditClientPage} />
