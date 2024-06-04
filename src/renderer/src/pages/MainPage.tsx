@@ -137,27 +137,33 @@ export const MainPage = (): ReactElement => {
 const PendingRow = ({ row, href }: { row: any; href: string }): ReactElement => {
   const [showIcon, setShowIcon] = useState(false)
   return (
-    <Link to={href} onMouseEnter={() => setShowIcon(true)} onMouseLeave={() => setShowIcon(false)}>
-      <div className="bg-gray-50 rounded-lg p-4 flex items-center">
-        <div className="relative flex items-center">
-          {showIcon && (
-            <span className="text-xl animate animate-fade-up animate-duration-150 absolute ">
-              <LuReply />
-            </span>
-          )}
+    <div>
+      <Link
+        to={href}
+        onMouseEnter={() => setShowIcon(true)}
+        onMouseLeave={() => setShowIcon(false)}
+      >
+        <div className="bg-gray-50 rounded-lg p-4 flex items-center">
+          <div className="relative flex items-center">
+            {showIcon && (
+              <span className="text-xl animate animate-fade-up animate-duration-150 absolute ">
+                <LuReply />
+              </span>
+            )}
+          </div>
+          <span
+            className={cn(
+              'w-1/3  text-xs xl:text-lg text-nowrap overflow-x-hidden text-start transition-all',
+              showIcon ? 'ps-8' : ''
+            )}
+          >{`${row.name} ${row.last_name}`}</span>
+          <span
+            className={cn('w-1/3 text-center', !Number(row.days_until_due) ? 'text-red-500' : '')}
+          >{`${Number(row.days_until_due) ? row.days_until_due : 'Ninguno'}`}</span>
+          <span className="p-2 bg-green-100 text-green-600 rounded-xl mx-auto">{`$${row.pending_payment.toFixed(2)}`}</span>
         </div>
-        <span
-          className={cn(
-            'w-1/3  text-xs xl:text-lg text-nowrap overflow-x-hidden text-start transition-all',
-            showIcon ? 'ps-8' : ''
-          )}
-        >{`${row.name} ${row.last_name}`}</span>
-        <span
-          className={cn('w-1/3 text-center', !Number(row.days_until_due) ? 'text-red-500' : '')}
-        >{`${Number(row.days_until_due) ? row.days_until_due : 'Ninguno'}`}</span>
-        <span className="p-2 bg-green-100 text-green-600 rounded-xl mx-auto">{`$${row.pending_payment.toFixed(2)}`}</span>
-      </div>
-    </Link>
+      </Link>
+    </div>
   )
 }
 
@@ -171,26 +177,35 @@ const RentalRow = ({
   const [showIcon, setShowIcon] = useState(false)
 
   return (
-    <Link onMouseEnter={() => setShowIcon(true)} onMouseLeave={() => setShowIcon(false)} to={href}>
-      <div className="flex relative h-auto w-full text-xl mb-2 items-center justify-between p-2 py-4 text-purple-500 bg-purple-100 rounded-xl active:bg-purple-200 transition-all active:scale-[99%]">
-        {showIcon && (
-          <div className="text-3xl ps-4 animate animate-fade-up animate-duration-150 absolute ">
-            <LuReply />
+    <div className="">
+      <Link
+        className=""
+        onMouseEnter={() => setShowIcon(true)}
+        onMouseLeave={() => setShowIcon(false)}
+        to={href}
+      >
+        <div className="flex h-auto w-full text-xl mb-2 items-center justify-between p-2 py-4 text-purple-500 bg-purple-100 rounded-xl active:bg-purple-200 transition-all active:scale-[99%]">
+          <div className="relative flex items-center">
+            {showIcon && (
+              <div className="text-3xl ps-4 animate animate-fade-up animate-duration-150 absolute ">
+                <LuReply />
+              </div>
+            )}
           </div>
-        )}
-        <div
-          className={cn(
-            'ms-4 w-full text-lg text-start text-wrap transition-all',
-            showIcon ? 'ps-12' : ''
-          )}
-        >
-          {`${rent.name} ${rent.last_name}`}
+          <div
+            className={cn(
+              'ms-4 w-full text-lg text-start text-wrap transition-all',
+              showIcon ? 'ps-12' : ''
+            )}
+          >
+            {`${rent.name} ${rent.last_name}`}
+          </div>
+          <div className="text-white p-2 bg-purple-300 rounded-xl">
+            <span className="pe-1">$</span>
+            {parseFloat(rent.total).toFixed(2)}
+          </div>
         </div>
-        <div className="text-white p-2 bg-purple-300 rounded-xl">
-          <span className="pe-1">$</span>
-          {parseFloat(rent.total).toFixed(2)}
-        </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   )
 }
