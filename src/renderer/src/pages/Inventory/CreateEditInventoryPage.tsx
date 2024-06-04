@@ -3,7 +3,7 @@ import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { AppLayout, Button } from '@renderer/components'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { ReactElement, useEffect, useState } from 'react'
-import { LuDollarSign } from 'react-icons/lu'
+import { LuDollarSign, LuMinus, LuPlus } from 'react-icons/lu'
 import Select from 'react-select'
 import { useLocation } from 'wouter'
 
@@ -15,6 +15,7 @@ export const CreateEditInventoryPage = (): ReactElement => {
   const [dimensionValue, setDimension] = useState<any>()
   const [description, setDescription] = useState<any>()
   const [selectedValue, setValue] = useState<any>()
+  const [count, setCount] = useState<number | undefined>()
   const [prices, setPrices] = useState<any>()
   const [, setLocation] = useLocation()
   const [parent] = useAutoAnimate()
@@ -46,14 +47,33 @@ export const CreateEditInventoryPage = (): ReactElement => {
         dimension: dimensionValue ? dimensionValue.value : null,
         reference: description
       }
-      createEquipment(values).then((res: any) => {
-        const id = res[0].id
-        if (id) {
-          delete prices.id
-          const values = { ...prices, equipment_id: id, type_id: selectedValue.value }
-          createPrices(values).then(() => setLocation('/inventory'))
-        }
-      })
+      createEquipment(values, count ? count : 0)
+        .then((res) => {
+          if (res && res.length > 0) {
+            // Usar Promise.all para manejar todas las inserciones de createPrices
+            const promises = res.map((equipment: any) => {
+              const { id } = equipment
+              if (id) {
+                delete prices.id
+                const newValues = { ...prices, equipment_id: id, type_id: selectedValue.value }
+                return createPrices(newValues)
+              }
+              return Promise.resolve(null)
+            })
+
+            // Esperar a que todas las promesas se resuelvan
+            Promise.all(promises)
+              .then(() => {
+                setLocation('/inventory')
+              })
+              .catch((error) => {
+                console.error('Error creating prices:', error)
+              })
+          }
+        })
+        .catch((error) => {
+          console.error('Error creating equipment:', error)
+        })
     }
   }
 
@@ -167,10 +187,35 @@ export const CreateEditInventoryPage = (): ReactElement => {
                     <LuDollarSign className="text-gray-400 absolute bottom-3 start-1" />
                   </div>
                 </div>
+                <p className="text-lg text-center col-span-full border-b mt-8">Cantidad</p>
+                <div className="flex">
+                  <div className="flex items-center py-6 gap-4 mx-auto">
+                    <button
+                      type="button"
+                      onClick={() => setCount(count ? count - 1 : 0)}
+                      className="transition-all bg-gray-200 p-4 rounded-lg  hover:bg-gray-300/70 active:bg-red-200 active:scale-90 "
+                    >
+                      <LuMinus />
+                    </button>
+                    <input
+                      className="p-2 text-lg outline-none border-2 rounded-lg text-center"
+                      type="number"
+                      min={0}
+                      onChange={(e) => setCount(parseFloat(e.target.value))}
+                      value={count}
+                      pattern="\d*"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setCount(count ? count + 1 : 1)}
+                      className="transition-all bg-gray-200 p-4 rounded-lg  hover:bg-gray-300/70 active:bg-green-200 active:scale-90 "
+                    >
+                      <LuPlus />
+                    </button>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <></>
-            )}
+            ) : null}
           </div>
           <Button
             type="submit"

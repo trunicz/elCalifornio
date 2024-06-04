@@ -9,7 +9,7 @@ interface InventoryMethods {
   getItem: (id: string | number) => Promise<object | null>
   getEquipmentTypes: () => Promise<object[] | null>
   getEquipmentStatus: () => Promise<object[] | null>
-  createEquipment: (values: object) => Promise<object[] | null>
+  createEquipment: (values: object, count: number) => Promise<object[] | null>
   deleteEquipment: (id: string | number) => Promise<void>
   updateEquipment: (id: string | number, values: object) => Promise<void>
   getAvailableInventory: () => Promise<object[] | null>
@@ -72,15 +72,21 @@ export const useInventory = (): InventoryMethods => {
     }
   }
 
-  const createEquipment = async (values: object): Promise<object[] | null> => {
+  const createEquipment = async (values: object, count: number): Promise<any[] | null> => {
     try {
-      const { data, error } = await supabase.from('equipment').insert(values).select()
-      if (error) throw error
-      return data
+      const results: any[] = []
+      for (let i = 0; i < count; i++) {
+        const { data, error } = await supabase.from('equipment').insert(values).select()
+        if (error) throw error
+        if (data) {
+          results.push(...data)
+        }
+      }
+      return results
     } catch (error) {
       console.log(error)
+      return null
     }
-    return null
   }
 
   const getEquipmentTypes = async (): Promise<object[] | null> => {
