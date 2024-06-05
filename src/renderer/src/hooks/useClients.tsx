@@ -221,17 +221,21 @@ export const useClients = (): Clients => {
         .is('deleted_at', null)
         .lt('strikes', 3)
       if (error) throw error
-      const filteredClients = data.map((client) => {
-        return {
-          id: client.id,
-          'nombre(s)': client.name,
-          'apellido(s)': client.last_name,
-          teléfono: client.phone,
-          strikes: client.strikes,
-          foráneo: client.isForeign ? 'Si' : 'No',
-          tipo_cliente: client.client_type[0].type_name
-        }
-      })
+
+      const filteredClients = data
+        .map((client) => {
+          return {
+            id: client.id,
+            'nombre(s)': client.name,
+            'apellido(s)': client.last_name,
+            teléfono: client.phone,
+            strikes: client.strikes,
+            foráneo: client.isForeign ? 'Si' : 'No',
+            tipo_cliente: client.client_type[0].type_name
+          }
+        })
+        .sort((a, b) => a['nombre(s)'].localeCompare(b['nombre(s)']))
+
       setClientList(filteredClients)
       return filteredClients
     } catch (error) {

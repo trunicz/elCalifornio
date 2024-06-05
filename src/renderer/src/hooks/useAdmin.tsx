@@ -31,6 +31,7 @@ export const useAdmin = (): AdminApi => {
             id: usr.id
           }
         })
+        .sort((a, b) => a['nombre'].localeCompare(b['nombre']))
       setUsersList(usersMap)
       return usersMap
     } catch (error) {

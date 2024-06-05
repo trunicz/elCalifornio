@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       bills: {
         Row: {
+          amount: number
           created_at: string
           deleted_at: string | null
           id: number
@@ -18,6 +19,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          amount: number
           created_at?: string
           deleted_at?: string | null
           id?: number
@@ -25,13 +27,43 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          amount?: number
           created_at?: string
           deleted_at?: string | null
           id?: number
           rental_id?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bills_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
+            referencedRelation: "all_bills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bills_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
+            referencedRelation: "all_rentals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bills_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
+            referencedRelation: "rental_to_edit"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bills_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
+            referencedRelation: "rentals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       client_type: {
         Row: {
@@ -570,6 +602,13 @@ export type Database = {
             foreignKeyName: "rentals_equipments_rental_id_fkey"
             columns: ["rental_id"]
             isOneToOne: false
+            referencedRelation: "all_bills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rentals_equipments_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
             referencedRelation: "all_rentals"
             referencedColumns: ["id"]
           },
@@ -684,6 +723,13 @@ export type Database = {
             foreignKeyName: "rentals_clients_rental_id_fkey"
             columns: ["rental_id"]
             isOneToOne: false
+            referencedRelation: "all_bills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rentals_clients_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
             referencedRelation: "all_rentals"
             referencedColumns: ["id"]
           },
@@ -728,6 +774,13 @@ export type Database = {
             foreignKeyName: "rentals_references_clients_rental_id_fkey"
             columns: ["rental_id"]
             isOneToOne: false
+            referencedRelation: "all_bills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rentals_references_clients_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
             referencedRelation: "all_rentals"
             referencedColumns: ["id"]
           },
@@ -761,6 +814,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "rentals_users_rental_id_fkey"
+            columns: ["rental_id"]
+            isOneToOne: false
+            referencedRelation: "all_bills"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "rentals_users_rental_id_fkey"
             columns: ["rental_id"]
@@ -871,6 +931,20 @@ export type Database = {
       }
     }
     Views: {
+      all_bills: {
+        Row: {
+          cliente: string | null
+          costo_total: string | null
+          equipo: Json | null
+          estado_actual: string | null
+          fecha_final: string | null
+          fecha_inicial: string | null
+          id: number | null
+          recibos: Json | null
+          telefono: string | null
+        }
+        Relationships: []
+      }
       all_inventory: {
         Row: {
           cantidad: number | null
