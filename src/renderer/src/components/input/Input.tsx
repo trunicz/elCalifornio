@@ -8,14 +8,27 @@ interface InputProps {
   type?: string
   options?: { value: string | number; label: string }[]
   value: string | number
-  className: string
-  placeholder: string
+  className?: string
+  placeholder?: string
+  onChange?: (e: any) => void
 }
 
 const Input: ForwardRefRenderFunction<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
   InputProps
-> = ({ as, type, options = [], value, className, placeholder, ...props }: InputProps, ref) => {
+> = (
+  {
+    as,
+    type,
+    options = [],
+    value,
+    className,
+    placeholder,
+    onChange = (): void => {},
+    ...props
+  }: InputProps,
+  ref
+) => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
   switch (as) {
@@ -25,9 +38,10 @@ const Input: ForwardRefRenderFunction<
           <input
             ref={ref as MutableRefObject<HTMLInputElement>}
             placeholder={placeholder}
-            className={cn('', className)}
+            className={cn('p-1 px-4 text-lg outline-none border-2 rounded-lg', className)}
             value={value as string}
             type={type === 'password' && showPassword ? 'text' : type}
+            onChange={(e) => onChange(e)}
             {...props}
           />
           {type === 'password' && (

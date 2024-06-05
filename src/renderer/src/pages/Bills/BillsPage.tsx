@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppLayout, Button } from '@renderer/components'
+import { AppLayout, Button, Form, useModal } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useBills } from '@renderer/stores/useBills'
 import { Fragment, ReactElement, useEffect, useState } from 'react'
 import { LuBadgeDollarSign, LuDownloadCloud } from 'react-icons/lu'
+import * as Yup from 'yup'
 
 export const BillsPage = (): ReactElement => {
   const { bills, getAllBills } = useBills()
   const [headers, setHeaders] = useState<any[]>()
   const hiddenKeys = ['id', 'equipo', 'recibos']
+  const { Modal, openModal, closeModal } = useModal()
 
   useEffect(() => {
     getAllBills().then((res: any) => {
@@ -23,7 +25,6 @@ export const BillsPage = (): ReactElement => {
             )
           : []
       )
-      console.log(res)
     })
   }, [])
 
@@ -31,6 +32,7 @@ export const BillsPage = (): ReactElement => {
     <AppLayout>
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle="Recibos" hasAddButton={false} />
+        <Modal title="Crear Recibo" />
         {bills && headers ? (
           <section className="flex flex-col gap-4 overflow-x-auto">
             <table className="min-w-full text-sm">
@@ -55,6 +57,8 @@ export const BillsPage = (): ReactElement => {
                       key={`row${rowIndex}`}
                       hiddenKeys={hiddenKeys}
                       headers={headers}
+                      openModal={openModal}
+                      closeModal={closeModal}
                     />
                   ) : (
                     <tr key={rowIndex}>
@@ -79,11 +83,15 @@ const RenderBillRow = ({
   row,
   hiddenKeys,
   headers,
+  openModal,
+  closeModal,
   ...props
 }: {
   row: any
   hiddenKeys: string[]
   headers: string[]
+  openModal: (i: ReactElement) => void
+  closeModal: () => void
 }): ReactElement => {
   const [isVisible, setVisible] = useState<boolean>(false)
 
@@ -121,6 +129,7 @@ const RenderBillRow = ({
             title={'Cobrar/Crear Recibo'}
             onClick={(event) => {
               event.stopPropagation()
+              openModal(<CreateBillModal closeModal={closeModal} />)
             }}
           />
         </td>
@@ -170,5 +179,38 @@ const RenderBillRow = ({
         </tr>
       )}
     </Fragment>
+  )
+}
+
+const CreateBillModal = ({ closeModal }: { closeModal: () => void }): ReactElement => {
+  const billSchema = Yup.object().shape({
+    amount: Yup.number().required('Ingrese un Valor valido')
+  })
+
+  const submit = (): void => {}
+
+  return (
+    <>
+      <Form
+        className=""
+        hasRequiereMessage={false}
+        formDirection="col"
+        onSubmit={submit}
+        validationSchema={billSchema}
+        fields={[
+          {
+            name: 'amount',
+            label: 'Cantidad',
+            as: 'input',
+            type: 'number'
+          }
+        ]}
+      >
+        <div className="flex gap-4">
+          <Button color="danger" type="button" text="Cancelar" onClick={closeModal} />
+          <Button color="success" type="submit" text="Enviar" />
+        </div>
+      </Form>
+    </>
   )
 }
