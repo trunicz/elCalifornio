@@ -24,7 +24,7 @@ export const AppLayout = ({
   ...props
 }: ComponentProps<'main'>): ReactElement => {
   const { loading } = useLoadingStore()
-  const { signOut } = useAuthStore()
+  const { signOut, user } = useAuthStore()
   return (
     <main className={cn('bg-main theme-light h-full flex', className)} {...props}>
       {loading && (
@@ -38,19 +38,26 @@ export const AppLayout = ({
         <div className="flex items-center justify-center gap-2">
           <img src="/src/assets/frame.png?asset" draggable={false} className="w-[100px]  p-3" />
         </div>
-        <div className="flex-1 flex flex-col gap-1">
-          <MenuButton icon={<LuHome />} to="/" text="Inicio" />
-          <Separator text="Usuarios" />
-          <MenuButton icon={<LuUsers />} to="/users" text="Usuarios" />
-          <MenuButton icon={<LuUserCog />} to="/clients" text="Clientes" />
-          <Separator text="Productos" />
-          <MenuButton icon={<LuHeartHandshake />} to="/rent" text="Rentar" />
-          <MenuButton icon={<LuShapes />} to="/inventory" text="Inventario" />
-          <Separator text="Historial" />
-          {/* <MenuButton icon={<LuFileEdit />} to="/contracts" text="Contratos" /> */}
-          <MenuButton icon={<LuSticker />} to="/bills" text="Recibos" />
-          <MenuButton icon={<LuBookOpenCheck />} to="/audit" text="Auditoria" />
-        </div>
+        {user?.user_metadata.rol == '2' ? (
+          <div className="flex-1 flex flex-col gap-1">
+            <Separator text="Usuarios" />
+            <MenuButton icon={<LuUserCog />} to="/clients" text="Clientes" />
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col gap-1">
+            <MenuButton icon={<LuHome />} to="/" text="Inicio" />
+            <Separator text="Usuarios" />
+            <MenuButton icon={<LuUsers />} to="/users" text="Usuarios" />
+            <MenuButton icon={<LuUserCog />} to="/clients" text="Clientes" />
+            <Separator text="Productos" />
+            <MenuButton icon={<LuHeartHandshake />} to="/rent" text="Rentar" />
+            <MenuButton icon={<LuShapes />} to="/inventory" text="Inventario" />
+            <Separator text="Historial" />
+            {/* <MenuButton icon={<LuFileEdit />} to="/contracts" text="Contratos" /> */}
+            <MenuButton icon={<LuSticker />} to="/bills" text="Recibos" />
+            <MenuButton icon={<LuBookOpenCheck />} to="/audit" text="Auditoria" />
+          </div>
+        )}
         <Button
           text="Cerrar Sesión"
           className="text-base text-stroke font-medium"

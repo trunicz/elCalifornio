@@ -81,47 +81,49 @@ export const ClientsPage = (): ReactElement => {
         </div>
         <div className="flex gap-4">
           <Button color="danger" text="Cerrar" onClick={() => watchFunction(id)} />
-          <Button
-            color="success"
-            text="Subir Archivo"
-            icon={<LuUpload />}
-            onClick={() => {
-              const input = document.createElement('input')
-              input.type = 'file'
-              input.click()
-              input.addEventListener('change', async (e) => {
-                const target = e.target as HTMLInputElement
-                const file = target.files
+          {user?.user_metadata.rol === '2' ? null : (
+            <Button
+              color="success"
+              text="Subir Archivo"
+              icon={<LuUpload />}
+              onClick={() => {
+                const input = document.createElement('input')
+                input.type = 'file'
+                input.click()
+                input.addEventListener('change', async (e) => {
+                  const target = e.target as HTMLInputElement
+                  const file = target.files
 
-                if (file && file.length > 0) {
-                  try {
-                    setLoading(true)
-                    await uploadFiles(file, String(id)).then(() => {
-                      setLoading(false)
-                      openModal(
-                        <div>
-                          <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
-                            <LuCheckCircle2 />
-                          </span>
-                          <h3>¡El cliente se elimino con éxito!</h3>
-                          <Button
-                            className="mt-4"
-                            color="success"
-                            text="Aceptar"
-                            onClick={() => {
-                              seeFiles(id)
-                            }}
-                          />
-                        </div>
-                      )
-                    })
-                  } catch (error) {
-                    console.error(error)
+                  if (file && file.length > 0) {
+                    try {
+                      setLoading(true)
+                      await uploadFiles(file, String(id)).then(() => {
+                        setLoading(false)
+                        openModal(
+                          <div>
+                            <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
+                              <LuCheckCircle2 />
+                            </span>
+                            <h3>¡El cliente se elimino con éxito!</h3>
+                            <Button
+                              className="mt-4"
+                              color="success"
+                              text="Aceptar"
+                              onClick={() => {
+                                seeFiles(id)
+                              }}
+                            />
+                          </div>
+                        )
+                      })
+                    } catch (error) {
+                      console.error(error)
+                    }
                   }
-                }
-              })
-            }}
-          />
+                })
+              }}
+            />
+          )}
         </div>
       </>
     )
@@ -339,82 +341,86 @@ export const ClientsPage = (): ReactElement => {
                 <IoMegaphone />
                 Contactar con el cliente
               </a>
-              <button
-                className="bg-red-500 border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-red-600 col-span-1"
-                onClick={() => {
-                  openModal(
-                    <>
-                      <div className="flex flex-col gap-4">
-                        <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
-                          <IoWarning />
-                        </div>
-                        <div>
-                          <p>¿Esta seguro de realizar esta acción?</p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            className="animate-fade animate-ease-out animate-duration-200"
-                            color="danger"
-                            text="cancelar"
-                            onClick={() => watchFunction(id)}
-                          />
-                          <Button
-                            className="animate-fade animate-ease-out animate-duration-200"
-                            color="success"
-                            text="aceptar"
-                            onClick={() =>
-                              addStrikes(id).then(() =>
-                                closeModal().then(() => setReloadPage(!reloadPage))
-                              )
-                            }
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )
-                }}
-              >
-                <LuUserX />
-                Dar Strike
-              </button>
-              <button
-                className="bg-black border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-gray-800 col-span-2"
-                onClick={() => {
-                  openModal(
-                    <>
-                      <div className="flex flex-col gap-4">
-                        <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
-                          <IoWarning />
-                        </div>
-                        <div>
-                          <p>¿Esta seguro de realizar esta acción?</p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            className="animate-fade animate-ease-out animate-duration-200"
-                            color="danger"
-                            text="cancelar"
-                            onClick={() => watchFunction(id)}
-                          />
-                          <Button
-                            className="animate-fade animate-ease-out animate-duration-200"
-                            color="success"
-                            text="aceptar"
-                            onClick={() =>
-                              banClientById(id).then(() =>
-                                closeModal().then(() => setReloadPage(!reloadPage))
-                              )
-                            }
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )
-                }}
-              >
-                <LuSkull />
-                Enviar a lista negra
-              </button>
+              {user?.user_metadata.rol === '2' ? null : (
+                <>
+                  <button
+                    className="bg-red-500 border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-red-600 col-span-1"
+                    onClick={() => {
+                      openModal(
+                        <>
+                          <div className="flex flex-col gap-4">
+                            <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
+                              <IoWarning />
+                            </div>
+                            <div>
+                              <p>¿Esta seguro de realizar esta acción?</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                className="animate-fade animate-ease-out animate-duration-200"
+                                color="danger"
+                                text="cancelar"
+                                onClick={() => watchFunction(id)}
+                              />
+                              <Button
+                                className="animate-fade animate-ease-out animate-duration-200"
+                                color="success"
+                                text="aceptar"
+                                onClick={() =>
+                                  addStrikes(id).then(() =>
+                                    closeModal().then(() => setReloadPage(!reloadPage))
+                                  )
+                                }
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )
+                    }}
+                  >
+                    <LuUserX />
+                    Dar Strike
+                  </button>
+                  <button
+                    className="bg-black border-0 text-xl w-full rounded-lg flex items-center gap-2  px-4 p-2 transition-all active:scale-95 text-white  hover:bg-gray-800 col-span-2"
+                    onClick={() => {
+                      openModal(
+                        <>
+                          <div className="flex flex-col gap-4">
+                            <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
+                              <IoWarning />
+                            </div>
+                            <div>
+                              <p>¿Esta seguro de realizar esta acción?</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                className="animate-fade animate-ease-out animate-duration-200"
+                                color="danger"
+                                text="cancelar"
+                                onClick={() => watchFunction(id)}
+                              />
+                              <Button
+                                className="animate-fade animate-ease-out animate-duration-200"
+                                color="success"
+                                text="aceptar"
+                                onClick={() =>
+                                  banClientById(id).then(() =>
+                                    closeModal().then(() => setReloadPage(!reloadPage))
+                                  )
+                                }
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )
+                    }}
+                  >
+                    <LuSkull />
+                    Enviar a lista negra
+                  </button>
+                </>
+              )}
             </div>
           </>
         )
@@ -563,21 +569,27 @@ export const ClientsPage = (): ReactElement => {
   return (
     <AppLayout>
       <AppLayout.Content>
-        <AppLayout.PageOptions pageTitle="Clientes" addRoute="/clients/create">
+        <AppLayout.PageOptions
+          pageTitle="Clientes"
+          addRoute="/clients/create"
+          hasAddButton={user?.user_metadata.rol !== '2'}
+        >
           <SearchBar
             searchFunction={setClients}
             data={clientList}
             initialValue={search ? search : ''}
           />
-          <Link
-            to="/client/bl/blacklist"
-            className="ms-4 flex items-center justify-center hover:bg-gray-500 px-4 w-auto rounded-xl h-full bg-gray-400 text-nowrap text-white font-medium active:scale-95 transition-all gap-1"
-          >
-            <span className="text-xl">
-              <LuSkull />
-            </span>
-            Lista Negra
-          </Link>
+          {user?.user_metadata.rol === '2' ? null : (
+            <Link
+              to="/client/bl/blacklist"
+              className="ms-4 flex items-center justify-center hover:bg-gray-500 px-4 w-auto rounded-xl h-full bg-gray-400 text-nowrap text-white font-medium active:scale-95 transition-all gap-1"
+            >
+              <span className="text-xl">
+                <LuSkull />
+              </span>
+              Lista Negra
+            </Link>
+          )}
         </AppLayout.PageOptions>
         <Modal title="Cliente" className="w-auto min-w-[450px]" />
         {clientList ? (
@@ -586,6 +598,8 @@ export const ClientsPage = (): ReactElement => {
             watchFunction={watchFunction}
             deleteFunction={deleteFunction}
             editFunction={editFunction}
+            canSeeEdit={user?.user_metadata.rol === '2' ? false : true}
+            canSeeDelete={user?.user_metadata.rol === '2' ? false : true}
             hiddenKeys={['tipo_cliente', 'foráneo', 'id']}
           />
         ) : (

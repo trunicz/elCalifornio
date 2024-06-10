@@ -434,10 +434,10 @@ export const CreateEditRentPage = (): ReactElement => {
                               '&:hover': {
                                 borderColor: '#D1D5DB'
                               }
-                            }),
-                            multiValueRemove: (base, state) => {
-                              return state.data.isFixed ? { ...base, display: 'none' } : base
-                            }
+                            })
+                            // multiValueRemove: (base, state) => {
+                            //   return state.data.isFixed ? { ...base, display: 'none' } : base
+                            // }
                           }}
                           getOptionValue={(option) => option.value}
                         />
@@ -529,7 +529,7 @@ export const CreateEditRentPage = (): ReactElement => {
                 {advicePayment ? (
                   <>
                     <p className="text-xl">{`+$${currentCost.toFixed(2)}`}</p>
-                    <p className="text-xl">{`-$${advicePayment.toFixed(2)}`}</p>
+                    <p className="text-xl">{`-$${Number(advicePayment).toFixed(2)}`}</p>
                   </>
                 ) : null}
                 <p>${printPrices(currentCost, advicePayment)}</p>
