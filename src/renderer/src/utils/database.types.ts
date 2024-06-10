@@ -11,54 +11,99 @@ export type Database = {
     Tables: {
       bills: {
         Row: {
-          amount: number
+          anio: string
+          cantidad: string
+          cliente: string
+          cliente_firma: string
+          concepto: string
           created_at: string
-          deleted_at: string | null
+          dia: string
+          estatus: string
+          factura: string
+          fecha_extension: string
+          fecha_vencimiento: string
+          forma_pago: string
           id: number
-          rental_id: number
-          updated_at: string
+          iva: string
+          mes: string
+          razon_social: string
+          recibidor: string
+          ref_contrato: string
+          rent_id: number
+          sub_total: string
+          total: string
         }
         Insert: {
-          amount: number
+          anio: string
+          cantidad: string
+          cliente: string
+          cliente_firma: string
+          concepto: string
           created_at?: string
-          deleted_at?: string | null
+          dia: string
+          estatus: string
+          factura: string
+          fecha_extension: string
+          fecha_vencimiento: string
+          forma_pago: string
           id?: number
-          rental_id: number
-          updated_at?: string
+          iva: string
+          mes: string
+          razon_social: string
+          recibidor: string
+          ref_contrato: string
+          rent_id: number
+          sub_total: string
+          total: string
         }
         Update: {
-          amount?: number
+          anio?: string
+          cantidad?: string
+          cliente?: string
+          cliente_firma?: string
+          concepto?: string
           created_at?: string
-          deleted_at?: string | null
+          dia?: string
+          estatus?: string
+          factura?: string
+          fecha_extension?: string
+          fecha_vencimiento?: string
+          forma_pago?: string
           id?: number
-          rental_id?: number
-          updated_at?: string
+          iva?: string
+          mes?: string
+          razon_social?: string
+          recibidor?: string
+          ref_contrato?: string
+          rent_id?: number
+          sub_total?: string
+          total?: string
         }
         Relationships: [
           {
-            foreignKeyName: "bills_rental_id_fkey"
-            columns: ["rental_id"]
+            foreignKeyName: "bills_rent_id_fkey"
+            columns: ["rent_id"]
             isOneToOne: false
             referencedRelation: "all_bills"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "bills_rental_id_fkey"
-            columns: ["rental_id"]
+            foreignKeyName: "bills_rent_id_fkey"
+            columns: ["rent_id"]
             isOneToOne: false
             referencedRelation: "all_rentals"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "bills_rental_id_fkey"
-            columns: ["rental_id"]
+            foreignKeyName: "bills_rent_id_fkey"
+            columns: ["rent_id"]
             isOneToOne: false
             referencedRelation: "rental_to_edit"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "bills_rental_id_fkey"
-            columns: ["rental_id"]
+            foreignKeyName: "bills_rent_id_fkey"
+            columns: ["rent_id"]
             isOneToOne: false
             referencedRelation: "rentals"
             referencedColumns: ["id"]
@@ -524,15 +569,7 @@ export type Database = {
           created_at?: string
           id?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "payments_bill_id_fkey"
-            columns: ["bill_id"]
-            isOneToOne: false
-            referencedRelation: "bills"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       prices: {
         Row: {
@@ -639,6 +676,7 @@ export type Database = {
           end_date: string
           equipments_id: number[]
           id: number
+          paid: number
           status: string
           total_cost: string
           updated_at: string
@@ -654,6 +692,7 @@ export type Database = {
           end_date: string
           equipments_id: number[]
           id?: number
+          paid?: number
           status: string
           total_cost: string
           updated_at?: string
@@ -669,6 +708,7 @@ export type Database = {
           end_date?: string
           equipments_id?: number[]
           id?: number
+          paid?: number
           status?: string
           total_cost?: string
           updated_at?: string
@@ -940,6 +980,7 @@ export type Database = {
           fecha_final: string | null
           fecha_inicial: string | null
           id: number | null
+          iscompleted: boolean | null
           recibos: Json | null
           telefono: string | null
         }
@@ -999,6 +1040,17 @@ export type Database = {
           fecha_inicial: string | null
           formdata: Json | null
           id: number | null
+          iscompleted: boolean | null
+          pagado: string | null
+        }
+        Relationships: []
+      }
+      grouped_inventory: {
+        Row: {
+          count: number | null
+          dimension_name: string | null
+          reference: string | null
+          type_name: string | null
         }
         Relationships: []
       }

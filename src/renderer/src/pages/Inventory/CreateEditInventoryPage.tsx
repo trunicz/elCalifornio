@@ -2,6 +2,7 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { AppLayout, Button } from '@renderer/components'
 import { useInventory } from '@renderer/hooks/useInventory'
+import { useLoadingStore } from '@renderer/stores/useLoading'
 import { ReactElement, useEffect, useState } from 'react'
 import { LuDollarSign, LuMinus, LuPlus } from 'react-icons/lu'
 import Select from 'react-select'
@@ -19,6 +20,7 @@ export const CreateEditInventoryPage = (): ReactElement => {
   const [prices, setPrices] = useState<any>()
   const [, setLocation] = useLocation()
   const [parent] = useAutoAnimate()
+  const { setLoading } = useLoadingStore()
 
   useEffect(() => {
     setDimension(null)
@@ -40,6 +42,7 @@ export const CreateEditInventoryPage = (): ReactElement => {
 
   const onSubmit = (e: any): void => {
     e.preventDefault()
+    setLoading(true)
 
     if (selectedValue) {
       const values = {
@@ -50,7 +53,6 @@ export const CreateEditInventoryPage = (): ReactElement => {
       createEquipment(values, count ? count : 0)
         .then((res) => {
           if (res && res.length > 0) {
-            // Usar Promise.all para manejar todas las inserciones de createPrices
             const promises = res.map((equipment: any) => {
               const { id } = equipment
               if (id) {
@@ -61,17 +63,19 @@ export const CreateEditInventoryPage = (): ReactElement => {
               return Promise.resolve(null)
             })
 
-            // Esperar a que todas las promesas se resuelvan
             Promise.all(promises)
               .then(() => {
+                setLoading(false)
                 setLocation('/inventory')
               })
               .catch((error) => {
+                setLoading(false)
                 console.error('Error creating prices:', error)
               })
           }
         })
         .catch((error) => {
+          setLoading(false)
           console.error('Error creating equipment:', error)
         })
     }

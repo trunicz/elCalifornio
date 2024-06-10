@@ -13,9 +13,9 @@ interface TableProps extends ComponentProps<'table'> {
   watchFunction?: (id: string | number) => void
   editFunction?: (id: any) => void
   deleteFunction?: (id: string | number) => void
-  customDeleteBtn?: { icon: ReactElement; title: string }
-  customMoreBtn?: { icon: ReactElement; title: string }
-  customEditBtn?: { icon: ReactElement; title: string }
+  customDeleteBtn?: { icon: ReactElement; title: string; className?: string }
+  customMoreBtn?: { icon: ReactElement; title: string; className?: string }
+  customEditBtn?: { icon: ReactElement; title: string; className?: string }
   canSeeEdit?: boolean
   canSeeDelete?: boolean
   canSeeMore?: boolean
@@ -79,7 +79,10 @@ export const Table = ({
                       <td className="px-6 py-4 flex gap-2 items-center justify-center">
                         {canSeeMore && (
                           <Button
-                            className="border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-500"
+                            className={cn(
+                              'border-0 p-4 rounded-xl text-blue-500 hover:bg-blue-100 hover:text-blue-500',
+                              customMoreBtn?.className
+                            )}
                             icon={customMoreBtn ? customMoreBtn.icon : <LuEye />}
                             isIconOnly={true}
                             title={customMoreBtn ? customMoreBtn.title : 'Ver'}
@@ -88,7 +91,10 @@ export const Table = ({
                         )}
                         {canSeeEdit && (
                           <Button
-                            className="border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-500"
+                            className={cn(
+                              'border-0 p-4 rounded-xl text-amber-500 hover:bg-amber-100 hover:text-amber-500',
+                              customEditBtn?.className
+                            )}
                             icon={customEditBtn ? customEditBtn.icon : <LuPencil />}
                             isIconOnly={true}
                             title={customEditBtn ? customEditBtn.title : 'Editar'}
@@ -97,7 +103,10 @@ export const Table = ({
                         )}
                         {canSeeDelete && (
                           <Button
-                            className="border-0 p-4 rounded-xl text-red-500 hover:bg-red-500"
+                            className={cn(
+                              'border-0 p-4 rounded-xl text-red-500 hover:bg-red-100 hover:text-red-500',
+                              customDeleteBtn?.className
+                            )}
                             icon={customDeleteBtn ? customDeleteBtn.icon : <LuTrash2 />}
                             isIconOnly={true}
                             title={customDeleteBtn ? customDeleteBtn.title : 'Eliminar'}

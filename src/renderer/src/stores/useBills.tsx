@@ -5,6 +5,7 @@ import { create } from 'zustand'
 interface Bill {
   bills: any
   getAllBills: () => Promise<any[]>
+  createBill: (values: any) => Promise<void>
 }
 
 export const useBills = create<Bill>((set) => ({
@@ -14,5 +15,9 @@ export const useBills = create<Bill>((set) => ({
     if (error) throw error
     set({ bills: data })
     return data
+  },
+  createBill: async (values: any): Promise<void> => {
+    const { error } = await supabase.from('bills').insert(values)
+    if (error) throw error
   }
 }))

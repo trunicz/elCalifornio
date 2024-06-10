@@ -8,6 +8,7 @@ interface RentalsMethods {
   deleteRental: (id: string | number) => Promise<void>
   createRental: (values: any) => Promise<void>
   getRental: (id: string | number) => Promise<object | null>
+  getRow: (id: string | number) => Promise<object | null>
   getRentalHistory: () => Promise<any[] | null>
   getRentalForEdit: (id: string | number) => Promise<object>
   updateRental: (id: string | number, values: any) => Promise<void>
@@ -58,6 +59,7 @@ export const useRentals = (): RentalsMethods => {
 
   const createRental = async (values: any): Promise<void> => {
     try {
+      delete values.rental_id
       const { error } = await supabase.from('rentals').insert(values)
       if (error) throw error
     } catch (error) {
@@ -111,6 +113,17 @@ export const useRentals = (): RentalsMethods => {
     return null
   }
 
+  const getRow = async (id: string | number): Promise<object | null> => {
+    try {
+      const { data, error } = await supabase.from('all_rentals').select().eq('id', id)
+      if (error) throw error
+      return data[0]
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+
   const getAllRentals = async (): Promise<any[] | null> => {
     try {
       const response = await supabase.from('all_rentals').select().is('deleted_at', null)
@@ -141,6 +154,7 @@ export const useRentals = (): RentalsMethods => {
     getRental,
     getRentalHistory,
     getRentalForEdit,
-    updateRental
+    updateRental,
+    getRow
   }
 }

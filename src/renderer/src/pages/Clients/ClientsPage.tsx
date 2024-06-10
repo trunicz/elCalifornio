@@ -169,6 +169,7 @@ export const ClientsPage = (): ReactElement => {
                       className="w-24 text-center text-xl flex justify-center items-center hover:bg-gray-200 transition-all active:bg-gray-300/75 hover:text-blue-600"
                       onClick={() =>
                         download(id, file.name).then((blob) => {
+                          setLoading(true)
                           try {
                             const url = window.URL.createObjectURL(blob)
                             const a = document.createElement('a')
@@ -177,6 +178,7 @@ export const ClientsPage = (): ReactElement => {
                             a.download = file.name
                             document.body.appendChild(a)
                             a.click()
+                            setLoading(false)
                             window.URL.revokeObjectURL(url)
                           } catch (error) {
                             console.log(error)

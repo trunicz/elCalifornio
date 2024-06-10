@@ -13,6 +13,7 @@ import { useAuthStore } from '@renderer/stores/useAuth'
 import { LuAlertCircle, LuDollarSign } from 'react-icons/lu'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { Loading } from '@renderer/components/Loading'
+import { useLoadingStore } from '@renderer/stores/useLoading'
 
 const useCustomForm = (
   schema: Yup.AnyObjectSchema,
@@ -58,7 +59,7 @@ export const CreateEditRentPage = (): ReactElement => {
     value: string | number
     label: string
   } | null>(null)
-  const { getAvailableInventory, getPricesByItemId } = useInventory()
+  const { getAvailableInventory, getPricesByItemId, getItemIdByTypeAndRef } = useInventory()
   const [endDateValue, setEndDateValue] = useState<string>()
   const { createRental, getRentalForEdit, updateRental } = useRentals()
   const [currentCost, setCurrentCost] = useState(0)
@@ -67,6 +68,8 @@ export const CreateEditRentPage = (): ReactElement => {
   const { user } = useAuthStore()
   const { id } = useParams()
   const [buildAddress, setBuildAddress] = useState<any>()
+  const [quantities, setQuantities] = useState({})
+  const { setLoading } = useLoadingStore()
 
   const client_id = watch('client_id')
 
@@ -84,39 +87,45 @@ export const CreateEditRentPage = (): ReactElement => {
   }
 
   useEffect(() => {
+    setLoading(true)
     const fetchPrices = async (): Promise<void> => {
       try {
-        const tempPricesPromises =
-          inventory?.map(async (val: any) => {
-            try {
-              const res: any = await getPricesByItemId(val.value)
-              if (res[0]) {
-                return endDate?.label === '1 a 3 Dias' ? res[0].price_days : res[0].price_week
-              }
-              return 0
-            } catch (err) {
-              if (err) throw err
+        const inventoryIds = await getEquipmentsIdByInventory()
+
+        if (!inventoryIds) {
+          setCurrentCost(0)
+          return
+        }
+        const tempPricesPromises = inventoryIds.map(async (val: any) => {
+          try {
+            if (val === undefined) {
+              throw new Error('Valor de inventario indefinido')
             }
-          }) || []
+
+            const res: any = await getPricesByItemId(val)
+            if (res[0]) {
+              return endDate?.label === '1 a 3 Dias' ? res[0].price_days : res[0].price_week
+            }
+            return 0
+          } catch (err) {
+            console.error(err)
+            return 0
+          }
+        })
 
         const tempPrices = await Promise.all(tempPricesPromises)
+        const totalCost = tempPrices.reduce((acc, cv) => acc + cv, 0)
 
-        if (tempPrices?.length) {
-          const totalCost = tempPrices.reduce((acc, cv) => {
-            return acc + cv
-          }, 0)
-
-          setCurrentCost(totalCost)
-        } else {
-          setCurrentCost(0)
-        }
+        setCurrentCost(totalCost)
+        setLoading(false)
       } catch (err) {
-        if (err) throw err
+        console.error(err)
+        setCurrentCost(0)
       }
     }
 
     fetchPrices()
-  }, [inventory, endDate])
+  }, [inventory, endDate, quantities])
 
   const onChangeAdvicePayment = (e: any): void => {
     const value = parseFloat(e.target.value)
@@ -151,17 +160,33 @@ export const CreateEditRentPage = (): ReactElement => {
       )
     })
 
-    getAvailableInventory().then((res) => {
-      const filteredInventory = (res || []).map((item: any) => {
-        const label = `${item.type.type_name}: ${item.reference ? item.reference : item.dimension.dimension_name}`
-        return {
-          value: item.id, // Usa un ID único aquí
-          label
-        }
-      })
-      setInv(filteredInventory)
+    // getAvailableInventory().then((res) => {
+    //   const filteredInventory = (res || []).map((item: any) => {
+    //     const label = `${item.type.type_name}: ${item.reference ? item.reference : item.dimension.dimension_name}`
+    //     return {
+    //       value: item.id, // Usa un ID único aquí
+    //       label
+    //     }
+    //   })
+    //   setInv(filteredInventory)
+    // })
+  }, [])
+
+  useEffect(() => {
+    getAvailableInventory().then((data: any) => {
+      setInv(data)
     })
   }, [])
+
+  useEffect(() => {
+    const updatedQuantities = {}
+    inventory?.forEach((inv) => {
+      if (quantities[inv.value]) {
+        updatedQuantities[inv.value] = quantities[inv.value]
+      }
+    })
+    setQuantities(updatedQuantities)
+  }, [inventory])
 
   useEffect(() => {
     if (id) {
@@ -182,49 +207,51 @@ export const CreateEditRentPage = (): ReactElement => {
     }
   }, [id, clients])
 
-  const onSubmit = (data: any): void => {
-    if (!id) {
-      if (inventory) {
-        const equipments = inventory.map((equip: any) => {
-          return equip.value
-        })
-        const values = {
-          client_id: selectClientID?.value,
-          advance_payment: advicePayment,
-          building_address: data.building_address,
-          user_id: user?.id,
-          end_date: endDate?.value,
-          equipments_id: equipments,
-          total_cost: currentCost,
-          status: 'ACTIVO'
-        }
+  const getEquipmentsIdByInventory = async (): Promise<any[]> => {
+    const equipments = await Promise.all(
+      Object.keys(quantities).map(async (q: string) => {
+        const s = q.split('-')
+        const ids = await getItemIdByTypeAndRef(s[0], s[1], s[2], quantities[q])
+        return ids
+      })
+    )
+    return equipments.flat()
+  }
 
-        const clientReferenceId = !showForeign ? null : data.client_reference_id?.value || null
-
-        createRental({ ...values, client_reference_id: clientReferenceId }).then(() =>
-          setLocation('/rent')
-        )
+  const onSubmit = async (data: any): Promise<void> => {
+    const equipment = await getEquipmentsIdByInventory()
+    if (!id && inventory && equipment) {
+      const values = {
+        client_id: selectClientID?.value,
+        advance_payment: advicePayment,
+        building_address: data.building_address,
+        user_id: user?.id,
+        end_date: endDate?.value,
+        equipments_id: equipment,
+        total_cost: currentCost,
+        status: 'ACTIVO'
       }
-    } else {
-      if (inventory) {
-        const equipments = inventory.map((equip: any) => {
-          return equip.value
-        })
-        const values = {
-          client_id: selectClientID?.value,
-          advance_payment: advicePayment,
-          building_address: data.building_address,
-          user_id: user?.id,
-          end_date: endDateValue ? new Date(endDateValue).toISOString() : new Date(),
-          equipments_id: equipments,
-          total_cost: currentCost,
-          status: 'ACTIVO'
-        }
 
-        updateRental(id, values).then(() => {
-          setLocation('/rent')
-        })
+      const clientReferenceId = !showForeign ? null : data.client_reference_id?.value || null
+
+      createRental({ ...values, client_reference_id: clientReferenceId }).then(() =>
+        setLocation('/rent')
+      )
+    } else if (inventory && equipment) {
+      const values = {
+        client_id: selectClientID?.value,
+        advance_payment: advicePayment,
+        building_address: data.building_address,
+        user_id: user?.id,
+        end_date: endDateValue ? new Date(endDateValue).toISOString() : new Date(),
+        equipments_id: equipment,
+        total_cost: currentCost,
+        status: 'ACTIVO'
       }
+
+      updateRental(`${id}`, values).then(() => {
+        setLocation('/rent')
+      })
     }
   }
 
@@ -238,6 +265,13 @@ export const CreateEditRentPage = (): ReactElement => {
         }
       })
     }
+  }
+
+  const handleQuantityChange = (id: any, event: any, max: number): void => {
+    setQuantities({
+      ...quantities,
+      [id]: event.target.value > max ? max : event.target.value
+    })
   }
 
   return (
@@ -409,6 +443,46 @@ export const CreateEditRentPage = (): ReactElement => {
                       </div>
                     )}
                   />
+                  <div ref={parent} className="px-5">
+                    {inventory
+                      ? inventory.map((inv, index) => {
+                          quantities[inv.value] = quantities[inv.value] ? quantities[inv.value] : 1
+                          return (
+                            <div key={`${inv.value}${index}`}>
+                              <div className="w-full flex items-center mt-2 gap-4 bg-gray-50 p-2 rounded-lg">
+                                <div className="text-nowrap  font-semibold">
+                                  {inv.label.replace(/\(\d\)/g, '')}
+                                </div>
+                                <div className="hidden 2xl:block text-nowrap p-2 text-xs bg-blue-400 text-white rounded-full">
+                                  {inv.label.match(/\((\d+)\)/)?.[1]} en existencia
+                                </div>
+                                <div className="flex items-center min-w-28 ms-auto">
+                                  <input
+                                    className="px-2 w-full text-center focus:bg-gray-100 outline-0 border rounded-lg p-1.5"
+                                    type="number"
+                                    value={quantities[inv.value]}
+                                    onChange={(event) => {
+                                      handleQuantityChange(
+                                        inv.value,
+                                        event,
+                                        Number(inv.label.match(/\((\d+)\)/)?.[1])
+                                      )
+                                    }}
+                                    min={1}
+                                    max={Number(inv.label.match(/\((\d+)\)/)?.[1])}
+                                  />
+                                </div>
+                              </div>
+                              {/* {quantities[inv.value] > Number(inv.label.match(/\((\d+)\)/)?.[1]) ? (
+                                <span className="text-red-500">
+                                  No hay en existencia la cantidad solicitada
+                                </span>
+                              ) : null} */}
+                            </div>
+                          )
+                        })
+                      : null}
+                  </div>
                   <div className="w-full p-4 relative">
                     <label className="">Anticipo</label>
                     <input

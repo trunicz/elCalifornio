@@ -110,14 +110,10 @@ export const MainPage = (): ReactElement => {
                     <LuDollarSign />
                   </div>
                 </header>
-                <div className="overflow-y-auto pb-8 flex-1 text-sm grid gap-2">
+                <div className="overflow-y-auto pb-8 flex-1 text-sm flex flex-col gap-2">
                   {home.pending_payments ? (
                     home.pending_payments.map((row: any, key: number) => (
-                      <PendingRow
-                        row={row}
-                        key={row.name + key}
-                        href={`/rent/${row.name} ${row.last_name}`}
-                      />
+                      <PendingRow row={row} key={row.client + key} href={`/rent/${row.client}`} />
                     ))
                   ) : (
                     <div className="text-center p-4 text-3xl text-red-500">Sin Adeudos</div>
@@ -135,6 +131,8 @@ export const MainPage = (): ReactElement => {
 }
 
 const PendingRow = ({ row, href }: { row: any; href: string }): ReactElement => {
+  console.log(row)
+
   const [showIcon, setShowIcon] = useState(false)
   return (
     <div>
@@ -143,7 +141,7 @@ const PendingRow = ({ row, href }: { row: any; href: string }): ReactElement => 
         onMouseEnter={() => setShowIcon(true)}
         onMouseLeave={() => setShowIcon(false)}
       >
-        <div className="bg-gray-50 rounded-lg p-4 flex items-center">
+        <div className="bg-gray-50 rounded-lg p-4 flex ">
           <div className="relative flex items-center">
             {showIcon && (
               <span className="text-xl animate animate-fade-up animate-duration-150 absolute ">
@@ -156,7 +154,9 @@ const PendingRow = ({ row, href }: { row: any; href: string }): ReactElement => 
               'w-1/3  text-xs xl:text-lg text-nowrap overflow-x-hidden text-start transition-all',
               showIcon ? 'ps-8' : ''
             )}
-          >{`${row.name} ${row.last_name}`}</span>
+          >
+            {`${row.client}`}
+          </span>
           <span
             className={cn('w-1/3 text-center', !Number(row.days_until_due) ? 'text-red-500' : '')}
           >{`${Number(row.days_until_due) ? row.days_until_due : 'Ninguno'}`}</span>

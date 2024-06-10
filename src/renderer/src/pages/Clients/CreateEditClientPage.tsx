@@ -57,7 +57,7 @@ export const CreateEditClientPage = (): ReactElement => {
     {
       name: 'phone',
       label: 'Teléfono',
-      type: 'text',
+      type: 'tel',
       placeholder: 'Ingrese el Numero Telefónico... ',
       isRequired: true,
       as: 'input'
@@ -188,6 +188,7 @@ export const CreateEditClientPage = (): ReactElement => {
               formDirection="col"
               fields={formFields}
               validationSchema={clientSchema}
+              hasFiles
             />
           </>
         ) : (

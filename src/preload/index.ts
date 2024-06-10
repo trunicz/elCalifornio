@@ -23,6 +23,15 @@ const api = {
       console.log(error)
       throw error
     }
+  },
+  createBill: async (formData: object): Promise<Uint8Array> => {
+    try {
+      const filledPdfBytes = await ipcRenderer.invoke('createBill', formData)
+      return filledPdfBytes
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
   }
 }
 

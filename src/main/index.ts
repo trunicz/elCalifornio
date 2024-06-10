@@ -39,6 +39,30 @@ function createWindow(): void {
     }
   })
 
+  ipcMain.handle('createBill', async (_event, formData): Promise<Uint8Array | void> => {
+    try {
+      const pdfUrl =
+        'https://kbwswwnpmbkmgzeqxyuv.supabase.co/storage/v1/object/public/pdfs/recibo.pdf'
+      const response = await axios.get(pdfUrl, { responseType: 'arraybuffer' })
+      const pdfBytes = new Uint8Array(response.data)
+      const pdfDoc = await PDFDocument.load(pdfBytes)
+      const contract = pdfDoc.getForm()
+
+      for (const fieldName of Object.keys(formData)) {
+        const field = contract.getTextField(fieldName)
+        if (field) {
+          field.setText(`${formData[fieldName]}`)
+        } else {
+          console.log(`Campo "${fieldName}" no encontrado en el PDF`)
+        }
+      }
+      return pdfDoc.save()
+    } catch (error) {
+      console.log('Error al llenar el PDF', error)
+      throw error
+    }
+  })
+
   ipcMain.handle('createContract', async (_event, formData): Promise<Uint8Array | void> => {
     try {
       const pdfUrl =

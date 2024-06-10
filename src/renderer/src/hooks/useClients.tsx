@@ -174,26 +174,33 @@ export const useClients = (): Clients => {
 
   const createClient = async (values: any, filesList: FileList): Promise<void> => {
     try {
-      const files = Array.from(filesList)
+      const files = Array.from(filesList ? filesList : [])
 
-      const { data } = await supabase.from('clients').select('id', { count: 'exact' })
+      const { data: clientData, error: insertError } = await supabase
+        .from('clients')
+        .insert(values)
+        .select('id')
+        .single()
+      if (insertError) throw insertError
 
-      const count = data?.length
+      const clientId = clientData.id
 
       const urls = await Promise.all(
         files.map(async (file: any) => {
-          const filePath = `clients/${count}/${file.name}`
+          const filePath = `clients/${clientId}/${file.name}`
           const { data, error } = await supabase.storage
             .from('clients_storage')
             .upload(filePath, file)
           if (error) throw error
-          console.log(data)
           return data.path
         })
       )
 
-      const { error } = await supabase.from('clients').insert({ ...values, urls })
-      if (error) throw error
+      const { error: updateError } = await supabase
+        .from('clients')
+        .update({ urls })
+        .eq('id', clientId)
+      if (updateError) throw updateError
     } catch (error) {
       console.error(error)
     }

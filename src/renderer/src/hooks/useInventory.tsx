@@ -17,6 +17,12 @@ interface InventoryMethods {
   getPricesBy: (id: string | number) => Promise<object[] | null>
   createPrices: (values: object) => Promise<void>
   getPricesByItemId: (id: string | number) => Promise<object[]>
+  getItemIdByTypeAndRef: (
+    type: string,
+    dimension: string | null,
+    ref: string,
+    limit: number
+  ) => Promise<any[]>
 }
 
 export const useInventory = (): InventoryMethods => {
@@ -75,16 +81,20 @@ export const useInventory = (): InventoryMethods => {
   const createEquipment = async (values: object, count: number): Promise<any[] | null> => {
     try {
       const results: any[] = []
-      for (let i = 0; i < count; i++) {
-        const { data, error } = await supabase.from('equipment').insert(values).select()
-        if (error) throw error
-        if (data) {
-          results.push(...data)
-        }
+      const items = Array(count).fill(values)
+
+      const { data, error } = await supabase.from('equipment').insert(items).select()
+      if (error) {
+        throw error
       }
+
+      if (data) {
+        results.push(...data)
+      }
+
       return results
     } catch (error) {
-      console.log(error)
+      console.error('Error creating equipment:', error)
       return null
     }
   }
@@ -133,22 +143,87 @@ export const useInventory = (): InventoryMethods => {
     }
     return null
   }
+  const getItemIdByTypeAndRef = async (
+    type: string,
+    dimension: string | null,
+    ref: string,
+    limit: number
+  ): Promise<number[]> => {
+    try {
+      // Verificar si la referencia es la cadena 'null' y tratarla como null
+      const actualRef = ref === 'null' ? null : ref
+
+      // Obtener el ID del tipo
+      const typeIdResponse = await supabase
+        .from('equipment_type')
+        .select('id')
+        .eq('type_name', type)
+
+      if (!typeIdResponse.data || typeIdResponse.data.length === 0) {
+        throw new Error('Tipo no encontrado')
+      }
+
+      const typeId = typeIdResponse.data[0].id
+
+      let dimensionId: string | null = null
+
+      // Si la dimensión no es null, obtener su ID
+      if (dimension) {
+        const dimensionIdResponse = await supabase
+          .from('equipment_dimension')
+          .select('id')
+          .eq('dimension_name', dimension)
+
+        if (dimensionIdResponse.data && dimensionIdResponse.data.length > 0) {
+          dimensionId = `${dimensionIdResponse.data[0].id}`
+        }
+      }
+
+      // Construir la consulta a equipment
+      let query = supabase.from('equipment').select('id').eq('type', typeId).limit(limit)
+
+      if (dimensionId) {
+        query = query.eq('dimension', dimensionId)
+      }
+
+      if (actualRef !== null) {
+        query = query.eq('reference', actualRef)
+      }
+
+      const { data, error } = await query
+
+      if (error) {
+        throw error
+      }
+
+      if (!data) {
+        return [] // Si no hay datos, devolver un array vacío
+      }
+
+      return data.map((item) => Number(item.id))
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
 
   const getAvailableInventory = async (): Promise<object[] | null> => {
     try {
-      const { data, error } = await supabase
-        .from('equipment')
-        .select(
-          'id,type(type_name),reference,status,dimension(dimension_name),prices(price_week,price_days)'
-        )
-        .eq('status', 1)
-        .is('deleted_at', null)
+      const { data, error } = await supabase.from('grouped_inventory').select('*')
+
       if (error) throw error
-      return data
+
+      // Transformar los datos en el formato deseado
+      const transformedData = data.map((item: any) => ({
+        value: `${item.type_name}-${item.dimension_name}-${item.reference}`,
+        label: `${item.type_name} - ${item.dimension_name ? item.dimension_name : item.reference ? item.reference : 'Sin Referencia'} (${item.count})`
+      }))
+
+      return transformedData
     } catch (error) {
       console.error(error)
+      return null
     }
-    return null
   }
 
   const getAllInventoryView = async (): Promise<object[] | null> => {
@@ -199,6 +274,7 @@ export const useInventory = (): InventoryMethods => {
     getItemDimension,
     getPricesBy,
     createPrices,
-    getPricesByItemId
+    getPricesByItemId,
+    getItemIdByTypeAndRef
   }
 }

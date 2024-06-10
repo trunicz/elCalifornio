@@ -12,16 +12,14 @@ import { Loading } from '@renderer/components/Loading'
 import { useRentals } from '@renderer/hooks/useRentals'
 import { ReactElement, useEffect, useState } from 'react'
 import {
-  LuCheckCircle,
+  LuBadgeDollarSign,
   LuCheckCircle2,
-  LuFileDown,
+  LuMegaphone,
+  LuMonitorDown,
   LuPencilLine,
-  LuPhoneCall,
   LuSettings2
 } from 'react-icons/lu'
-import { FiWatch } from 'react-icons/fi'
 import { Link, useLocation, useParams } from 'wouter'
-import { IoWarning } from 'react-icons/io5'
 import { useContracts } from '@renderer/hooks/useContracts'
 import supabase from '@renderer/utils/supabase'
 import * as Yup from 'yup'
@@ -29,9 +27,11 @@ import { SubmitHandler } from 'react-hook-form'
 import { useAuthStore } from '@renderer/stores/useAuth'
 import { useLoadingStore } from '@renderer/stores/useLoading'
 import { useUpdater } from '@renderer/hooks/useUpdater'
+import { convertirNumeroALetras } from '@renderer/utils'
+import { useBills } from '@renderer/stores/useBills'
 
 export const RentPage = (): ReactElement => {
-  const { getAllRentals, rentals, deleteRental } = useRentals()
+  const { getAllRentals, rentals, getRow } = useRentals()
   const [rentList, setRentList] = useState<unknown[] | null>(null)
   const { Modal, openModal, closeModal } = useModal()
   const { createContract } = useContracts()
@@ -41,66 +41,38 @@ export const RentPage = (): ReactElement => {
   const [, setLocation] = useLocation()
   const { updateDueRents } = useUpdater()
   const [isLoaded, setLoaded] = useState<boolean>(false)
+  const { createBill } = useBills()
 
-  useEffect(() => {
+  const loadFunction = (): void => {
     getAllRentals().then((res) => {
       setRentList(res)
+      console.log(res)
     })
     updateDueRents().then(() => setLoaded(true))
-  }, [])
-
-  const deleteFunction = (id: string | number): void => {
-    deleteRental(id).then(() => {
-      getAllRentals().then((res) => {
-        setRentList(res)
-        openModal(
-          <>
-            <div>
-              <span className="animate-fade-up animate-duration-200 text-6xl mb-4 flex justify-center text-green-500">
-                <LuCheckCircle />
-              </span>
-              <h3>¡Termino la renta Correctamente!</h3>
-              <Button
-                className="mt-4"
-                color="success"
-                text="Aceptar"
-                onClick={() => closeModal()}
-              />
-            </div>
-          </>
-        )
-      })
-    })
   }
 
-  const endRent = (id: string | number): void => {
-    openModal(
-      <>
-        <div className="flex flex-col gap-4">
-          <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
-            <IoWarning />
-          </div>
-          <div className="">
-            <p>Al realizar esta acción no se podrá deshacer</p>
-            <p>¿Quiere continuar?</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              className="animate-fade animate-ease-out animate-duration-200"
-              color="danger"
-              text="cancelar"
-              onClick={closeModal}
-            />
-            <Button
-              className="animate-fade animate-ease-out animate-duration-200"
-              color="success"
-              text="aceptar"
-              onClick={() => deleteFunction(id)}
-            />
-          </div>
-        </div>
-      </>
-    )
+  useEffect(() => {
+    loadFunction()
+  }, [])
+
+  const endRent = async (id: string | number): Promise<any> => {
+    setLoading(true)
+    try {
+      const row = await getRow(id)
+      if (row) {
+        setLoading(false)
+        openModal(
+          <CreateBillModal
+            row={row}
+            closeModal={closeModal}
+            createBill={createBill}
+            loadFunction={loadFunction}
+          />
+        )
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const downloadRentalContract = async (id: string | number): Promise<void> => {
@@ -201,30 +173,30 @@ export const RentPage = (): ReactElement => {
 
   const openMore = (id: string | number): void => {
     openModal(
-      <div className="grid grid-cols-3 grid-rows-1 gap-4">
+      <div className="grid  gap-4">
         <Button
           color="warning"
-          icon={<LuPencilLine className="text-6xl" />}
-          isIconOnly
-          text="gola"
-          className="animate-fade animate-duration-100 w-full p-12 flex items-center justify-center "
+          icon={<LuPencilLine className="text-3xl" />}
+          className="animate-fade animate-duration-100  p-8 flex items-center justify-start text-2xl"
           onClick={() => setLocation('/rent/edit/' + id)}
+          iconLeft
+          text="Editar"
         />
         <Button
           color="info"
-          icon={<LuFileDown className="text-6xl" />}
-          isIconOnly
-          text="gola"
-          className="animate-fade animate-duration-100 w-full p-12 flex items-center justify-center "
+          icon={<LuMonitorDown className="text-3xl" />}
+          className="animate-fade animate-duration-100 text-nowrap p-8 flex items-center justify-start text-2xl  "
           onClick={() => downloadRentalContract(id)}
+          iconLeft
+          text="Descargar Contrato"
         />
         <Button
           color="success"
-          icon={<LuPhoneCall className="text-6xl" />}
-          isIconOnly
-          text="gola"
-          className="animate-fade animate-duration-100 w-full p-12 flex items-center justify-center "
+          icon={<LuMegaphone className="text-3xl" />}
+          className="animate-fade animate-duration-100  p-8 flex items-center justify-start text-2xl  "
           onClick={() => callRentalUser(id)}
+          iconLeft
+          text="Contactar"
         />
       </div>
     )
@@ -246,7 +218,7 @@ export const RentPage = (): ReactElement => {
             Historial de Rentas
           </Link>
         </AppLayout.PageOptions>
-        <Modal title="Renta" className="w-[500px]" />
+        <Modal title="Renta" className="w-auto min-w-[500px]" />
         {isLoaded && rentList ? (
           <Table
             data={rentList}
@@ -256,19 +228,167 @@ export const RentPage = (): ReactElement => {
               'cliente_tel',
               'formdata',
               'dirección',
-              'deleted_at'
+              'deleted_at',
+              'pagado',
+              'iscompleted'
             ]}
             deleteFunction={endRent}
             watchFunction={openMore}
             canSeeEdit={false}
-            customDeleteBtn={{ icon: <FiWatch />, title: 'Terminar Renta' }}
-            customMoreBtn={{ icon: <LuSettings2 />, title: 'Opciones' }}
+            customDeleteBtn={{
+              icon: <LuBadgeDollarSign className="text-green-500" />,
+              title: 'Cobrar',
+              className: 'hover:bg-green-100'
+            }}
+            customMoreBtn={{
+              icon: <LuSettings2 className="text-blue-500" />,
+              title: 'Opciones',
+              className: 'hover:bg-blue-100'
+            }}
           />
         ) : (
           <Loading />
         )}
       </AppLayout.Content>
     </AppLayout>
+  )
+}
+
+const CreateBillModal = ({
+  closeModal,
+  row,
+  createBill,
+  loadFunction
+}: {
+  closeModal: () => Promise<void>
+  row: any
+  createBill: any
+  loadFunction: any
+}): ReactElement => {
+  const { user } = useAuthStore()
+
+  const billSchema = Yup.object().shape({
+    // cliente: Yup.string().required('Es un valor Obligatorio'),
+    concepto: Yup.string(),
+    cantidad: Yup.number().positive().integer(),
+    forma_pago: Yup.string(),
+    factura: Yup.string(),
+    razon_social: Yup.string(),
+    // recibidor: Yup.string(),
+    // cliente_firma: Yup.string(),
+    // sub_total: Yup.number(),
+    // iva: Yup.number(),
+    // ref_contrato: Yup.string(),
+    // estatus: Yup.string(),
+    // fecha_vencimiento: Yup.string(),
+    fecha_extension: Yup.string()
+  })
+
+  const submit = (data: any): void => {
+    const { cliente, fecha_final, fecha_inicial, id } = row
+    console.log(row)
+
+    console.log(fecha_inicial)
+
+    const ref_contrato = `contrato${fecha_inicial.replaceAll('/', '')}${cliente[0]}${id}`
+
+    const bill = {
+      rent_id: id,
+      cliente,
+      concepto: data.concepto,
+      cantidad: convertirNumeroALetras(data.cantidad),
+      forma_pago: data.forma_pago,
+      factura: data.factura,
+      razon_social: data.razon_social,
+      recibidor: user?.user_metadata.name
+        ? user?.user_metadata.name + ' ' + user?.user_metadata.last_name
+        : 'ElCalifornio',
+      cliente_firma: cliente,
+      sub_total: data.cantidad.toFixed(2),
+      iva: (data.cantidad * 0.16).toFixed(2),
+      ref_contrato,
+      estatus:
+        data.concepto === 'RENOVACIÓN/ENTREGA' || data.concepto === 'RENOVACIÓN'
+          ? 'VIGENCIA'
+          : 'ENTREGADO',
+      fecha_vencimiento: fecha_final,
+      fecha_extension: data.fecha_extension.replaceAll('-', '/'),
+      dia: new Date().getDate(),
+      mes: new Date().getMonth() + 1,
+      anio: new Date().getFullYear(),
+      total: (data.cantidad + data.cantidad * 0.16).toFixed(2)
+    }
+    createBill(bill).then(() => {
+      closeModal().then(() => loadFunction())
+    })
+  }
+  return (
+    <Form
+      className="mx-auto overflow-y-auto auto-rows-max grid md:grid-cols-2 lg:grid-cols-2 gap-2"
+      hasRequiereMessage={false}
+      formDirection="col"
+      onSubmit={submit}
+      validationSchema={billSchema}
+      fields={[
+        {
+          name: 'concepto',
+          label: 'Concepto',
+          as: 'select',
+          options: [
+            { value: 'RENOVACIÓN/ENTREGA', label: 'RENOVACIÓN Y ENTREGA PARCIAL' },
+            { value: 'RENOVACIÓN', label: 'RENOVACIÓN' },
+            { value: 'FINIQUITO', label: 'FINIQUITO' },
+            { value: 'ABONO', label: 'ABONO' }
+          ],
+          className: 'col-span-full'
+        },
+        {
+          name: 'forma_pago',
+          label: 'Forma de pago',
+          as: 'select',
+          options: [
+            { value: 'EFECTIVO', label: 'EFECTIVO' },
+            { value: 'TRANSFERENCIA', label: 'TRANSFERENCIA' },
+            { value: 'TARJETA DE CRÉDITO', label: 'TARJETA DE CRÉDITO' },
+            { value: 'TARJETA DE DÉBITO', label: 'TARJETA DE DÉBITO' }
+          ]
+        },
+        {
+          name: 'factura',
+          label: 'Factura',
+          as: 'select',
+          options: [
+            { value: 'Si', label: 'Si' },
+            { value: 'No', label: 'No' }
+          ]
+        },
+        {
+          name: 'cantidad',
+          label: 'Cantidad',
+          as: 'input',
+          type: 'number',
+          placeholder: '500'
+        },
+        {
+          name: 'fecha_extension',
+          label: 'Fecha Extension',
+          as: 'input',
+          type: 'date'
+        },
+        {
+          name: 'razon_social',
+          label: 'Razon Social',
+          as: 'input',
+          type: 'text',
+          className: 'col-span-full'
+        }
+      ]}
+    >
+      <div className="flex gap-4 col-span-full">
+        <Button color="danger" type="button" text="Cancelar" onClick={closeModal} />
+        <Button color="success" type="submit" text="Enviar" />
+      </div>
+    </Form>
   )
 }
 

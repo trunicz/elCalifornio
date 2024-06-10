@@ -31,7 +31,15 @@ export const RentHistory = (): ReactElement => {
         </AppLayout.PageOptions>
         {listRentals ? (
           <Table
-            hiddenKeys={['id', 'cliente_tel', 'formdata', 'dirección', 'deleted_at']}
+            hiddenKeys={[
+              'id',
+              'cliente_tel',
+              'formdata',
+              'dirección',
+              'deleted_at',
+              'anticipo',
+              'iscompleted'
+            ]}
             data={listRentals}
             hasOptions={false}
           />
