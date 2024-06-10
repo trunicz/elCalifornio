@@ -229,7 +229,7 @@ export const RentPage = (): ReactElement => {
               'formdata',
               'dirección',
               'deleted_at',
-              'pagado',
+              'anticipo',
               'iscompleted'
             ]}
             deleteFunction={endRent}
@@ -238,12 +238,12 @@ export const RentPage = (): ReactElement => {
             customDeleteBtn={{
               icon: <LuBadgeDollarSign className="text-green-500" />,
               title: 'Cobrar',
-              className: 'hover:bg-green-100'
+              className: 'hover:bg-green-100 border-none p-4'
             }}
             customMoreBtn={{
-              icon: <LuSettings2 className="text-blue-500" />,
+              icon: <LuSettings2 className="text-blue-500 " />,
               title: 'Opciones',
-              className: 'hover:bg-blue-100'
+              className: 'hover:bg-blue-100 border-none p-4'
             }}
           />
         ) : (
@@ -371,7 +371,7 @@ const CreateBillModal = ({
         },
         {
           name: 'fecha_extension',
-          label: 'Fecha Extension',
+          label: 'Fecha Extension/Termino',
           as: 'input',
           type: 'date'
         },

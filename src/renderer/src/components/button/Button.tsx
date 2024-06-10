@@ -32,7 +32,7 @@ export const Button = ({
   return (
     <button
       className={cn(
-        'flex items-center px-3 text-white w-full py-2 hover:text-main text-stroke hover:bg-hover  active:scale-[98%] transition-all max-h-10 rounded-lg  border-2 border-base hover:border-transparent duration-150 font-normal',
+        'flex items-center px-3 text-white w-full py-2 hover:text-main text-stroke hover:bg-hover  active:scale-[98%] transition-all max-h-10 rounded-lg  border-2 border-base hover:border-transparent duration-150 font-normal disabled:bg-gray-50 disabled:text-gray-400',
         color ? colorStyle[color] : '',
         {
           '': icon,

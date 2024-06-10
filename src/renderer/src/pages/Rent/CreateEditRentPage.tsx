@@ -224,6 +224,7 @@ export const CreateEditRentPage = (): ReactElement => {
       const values = {
         client_id: selectClientID?.value,
         advance_payment: advicePayment,
+        paid: advicePayment,
         building_address: data.building_address,
         user_id: user?.id,
         end_date: endDate?.value,
@@ -241,6 +242,7 @@ export const CreateEditRentPage = (): ReactElement => {
       const values = {
         client_id: selectClientID?.value,
         advance_payment: advicePayment,
+        paid: advicePayment,
         building_address: data.building_address,
         user_id: user?.id,
         end_date: endDateValue ? new Date(endDateValue).toISOString() : new Date(),
@@ -522,9 +524,16 @@ export const CreateEditRentPage = (): ReactElement => {
               )}
             </div>
             <div className="fixed z-10 end-4 bottom-4">
-              <p ref={parent} className="text-3xl flex flex-col pb-2">
-                <span className="text-lg">Total:</span>${printPrices(currentCost, advicePayment)}
-              </p>
+              <div ref={parent} className="text-3xl flex flex-col pb-2">
+                <p className="text-lg">Total:</p>
+                {advicePayment ? (
+                  <>
+                    <p className="text-xl">{`+$${currentCost.toFixed(2)}`}</p>
+                    <p className="text-xl">{`-$${advicePayment.toFixed(2)}`}</p>
+                  </>
+                ) : null}
+                <p>${printPrices(currentCost, advicePayment)}</p>
+              </div>
               <Button
                 type="submit"
                 className=" bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"

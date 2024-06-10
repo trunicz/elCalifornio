@@ -28,7 +28,7 @@ export const AppLayout = ({
   return (
     <main className={cn('bg-main theme-light h-full flex', className)} {...props}>
       {loading && (
-        <div className="absolute bg-secondary z-20 rounded-t-xl animate-fade text-3xl bottom-0 right-8 p-4 text-black">
+        <div className="absolute bg-secondary z-20 rounded-b-xl animate-fade text-3xl top-0 right-8 p-4 text-black">
           <div className="animate-spin">
             <LuLoader />
           </div>

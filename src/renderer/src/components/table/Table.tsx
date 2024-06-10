@@ -87,6 +87,7 @@ export const Table = ({
                             isIconOnly={true}
                             title={customMoreBtn ? customMoreBtn.title : 'Ver'}
                             onClick={() => (watchFunction ? watchFunction(row.id) : '')}
+                            {...customMoreBtn}
                           />
                         )}
                         {canSeeEdit && (
@@ -99,6 +100,7 @@ export const Table = ({
                             isIconOnly={true}
                             title={customEditBtn ? customEditBtn.title : 'Editar'}
                             onClick={() => (editFunction ? editFunction(row.id) : '')}
+                            {...customEditBtn}
                           />
                         )}
                         {canSeeDelete && (
@@ -111,6 +113,7 @@ export const Table = ({
                             isIconOnly={true}
                             title={customDeleteBtn ? customDeleteBtn.title : 'Eliminar'}
                             onClick={() => (deleteFunction ? deleteFunction(row.id) : '')}
+                            {...customDeleteBtn}
                           />
                         )}
                       </td>

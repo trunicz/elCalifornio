@@ -4,7 +4,7 @@ import { Loading } from '@renderer/components/Loading'
 import { useContracts } from '@renderer/hooks/useContracts'
 import { useAuthStore } from '@renderer/stores/useAuth'
 import { useBills } from '@renderer/stores/useBills'
-import { convertirNumeroALetras } from '@renderer/utils'
+import { cn, convertirNumeroALetras } from '@renderer/utils'
 import { Fragment, ReactElement, useEffect, useState } from 'react'
 import { LuBadgeDollarSign, LuDownloadCloud } from 'react-icons/lu'
 import * as Yup from 'yup'
@@ -12,7 +12,7 @@ import * as Yup from 'yup'
 export const BillsPage = (): ReactElement => {
   const { bills, getAllBills } = useBills()
   const [headers, setHeaders] = useState<any[]>()
-  const hiddenKeys = ['id', 'equipo', 'recibos']
+  const hiddenKeys = ['id', 'equipo', 'recibos', 'iscompleted']
   const { Modal, openModal, closeModal } = useModal()
   const { createBill } = useBills()
   const { createBillPdf } = useContracts()
@@ -49,7 +49,7 @@ export const BillsPage = (): ReactElement => {
                 <tr className="text-center text-stroke">
                   {headers.map((head, index) => (
                     <th
-                      className="px-6 py-5 font-medium text-nowrap text-start"
+                      className="px-6 py-5 font-medium text-nowrap text-center"
                       key={`head${index}`}
                     >
                       {String(head).replaceAll('_', ' ')}
@@ -134,14 +134,15 @@ const RenderBillRow = ({
         {Object.keys(row)
           .filter((key) => !hiddenKeys.includes(key))
           .map((key, colIndex) => (
-            <td className="px-6 py-4 text-nowrap text-start" key={`itm${colIndex}`}>
+            <td className="px-6 py-4 text-nowrap text-center" key={`itm${colIndex}`}>
               {row[key]}
             </td>
           ))}
         <td className="px-6 py-4 flex gap-2 items-center justify-center">
           <Button
             type="button"
-            className="border-0 p-4 rounded-xl text-green-500 hover:bg-green-500"
+            className={cn('border-0 p-4 rounded-xl text-green-500 hover:bg-green-500')}
+            disabled={row.iscompleted}
             icon={<LuBadgeDollarSign />}
             isIconOnly={true}
             title={'Cobrar/Crear Recibo'}
@@ -333,7 +334,7 @@ const CreateBillModal = ({
         },
         {
           name: 'fecha_extension',
-          label: 'Fecha Extension',
+          label: 'Fecha Extension/Termino',
           as: 'input',
           type: 'date'
         },

@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useAuthStore } from '@renderer/stores/useAuth'
+import { convertirNumeroALetras } from '@renderer/utils'
 import supabase from '@renderer/utils/supabase'
 import { useState } from 'react'
 
@@ -16,6 +18,7 @@ interface RentalsMethods {
 
 export const useRentals = (): RentalsMethods => {
   const [rentals, setRentals] = useState<any[] | null>(null)
+  const { user } = useAuthStore()
 
   const updateRental = async (id: string | number, values: any): Promise<void> => {
     const updates = [
@@ -57,10 +60,50 @@ export const useRentals = (): RentalsMethods => {
     }
   }
 
-  const createRental = async (values: any): Promise<void> => {
+  const createRental = async (rentalValues: any): Promise<void> => {
     try {
-      delete values.rental_id
-      const { error } = await supabase.from('rentals').insert(values)
+      const { data, error } = await supabase
+        .from('rentals')
+        .insert(rentalValues)
+        .select(
+          'id,clients!rentals_client_id_fkey(name,last_name,id),total_cost,created_at,end_date,advance_payment'
+        )
+
+      if (data) {
+        const rent = data[0]
+        const fechaOriginal = new Date(rent.end_date)
+        const fechaFormateada = fechaOriginal.toLocaleDateString('es-ES', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
+
+        const billValues = {
+          rent_id: rent.id,
+          cliente: rent.clients?.name + ' ' + rent.clients?.last_name,
+          concepto: 'ABONO',
+          cantidad: convertirNumeroALetras(parseFloat(rent.advance_payment)),
+          forma_pago: 'NO ESPECIFICADO',
+          factura: 'NO',
+          razon_social: 'NO APLICA',
+          recibidor: user?.user_metadata.name
+            ? user?.user_metadata.name + ' ' + user?.user_metadata.last_name
+            : 'ElCalifornio',
+          cliente_firma: rent.clients?.name + ' ' + rent.clients?.last_name,
+          sub_total: Number(rent.advance_payment).toFixed(2),
+          iva: (Number(rent.advance_payment) * 0.16).toFixed(2),
+          ref_contrato: `contrato${rent.created_at.replaceAll('/', '')}${rent.clients?.name[0]}${rent.id}`,
+          estatus: 'VIGENCIA',
+          fecha_vencimiento: fechaFormateada,
+          fecha_extension: fechaFormateada.replaceAll('-', '/'),
+          dia: `${new Date().getDate()}`,
+          mes: `${new Date().getMonth() + 1}`,
+          anio: `${new Date().getFullYear()}`,
+          total: (Number(rent.advance_payment) + Number(rent.advance_payment) * 0.16).toFixed(2)
+        }
+        const { error } = await supabase.from('bills').insert(billValues)
+        if (error) throw error
+      }
       if (error) throw error
     } catch (error) {
       console.error(error)

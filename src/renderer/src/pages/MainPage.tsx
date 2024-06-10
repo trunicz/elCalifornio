@@ -79,7 +79,7 @@ export const MainPage = (): ReactElement => {
                     <LuDollarSign />
                   </div>
                 </header>
-                <div className="overflow-y-auto pb-8 flex-1 text-sm grid gap-2">
+                <div className="overflow-y-auto pb-8 flex-1 text-sm flex flex-col">
                   {home.rentals_info ? (
                     home.rentals_info
                       .sort((a: any, b: any) => b.total - a.total)
