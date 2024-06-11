@@ -131,8 +131,6 @@ export const MainPage = (): ReactElement => {
 }
 
 const PendingRow = ({ row, href }: { row: any; href: string }): ReactElement => {
-  console.log(row)
-
   const [showIcon, setShowIcon] = useState(false)
   return (
     <div>

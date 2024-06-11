@@ -46,7 +46,6 @@ export const RentPage = (): ReactElement => {
   const loadFunction = (): void => {
     getAllRentals().then((res) => {
       setRentList(res)
-      console.log(res)
     })
     updateDueRents().then(() => setLoaded(true))
   }

@@ -64,19 +64,48 @@ export const Widget = ({
           <LuArrowUpRight />
         </div>
       )}
-      <Link to={href} className="h-full">
-        <header className="w-full flex items-center p-2 gap-1 ">
-          <section className="flex">
-            <article className="text-2xl p-1 rounded-full">
-              {icon ? icon : <LuActivitySquare />}
-            </article>
-          </section>
-          <section className={`${titleFontSize[size]}`}>{title}</section>
-        </header>
-        <main className="text-6xl h-full flex items-start justify-center p-6 2xl:pt-6 pt-2">
-          {children}
-        </main>
-      </Link>
+      {hasGoTo ? (
+        <Link to={href} className="h-full">
+          <WidgetContent icon={icon} fontSize={titleFontSize[size]} title={title}>
+            {children}
+          </WidgetContent>
+        </Link>
+      ) : (
+        <>
+          <WidgetContent icon={icon} fontSize={titleFontSize[size]} title={title}>
+            {children}
+          </WidgetContent>
+        </>
+      )}
     </div>
   )
 }
+
+interface WidgetContentProps {
+  icon?: ReactElement
+  fontSize: string
+  title: string
+  children: ReactNode
+}
+
+const WidgetContent = ({
+  icon,
+  fontSize,
+  title,
+  children,
+  ...props
+}: WidgetContentProps): ReactElement => (
+  <>
+    <header className="w-full flex items-center p-2 gap-1 " {...props}>
+      <section className="flex">
+        <article className="text-2xl p-1 rounded-full">
+          {icon ? icon : <LuActivitySquare />}
+        </article>
+      </section>
+      <section className={`${fontSize}`}>{title}</section>
+    </header>
+    <main className="text-6xl h-full flex items-start justify-center p-6 2xl:pt-6 pt-2">
+      {children}
+    </main>
+  </>
+)

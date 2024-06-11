@@ -223,8 +223,8 @@ export const CreateEditRentPage = (): ReactElement => {
     if (!id && inventory && equipment) {
       const values = {
         client_id: selectClientID?.value,
-        advance_payment: advicePayment,
-        paid: advicePayment,
+        advance_payment: advicePayment ? advicePayment : 0,
+        paid: advicePayment ? advicePayment : 0,
         building_address: data.building_address,
         user_id: user?.id,
         end_date: endDate?.value,
@@ -241,8 +241,8 @@ export const CreateEditRentPage = (): ReactElement => {
     } else if (inventory && equipment) {
       const values = {
         client_id: selectClientID?.value,
-        advance_payment: advicePayment,
-        paid: advicePayment,
+        advance_payment: advicePayment ? advicePayment : 0,
+        paid: advicePayment ? advicePayment : 0,
         building_address: data.building_address,
         user_id: user?.id,
         end_date: endDateValue ? new Date(endDateValue).toISOString() : new Date(),
@@ -269,10 +269,10 @@ export const CreateEditRentPage = (): ReactElement => {
     }
   }
 
-  const handleQuantityChange = (id: any, event: any, max: number): void => {
+  const handleQuantityChange = (id: any, value: any, max: number): void => {
     setQuantities({
       ...quantities,
-      [id]: event.target.value > max ? max : event.target.value
+      [id]: value > max ? max : value
     })
   }
 
@@ -466,7 +466,14 @@ export const CreateEditRentPage = (): ReactElement => {
                                     onChange={(event) => {
                                       handleQuantityChange(
                                         inv.value,
-                                        event,
+                                        event.target.value,
+                                        Number(inv.label.match(/\((\d+)\)/)?.[1])
+                                      )
+                                    }}
+                                    onMouseDown={() => {
+                                      handleQuantityChange(
+                                        inv.value,
+                                        '',
                                         Number(inv.label.match(/\((\d+)\)/)?.[1])
                                       )
                                     }}
