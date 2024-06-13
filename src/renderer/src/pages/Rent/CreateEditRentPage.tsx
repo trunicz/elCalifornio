@@ -78,6 +78,10 @@ export const CreateEditRentPage = (): ReactElement => {
     setSelectClientID(e)
   }
 
+  useEffect(() => {
+    console.log(inventory)
+  }, [inventory])
+
   const onChangeEndDate = (e: any): void => {
     setEndDate(e)
     setEquipmentVisible(true)
@@ -515,10 +519,8 @@ export const CreateEditRentPage = (): ReactElement => {
                       id="adelantado"
                       className="h-5 w-5 ring-offset-2"
                       onChange={(e) => {
-                        console.log(e.target.checked)
-
                         if (e.target.checked) {
-                          setAdvicePayment(currentCost)
+                          setAdvicePayment(currentCost ? currentCost : 0)
                         } else {
                           setAdvicePayment(0)
                         }
@@ -526,7 +528,7 @@ export const CreateEditRentPage = (): ReactElement => {
                     />
                   </div>
                   {typeof advicePayment === 'number' && currentCost < advicePayment && (
-                    <p className="px-4 text-red-400 text-sm -mt-2">
+                    <p className="px-4 text-red-400 text-sm -mt-2 pt-3">
                       El anticipo es mayor al costo, verifica que no sea un error.
                     </p>
                   )}
