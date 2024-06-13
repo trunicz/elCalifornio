@@ -7,7 +7,7 @@ interface Clients {
   localsClients: any[] | null
   getAllClients: () => Promise<object[] | null>
   getClientById: (id: string | number) => Promise<object | null>
-  createClient: (values: any, fileList: FileList) => Promise<void>
+  createClient: (values: any, fileList?: FileList) => Promise<void>
   deleteClient: (id: string | number) => Promise<void>
   updateClient: (id: string | number, values: any, fileList: FileList) => Promise<void>
   getAllLocalClients: () => Promise<object[] | null>
@@ -172,7 +172,7 @@ export const useClients = (): Clients => {
     }
   }
 
-  const createClient = async (values: any, filesList: FileList): Promise<void> => {
+  const createClient = async (values: any, filesList?: FileList): Promise<void> => {
     try {
       const files = Array.from(filesList ? filesList : [])
 
@@ -258,6 +258,7 @@ export const useClients = (): Clients => {
         .select('id,name,last_name,email,phone,isForeign,client_type(type_name)')
         .is('isForeign', false)
         .is('deleted_at', null)
+        .lt('strikes', 3)
       if (error) throw error
       const filteredClients = data.map((client) => {
         return {

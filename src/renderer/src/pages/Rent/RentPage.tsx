@@ -79,10 +79,14 @@ export const RentPage = (): ReactElement => {
     const rent: any = rentList?.filter((rent: any) => rent.id === id)
 
     if (rent) {
-      await createContract(
-        rent[0].formdata,
-        `Contrato${rent[0].formdata.day}${rent[0].formdata.month}${rent[0].formdata.year}${rent[0].cliente[0]}${rent[0].id}`
-      ).then(() => {
+      rent[0].formdata = {
+        ...rent[0].formdata,
+        folio: rent[0].id,
+        total_cost: convertirNumeroALetras(Number(rent[0].formdata.total_cost))
+      }
+      console.log(rent[0].formdata)
+
+      await createContract(rent[0].formdata, `Contrato#${rent[0].id}`).then(() => {
         setLoading(false)
       })
     }

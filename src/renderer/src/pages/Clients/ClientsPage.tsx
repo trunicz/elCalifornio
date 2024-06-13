@@ -322,7 +322,9 @@ export const ClientsPage = (): ReactElement => {
             </p>
             <p className="text-lg flex gap-4">
               <span className="font-medium text-nowrap w-1/3 text-start">Dirección:</span>
-              <span className="bg-gray-100 px-2  rounded-md">{client.address}</span>
+              <span className="bg-gray-100 px-2 rounded-md break-all text-left">
+                {client?.address || 'No disponible'}
+              </span>
             </p>
             <div className="grid grid-cols-3 gap-2 border-t-2  pt-4 text-xl ">
               <button

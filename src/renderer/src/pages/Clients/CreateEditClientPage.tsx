@@ -168,7 +168,7 @@ export const CreateEditClientPage = (): ReactElement => {
         setLocation(enable ? '/rent/create' : '/clients')
       })
     } else {
-      createClient(data, files).then(() => setLocation(enable ? '/rent/create' : '/clients'))
+      createClient(data, files).then(() => setLocation(enable ? '/rents/create' : '/clients'))
     }
   }
 

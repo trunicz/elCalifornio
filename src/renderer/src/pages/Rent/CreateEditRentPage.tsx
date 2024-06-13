@@ -74,6 +74,7 @@ export const CreateEditRentPage = (): ReactElement => {
   const client_id = watch('client_id')
 
   const updateSelectClientId = (e: any): void => {
+    handleSelectChange(e)
     setSelectClientID(e)
   }
 
@@ -355,7 +356,7 @@ export const CreateEditRentPage = (): ReactElement => {
                   <div className="p-4 pt-0">
                     <Button
                       className="w-full bg-gray-200 border-gray-200 hover:bg-gray-300 transition-all hover:text-gray-500"
-                      onClick={() => setLocation('/clients/create')}
+                      onClick={() => setLocation('/clients/create/' + true)}
                       text="Crear Cliente"
                     />
                   </div>
@@ -500,9 +501,27 @@ export const CreateEditRentPage = (): ReactElement => {
                       onChange={(e) => onChangeAdvicePayment(e)}
                       value={advicePayment ?? ''}
                       className="ps-7 w-full focus:bg-gray-100 outline-0 border rounded-lg p-1.5"
+                      hidden
                       min={0}
                     />
-                    <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg" />
+                    <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg hidden" />
+                  </div>
+                  <div className="w-full px-4 relative flex  gap-2">
+                    <label htmlFor="adelantado" className="w-full text-gray-400">
+                      Pago Adelantado
+                    </label>
+                    <input
+                      type="checkbox"
+                      id="adelantado"
+                      className="h-5 w-5 ring-offset-2"
+                      onChange={(e) => {
+                        console.log(e.target.checked)
+
+                        if (e.target.checked) {
+                          setAdvicePayment(currentCost)
+                        }
+                      }}
+                    />
                   </div>
                   {typeof advicePayment === 'number' && currentCost < advicePayment && (
                     <p className="px-4 text-red-400 text-sm -mt-2">

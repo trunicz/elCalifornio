@@ -19,6 +19,7 @@ interface TableProps extends ComponentProps<'table'> {
   canSeeEdit?: boolean
   canSeeDelete?: boolean
   canSeeMore?: boolean
+  shouldShowOptions?: (row: any) => boolean // nueva propiedad
 }
 
 export const Table = ({
@@ -35,6 +36,7 @@ export const Table = ({
   customMoreBtn,
   customEditBtn,
   hiddenKeys = [],
+  shouldShowOptions = (): boolean => true, // valor por defecto
   ...props
 }: TableProps): ReactElement => {
   const headers = data
@@ -75,7 +77,7 @@ export const Table = ({
                             : formatDate(row[key])}
                         </td>
                       ))}
-                    {hasOptions && (
+                    {hasOptions && shouldShowOptions(row) && (
                       <td className="px-6 py-4 flex gap-2 items-center justify-center">
                         {canSeeMore && (
                           <Button

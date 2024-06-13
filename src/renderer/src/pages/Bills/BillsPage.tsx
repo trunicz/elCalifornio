@@ -142,7 +142,7 @@ const RenderBillRow = ({
           <Button
             type="button"
             className={cn('border-0 p-4 rounded-xl text-green-500 hover:bg-green-500')}
-            disabled={row.iscompleted}
+            disabled={row.estado_actual === 'COMPLETADO'}
             icon={<LuBadgeDollarSign />}
             isIconOnly={true}
             title={'Cobrar/Crear Recibo'}
@@ -184,11 +184,16 @@ const RenderBillRow = ({
                     <button
                       className="h-full px-4 rounded-xl text-center text-xl flex justify-center items-center hover:bg-gray-100 transition-all active:bg-gray-200/75 hover:text-blue-600"
                       onClick={() => {
-                        const formData = recibo.formData
+                        const formData = {
+                          ...recibo.formData,
+                          numero_contrato: recibo.formData.id,
+                          ref_contrato: `Contrato #${recibo.formData.rent_id}`
+                        }
+                        const folio = formData.id
                         delete formData.id
                         delete formData.rent_id
                         delete formData.created_at
-                        createBillPdf(formData, '')
+                        createBillPdf(formData, `Recibo#${folio}`)
                       }}
                     >
                       <LuDownloadCloud />
