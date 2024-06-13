@@ -519,6 +519,8 @@ export const CreateEditRentPage = (): ReactElement => {
 
                         if (e.target.checked) {
                           setAdvicePayment(currentCost)
+                        } else {
+                          setAdvicePayment(0)
                         }
                       }}
                     />
