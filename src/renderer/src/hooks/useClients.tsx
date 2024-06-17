@@ -19,6 +19,7 @@ interface Clients {
   uploadFiles: (files: FileList, id: string) => Promise<string[]>
   addStrikes: (id: string | number) => Promise<void>
   banClientById: (id: string | number) => Promise<void>
+  getAllClientsForRent: () => Promise<{ value: any; label: string }[]>
 }
 
 export const useClients = (): Clients => {
@@ -57,14 +58,14 @@ export const useClients = (): Clients => {
   }
 
   const unBanClientById = async (id: string | number): Promise<void> => {
-    const { error } = await supabase.from('clients').update({ strikes: 2 }).eq('id', id)
+    const { error } = await supabase.from('clients').update({ strikes: 0 }).eq('id', id)
     if (error) throw error
   }
 
   const getBannedClients = async (): Promise<any[]> => {
     const { data, error } = await supabase
       .from('clients')
-      .select('id,name,last_name,phone,strikes')
+      .select('id,name,last_name,phone,strikes,isBanned')
       .gt('strikes', 2)
     if (error) throw error
     const filteredData = data.map((r) => {
@@ -73,7 +74,8 @@ export const useClients = (): Clients => {
         nombre: r.name,
         apellido: r.last_name,
         teléfono: r.phone,
-        strikes: r.strikes
+        strikes: r.strikes,
+        isBanned: r.isBanned
       }
     })
     setClientList(filteredData)
@@ -106,6 +108,8 @@ export const useClients = (): Clients => {
         .from('clients_storage')
         .list(`clients/${id}`, { limit: 100 })
       if (response.error) throw response.error
+      console.log(response)
+
       return response.data
     } catch (error) {
       console.error(error)
@@ -279,6 +283,22 @@ export const useClients = (): Clients => {
     return null
   }
 
+  const getAllClientsForRent = async (): Promise<{ value: any; label: string }[]> => {
+    const { data } = await supabase
+      .from('clients')
+      .select('id,name,last_name')
+      .is('deleted_at', null)
+      .lt('strikes', 3)
+
+    if (data) {
+      return data.map((c) => {
+        return { value: c.id, label: `${c.name} ${c.last_name}` }
+      })
+    } else {
+      return [{ value: 0, label: '' }]
+    }
+  }
+
   return {
     getAllClients,
     clientList,
@@ -295,6 +315,7 @@ export const useClients = (): Clients => {
     unBanClientById,
     uploadFiles,
     addStrikes,
-    banClientById
+    banClientById,
+    getAllClientsForRent
   }
 }

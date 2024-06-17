@@ -667,7 +667,7 @@ export type Database = {
       }
       rentals: {
         Row: {
-          advance_payment: string
+          advance_payment: string | null
           building_address: string | null
           client_id: number
           client_reference_id: number | null
@@ -676,6 +676,7 @@ export type Database = {
           end_date: string
           equipments_id: number[]
           id: number
+          items_returned: boolean | null
           paid: number
           status: string
           total_cost: string
@@ -683,7 +684,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          advance_payment: string
+          advance_payment?: string | null
           building_address?: string | null
           client_id: number
           client_reference_id?: number | null
@@ -692,6 +693,7 @@ export type Database = {
           end_date: string
           equipments_id: number[]
           id?: number
+          items_returned?: boolean | null
           paid?: number
           status: string
           total_cost: string
@@ -699,7 +701,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          advance_payment?: string
+          advance_payment?: string | null
           building_address?: string | null
           client_id?: number
           client_reference_id?: number | null
@@ -708,6 +710,7 @@ export type Database = {
           end_date?: string
           equipments_id?: number[]
           id?: number
+          items_returned?: boolean | null
           paid?: number
           status?: string
           total_cost?: string
@@ -980,7 +983,6 @@ export type Database = {
           fecha_final: string | null
           fecha_inicial: string | null
           id: number | null
-          iscompleted: boolean | null
           recibos: Json | null
           telefono: string | null
         }
@@ -1049,6 +1051,8 @@ export type Database = {
         Row: {
           count: number | null
           dimension_name: string | null
+          price_days: number | null
+          price_week: number | null
           reference: string | null
           type_name: string | null
         }

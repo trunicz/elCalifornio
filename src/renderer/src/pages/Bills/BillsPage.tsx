@@ -260,6 +260,13 @@ const CreateBillModal = ({
 
     const ref_contrato = `contrato${fecha_inicial.replaceAll('/', '')}${cliente[0]}${id}`
 
+    const recibidor =
+      user?.user_metadata.name && user?.user_metadata.lastname
+        ? user?.user_metadata.name + ' ' + user?.user_metadata.lastname
+        : 'ElCalifornio'
+
+    console.log(recibidor)
+
     const bill = {
       rent_id: id,
       cliente,
@@ -268,9 +275,7 @@ const CreateBillModal = ({
       forma_pago: data.forma_pago,
       factura: data.factura,
       razon_social: data.razon_social,
-      recibidor: user?.user_metadata.name
-        ? user?.user_metadata.name + ' ' + user?.user_metadata.last_name
-        : 'ElCalifornio',
+      recibidor,
       cliente_firma: cliente,
       sub_total: data.cantidad.toFixed(2),
       iva: (data.cantidad * 0.16).toFixed(2),

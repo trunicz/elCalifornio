@@ -82,7 +82,7 @@ export const useRentals = (): RentalsMethods => {
           rent_id: rent.id,
           cliente: rent.clients?.name + ' ' + rent.clients?.last_name,
           concepto: 'ABONO',
-          cantidad: convertirNumeroALetras(parseFloat(rent.advance_payment)),
+          cantidad: convertirNumeroALetras(Number(rent.advance_payment)),
           forma_pago: 'NO ESPECIFICADO',
           factura: 'NO',
           razon_social: 'NO APLICA',

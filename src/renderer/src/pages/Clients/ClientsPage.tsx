@@ -132,6 +132,8 @@ export const ClientsPage = (): ReactElement => {
   const seeFiles = (id: string | number): void => {
     getAllFiles(id).then((prom: object[]) => {
       const files = Array.from(prom)
+
+      console.log(files)
       if (files.length > 0) {
         openModal(
           <div className="flex flex-col gap-4 h-auto">

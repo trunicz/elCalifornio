@@ -4,6 +4,7 @@ import { useAuthStore } from '@renderer/stores/useAuth'
 import { ReactElement, useEffect } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import * as Yup from 'yup'
+import img from '@renderer/assets/frame.png'
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email('El correo no es valido').required('El correo es obligatorio'),
@@ -47,7 +48,7 @@ export const AuthPage = (): ReactElement => {
     <main className="flex flex-col items-center h-full">
       <section className="flex flex-col sm:w-1/2 lg:w-1/3 xl:w-1/4 justify-center flex-1 gap-4">
         <div className="flex justify-center">
-          <img className="w-1/2 h-auto" src="/src/assets/Frame.png" />
+          <img className="w-1/2 h-auto" src={img} />
         </div>
         <Form
           className="flex-none"

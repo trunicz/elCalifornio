@@ -58,7 +58,7 @@ export const ClientsBLPages = (): ReactElement => {
   }
 
   const shouldShowOptions = (row: any): boolean => {
-    return row.isBanned
+    return !row.isBanned
   }
 
   return (
@@ -85,7 +85,7 @@ export const ClientsBLPages = (): ReactElement => {
         {clientList ? (
           <Table
             data={clients}
-            hiddenKeys={['id']}
+            hiddenKeys={['id', 'isBanned', 'strikes']}
             canSeeDelete={false}
             canSeeEdit={false}
             watchFunction={restoreClient}
@@ -118,7 +118,8 @@ const createClientModal = ({ closeModal, openModal, loadInfo, createClient }): v
       isForeign: false,
       type: 1,
       phone: 'Desconocido',
-      strikes: 3
+      strikes: 3,
+      isBanned: true
     }
     createClient(values).then(() => {
       closeModal()

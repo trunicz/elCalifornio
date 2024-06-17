@@ -17,6 +17,7 @@ import { Separator } from './separator'
 import { Link } from 'wouter'
 import { useAuthStore } from '@renderer/stores/useAuth'
 import { useLoadingStore } from '@renderer/stores/useLoading'
+import logo from '@renderer/assets/frame.png'
 
 export const AppLayout = ({
   className,
@@ -36,7 +37,7 @@ export const AppLayout = ({
       )}
       <AppMenu>
         <div className="flex items-center justify-center gap-2">
-          <img src="/src/assets/frame.png?asset" draggable={false} className="w-[100px]  p-3" />
+          <img src={logo} draggable={false} className="w-[100px]  p-3" />
         </div>
         {user?.user_metadata.rol == '2' ? (
           <div className="flex-1 flex flex-col gap-1">

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppLayout, Widget } from '@renderer/components'
+import { AppLayout, Button, Widget } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useHomeStore } from '@renderer/stores/useHome'
 import { cn } from '@renderer/utils'
@@ -8,6 +8,7 @@ import {
   LuBadgeDollarSign,
   LuCalendarHeart,
   LuCalendarOff,
+  LuCircleDollarSign,
   LuDollarSign,
   LuPhoneOutgoing,
   LuReply,
@@ -18,6 +19,7 @@ import { Link } from 'wouter'
 
 export const MainPage = (): ReactElement => {
   const { home, getHomeInfo } = useHomeStore()
+  const [showTotalCost, setShowTotalCost] = useState<boolean>(true)
 
   useEffect(() => {
     getHomeInfo()
@@ -103,17 +105,30 @@ export const MainPage = (): ReactElement => {
               size="xl"
             >
               <div className="h-full w-full flex flex-col">
+                <div>
+                  <Button
+                    isIconOnly
+                    icon={<LuCircleDollarSign />}
+                    className="text-xs ms-auto absolute right-2 top-2 border-none bg-gray-100 hover:bg-gray-200 hover:text-black"
+                    onClick={() => setShowTotalCost(!showTotalCost)}
+                  />
+                </div>
                 <header className="flex text-lg pb-2 border-b mb-3">
                   <div className="w-1/3 p-2 font-bold">Nombre</div>
                   <div className="w-1/3 text-center p-2 font-bold text-nowrap">Dias Restantes</div>
                   <div className="w-1/3 flex items-center justify-center p-2 font-bold">
-                    <LuDollarSign />
+                    {showTotalCost ? 'Pendiente' : 'Costo Total'}
                   </div>
                 </header>
                 <div className="overflow-y-auto pb-8 flex-1 text-sm flex flex-col gap-2">
                   {home.pending_payments ? (
                     home.pending_payments.map((row: any, key: number) => (
-                      <PendingRow row={row} key={row.client + key} href={`/rent/${row.client}`} />
+                      <PendingRow
+                        row={row}
+                        showTotalCost={showTotalCost}
+                        key={row.client + key}
+                        href={`/rent/${row.client}`}
+                      />
                     ))
                   ) : (
                     <div className="text-center p-4 text-3xl text-red-500">Sin Adeudos</div>
@@ -130,7 +145,15 @@ export const MainPage = (): ReactElement => {
   )
 }
 
-const PendingRow = ({ row, href }: { row: any; href: string }): ReactElement => {
+const PendingRow = ({
+  row,
+  showTotalCost,
+  href
+}: {
+  row: any
+  showTotalCost: boolean
+  href: string
+}): ReactElement => {
   const [showIcon, setShowIcon] = useState(false)
   return (
     <div>
@@ -158,7 +181,11 @@ const PendingRow = ({ row, href }: { row: any; href: string }): ReactElement => 
           <span
             className={cn('w-1/3 text-center', !Number(row.days_until_due) ? 'text-red-500' : '')}
           >{`${Number(row.days_until_due) ? row.days_until_due : 'Ninguno'}`}</span>
-          <span className="p-2 bg-green-100 text-green-600 rounded-xl mx-auto">{`$${row.pending_payment.toFixed(2)}`}</span>
+          {showTotalCost ? (
+            <span className="p-2 bg-green-100 text-green-600 rounded-xl mx-auto">{`$${Number(row.pending_payment) > 0 ? row.pending_payment.toFixed(2) : 0}`}</span>
+          ) : (
+            <span className="p-2 bg-green-100 text-green-600 rounded-xl mx-auto">{`$${Number(row.total_cost)}`}</span>
+          )}
         </div>
       </Link>
     </div>

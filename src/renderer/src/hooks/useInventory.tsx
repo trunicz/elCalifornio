@@ -213,13 +213,19 @@ export const useInventory = (): InventoryMethods => {
 
       if (error) throw error
 
-      // Transformar los datos en el formato deseado
-      const transformedData = data.map((item: any) => ({
-        value: `${item.type_name}-${item.dimension_name}-${item.reference}`,
-        label: `${item.type_name} - ${item.dimension_name ? item.dimension_name : item.reference ? item.reference : 'Sin Referencia'} (${item.count})`
-      }))
+      return data
 
-      return transformedData
+      // Transformar los datos en el formato deseado
+      // const transformedData = data.map((item) => ({
+      //   value: `${item}`,
+      //   label: `${item.type_name} - ${item.dimension_name ? item.dimension_name : item.reference ? item.reference : 'Sin Referencia'} (${item.count})`,
+      //   prices: {
+      //     price_days: item.price_days,
+      //     price_week: item.price_week
+      //   }
+      // }))
+
+      // return transformedData
     } catch (error) {
       console.error(error)
       return null

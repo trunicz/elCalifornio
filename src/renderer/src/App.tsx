@@ -18,7 +18,7 @@ import { useAuthStore } from '@renderer/stores/useAuth'
 import { Loading } from '@renderer/components/Loading'
 import { CreateEditClientPage } from '@renderer/pages/Clients/CreateEditClientPage'
 import { CreateEditInventoryPage } from '@renderer/pages/Inventory/CreateEditInventoryPage'
-import { CreateEditRentPage } from '@renderer/pages/Rent/CreateEditRentPage'
+import { CreateEditRentPage } from './pages/Rent/CreateEditRentPage'
 import { RentHistory } from '@renderer/pages/Rent/RentHistory'
 import { ClientsBLPages } from './pages/Clients/ClientsBLPages'
 

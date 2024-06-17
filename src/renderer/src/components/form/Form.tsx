@@ -6,9 +6,10 @@ import { Button } from '../button'
 import { Fragment, ReactElement, ReactNode, isValidElement } from 'react'
 import Input from '../input/Input'
 import { cn } from '@renderer/utils'
-import { LuUploadCloud } from 'react-icons/lu'
+import { LuUploadCloud, LuX } from 'react-icons/lu'
 import { useModal } from '../modal'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
+import noImage from '@renderer/assets/noImage.jpeg'
 
 const useCustomForm = (
   schema: Yup.AnyObjectSchema,
@@ -19,6 +20,7 @@ const useCustomForm = (
     control,
     register,
     watch,
+    setValue,
     formState: { errors }
   } = useForm({ resolver: yupResolver(schema), defaultValues: initialValues })
 
@@ -27,7 +29,8 @@ const useCustomForm = (
     control,
     register,
     errors,
-    watch
+    watch,
+    setValue
   }
 }
 export interface FormField {
@@ -73,7 +76,10 @@ export const Form = ({
   hasRequiereMessage = true,
   ...props
 }: FormProps): ReactElement => {
-  const { handleSubmit, register, errors, watch } = useCustomForm(validationSchema, defaultValues)
+  const { handleSubmit, register, errors, watch, setValue } = useCustomForm(
+    validationSchema,
+    defaultValues
+  )
 
   const [parent] = useAutoAnimate()
   const { Modal, openModal } = useModal()
@@ -171,60 +177,76 @@ export const Form = ({
             />
           </div>
         )}
-        {typeof files !== 'undefined' && (
-          <div ref={parent} className="col-span-full border-t pt-6 grid grid-cols-6 gap-4">
-            <Modal title="Vista Previa" />
-            {Array.from(files).map((file: any, index) => (
-              <div
-                className="border hover:bg-gray-100 transition-all rounded-xl overflow-hidden p-4"
-                key={file.name + index}
-              >
-                <div
-                  className="flex flex-col justify-center items-center"
-                  onClick={() => {
-                    openModal(
-                      <div className="overflow-y-auto w-auto flex justify-center">
-                        <img
-                          src={file.name ? file.name : URL.createObjectURL(file)}
-                          alt="img"
-                          className="h-[500px] object-cover"
-                          onError={(e: any) => {
-                            e.onError = null
-                            e.target.src = '/src/assets/noImage.jpeg'
-                          }}
-                        />
-                      </div>
-                    )
-                  }}
-                >
-                  <img
-                    src={file.name ? file.name : URL.createObjectURL(file)}
-                    alt="img"
-                    className="min-w-16 h-16 object-cover"
-                    onError={(e: any) => {
-                      e.onError = null
-                      e.target.src = '/src/assets/noImage.jpeg'
-                    }}
-                  />
-                  <p className="text-nowrap w-full overflow-x-clip text-xs text-center">
-                    {file.name}
-                  </p>
-                  {files.size && (
-                    <p className="text-nowrap w-full overflow-x-clip text-xs text-center">
-                      {file.size > 1024 * 1024
-                        ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
-                        : `${Math.round(file.size / 1024)} KB`}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+        {typeof files !== 'undefined' && files.length > 0 && (
+          <>
+            <div>
+              <Button
+                color="danger"
+                text="Vaciar Archivos"
+                className="flex gap-2 w-auto"
+                iconLeft
+                icon={<LuX />}
+                onClick={() => setValue('files', [])}
+              />
+            </div>
+            <div className="col-span-full border-t pt-6 grid grid-cols-6 gap-4">
+              <Modal title="Vista Previa" />
+              {Array.from(files).map((file: any, index) => {
+                const fileURL = URL.createObjectURL(file)
+                return (
+                  <div
+                    className="border hover:bg-gray-100 transition-all rounded-xl overflow-hidden p-4"
+                    key={file.name + index}
+                  >
+                    <div
+                      className="flex flex-col justify-center items-center"
+                      onClick={() => {
+                        openModal(
+                          <div className="overflow-y-auto w-auto flex justify-center">
+                            <img
+                              src={fileURL}
+                              alt="img"
+                              className="h-[500px] object-cover"
+                              onError={(e: any) => {
+                                e.target.onerror = null
+                                e.target.src = noImage
+                              }}
+                            />
+                          </div>
+                        )
+                      }}
+                    >
+                      <img
+                        src={fileURL}
+                        alt="img"
+                        className="min-w-16 h-16 object-cover"
+                        onError={(e: any) => {
+                          e.target.onerror = null
+                          e.target.src = noImage
+                        }}
+                      />
+                      <p className="text-nowrap w-full overflow-x-clip text-xs text-center">
+                        {file.name}
+                      </p>
+                      {file.size && (
+                        <p className="text-nowrap w-full overflow-x-clip text-xs text-center">
+                          {file.size > 1024 * 1024
+                            ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+                            : `${Math.round(file.size / 1024)} KB`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
         )}
+
         {!children && (
           <Button
             type="submit"
-            className="fixed z-[5] end-4 bottom-4 bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
+            className="absolute z-[5] right-0 bottom-4 bg-emerald-400 hover:bg-emerald-500  text-white w-auto ms-auto px-12 py-6 border-0"
             text="Continuar"
           />
         )}

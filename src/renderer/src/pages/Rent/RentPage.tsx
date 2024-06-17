@@ -169,7 +169,12 @@ export const RentPage = (): ReactElement => {
               as: 'textarea'
             }
           ]}
-        />
+        >
+          <div className="flex gap-4">
+            <Button type="button" color="danger" text="cancelar" onClick={() => closeModal()} />
+            <Button color="success" text="continuar" />
+          </div>
+        </Form>
       </>
     )
   }

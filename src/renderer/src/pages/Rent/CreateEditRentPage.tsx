@@ -10,7 +10,7 @@ import * as Yup from 'yup'
 import { useInventory } from '@renderer/hooks/useInventory'
 import { useRentals } from '@renderer/hooks/useRentals'
 import { useAuthStore } from '@renderer/stores/useAuth'
-import { LuAlertCircle, LuDollarSign } from 'react-icons/lu'
+import { LuAlertCircle, LuDelete, LuDollarSign, LuMinus, LuPlus } from 'react-icons/lu'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { Loading } from '@renderer/components/Loading'
 import { useLoadingStore } from '@renderer/stores/useLoading'
@@ -45,8 +45,7 @@ const rentalSchema = Yup.object().shape({
 export const CreateEditRentPage = (): ReactElement => {
   const { handleSubmit, register, errors, control, watch, reset } = useCustomForm(rentalSchema)
   const [localClients, setLocalClients] = useState<{ value: string; label: string }[] | null>()
-  const [inventory, setInventory] =
-    useState<{ value: string; label: string; isFixed?: boolean }[]>()
+  const [inventory, setInventory] = useState<{ value: string; label: string }[]>()
   const [clients, setClients] = useState<{ value: string; label: string }[]>()
   const [endDate, setEndDate] = useState<{ value: string; label: string }>()
   const [isEquipmentVisible, setEquipmentVisible] = useState<boolean>(false)
@@ -59,7 +58,7 @@ export const CreateEditRentPage = (): ReactElement => {
     value: string | number
     label: string
   } | null>(null)
-  const { getAvailableInventory, getPricesByItemId, getItemIdByTypeAndRef } = useInventory()
+  const { getAvailableInventory, getItemIdByTypeAndRef } = useInventory()
   const [endDateValue, setEndDateValue] = useState<string>()
   const { createRental, getRentalForEdit, updateRental } = useRentals()
   const [currentCost, setCurrentCost] = useState(0)
@@ -70,6 +69,7 @@ export const CreateEditRentPage = (): ReactElement => {
   const [buildAddress, setBuildAddress] = useState<any>()
   const [quantities, setQuantities] = useState({})
   const { setLoading } = useLoadingStore()
+  const [prices, setPrices] = useState<any>()
 
   const client_id = watch('client_id')
 
@@ -77,10 +77,6 @@ export const CreateEditRentPage = (): ReactElement => {
     handleSelectChange(e)
     setSelectClientID(e)
   }
-
-  useEffect(() => {
-    console.log(inventory)
-  }, [inventory])
 
   const onChangeEndDate = (e: any): void => {
     setEndDate(e)
@@ -93,43 +89,33 @@ export const CreateEditRentPage = (): ReactElement => {
 
   useEffect(() => {
     setLoading(true)
-    const fetchPrices = async (): Promise<void> => {
-      try {
-        const inventoryIds = await getEquipmentsIdByInventory()
+    const setCost = (): void => {
+      if (inventory && prices && quantities) {
+        const totalCost = inventory.reduce((acc, data) => {
+          const valueToSearch = data.value
+          const matchingPrice: any = prices.find((p: any) => p.id === valueToSearch)
 
-        if (!inventoryIds) {
-          setCurrentCost(0)
-          return
-        }
-        const tempPricesPromises = inventoryIds.map(async (val: any) => {
-          try {
-            if (val === undefined) {
-              throw new Error('Valor de inventario indefinido')
-            }
-
-            const res: any = await getPricesByItemId(val)
-            if (res[0]) {
-              return endDate?.label === '1 a 3 Dias' ? res[0].price_days : res[0].price_week
-            }
-            return 0
-          } catch (err) {
-            console.error(err)
-            return 0
+          if (matchingPrice) {
+            const currentPrices =
+              endDate?.label === '1 a 3 Dias'
+                ? matchingPrice.prices.price_days
+                : matchingPrice.prices.price_week
+            const priceForItem = currentPrices * quantities[valueToSearch]
+            return acc + priceForItem
+          } else {
+            return acc
           }
-        })
-
-        const tempPrices = await Promise.all(tempPricesPromises)
-        const totalCost = tempPrices.reduce((acc, cv) => acc + cv, 0)
+        }, 0)
 
         setCurrentCost(totalCost)
-        setLoading(false)
-      } catch (err) {
-        console.error(err)
+      } else {
         setCurrentCost(0)
       }
+
+      setLoading(false)
     }
 
-    fetchPrices()
+    setCost()
   }, [inventory, endDate, quantities])
 
   const onChangeAdvicePayment = (e: any): void => {
@@ -164,24 +150,107 @@ export const CreateEditRentPage = (): ReactElement => {
         })
       )
     })
-
-    // getAvailableInventory().then((res) => {
-    //   const filteredInventory = (res || []).map((item: any) => {
-    //     const label = `${item.type.type_name}: ${item.reference ? item.reference : item.dimension.dimension_name}`
-    //     return {
-    //       value: item.id, // Usa un ID único aquí
-    //       label
-    //     }
-    //   })
-    //   setInv(filteredInventory)
-    // })
   }, [])
 
   useEffect(() => {
-    getAvailableInventory().then((data: any) => {
-      setInv(data)
-    })
-  }, [])
+    const fetchData = async (): Promise<void> => {
+      try {
+        const inventoryData = await getAvailableInventory()
+
+        if (inventoryData) {
+          const transformedData = inventoryData.map((item: any) => ({
+            value: `${item.type_name}-${item.dimension_name}-${item.reference}`,
+            label: `${item.type_name} - ${item.dimension_name ? item.dimension_name : item.reference ? item.reference : 'Sin Referencia'} (${item.count})`
+          }))
+
+          const priceData = inventoryData.map((item: any) => ({
+            id: `${item.type_name}-${item.dimension_name}-${item.reference}`,
+            prices: {
+              price_days: item.price_days,
+              price_week: item.price_week
+            }
+          }))
+
+          setPrices(priceData)
+          setInv(transformedData)
+
+          if (id) {
+            const rentalData: any = await getRentalForEdit(id)
+
+            if (rentalData) {
+              const rest = clients?.filter((c) => c.value === rentalData.client_id)
+
+              if (rest) {
+                setSelectClientID(rest[0])
+                setEndDateValue(formatDate(new Date(rentalData.end_date)))
+                setAdvicePayment(rentalData.advance_payment)
+                setBuildAddress(rentalData.building_address)
+
+                if (inv) {
+                  const updatedInventory = inventory ?? []
+
+                  rentalData.equipments.forEach((equipmentItem: any) => {
+                    setInv([
+                      ...inv,
+                      {
+                        value: `${equipmentItem.type_name}-${equipmentItem.dimension_name}-${equipmentItem.reference}`,
+                        label: `${equipmentItem.type_name} - ${equipmentItem.dimension_name ? equipmentItem.dimension_name : equipmentItem.reference ? equipmentItem.reference : 'Sin Referencia'} (${equipmentItem.count})`
+                      }
+                    ])
+                    console.log(inv)
+
+                    const matchingItem = transformedData.find(
+                      (invItem) =>
+                        invItem.value ===
+                        `${equipmentItem.type_name}-${equipmentItem.dimension_name}-${equipmentItem.reference}`
+                    )
+
+                    if (matchingItem) {
+                      console.log(matchingItem)
+
+                      const count = matchingItem.label.replace(')', '').split('(')
+                      setInv(
+                        inv.map((i) => {
+                          if (i === matchingItem) {
+                            return {
+                              value: matchingItem.value,
+                              label: `${count[0]} (${Number(count[1]) + equipmentItem.count})`
+                            }
+                          } else {
+                            return i
+                          }
+                        })
+                      )
+
+                      const inventoryItem = updatedInventory.find(
+                        (item) => item.value === matchingItem.value
+                      )
+
+                      if (!inventoryItem) {
+                        updatedInventory.push({ ...matchingItem })
+                      }
+                    }
+
+                    quantities[
+                      `${equipmentItem.type_name}-${equipmentItem.dimension_name}-${equipmentItem.reference}`
+                    ] = equipmentItem.count
+                  })
+                  setInventory(updatedInventory)
+                }
+              }
+            }
+          }
+        }
+        setCanShowForm(true)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [id, clients])
 
   useEffect(() => {
     const updatedQuantities = {}
@@ -192,25 +261,6 @@ export const CreateEditRentPage = (): ReactElement => {
     })
     setQuantities(updatedQuantities)
   }, [inventory])
-
-  useEffect(() => {
-    if (id) {
-      getRentalForEdit(id).then((res: any) => {
-        const rest = clients?.filter((c) => c.value === res.client_id)
-
-        if (res && rest && rest.length > 0) {
-          setSelectClientID(rest[0])
-          setEndDateValue(formatDate(new Date(res.end_date)))
-          setInventory(res.equipments)
-          setAdvicePayment(res.advance_payment)
-          setBuildAddress(res.building_address)
-          setCanShowForm(true)
-        }
-      })
-    } else {
-      setCanShowForm(true)
-    }
-  }, [id, clients])
 
   const getEquipmentsIdByInventory = async (): Promise<any[]> => {
     const equipments = await Promise.all(
@@ -224,6 +274,7 @@ export const CreateEditRentPage = (): ReactElement => {
   }
 
   const onSubmit = async (data: any): Promise<void> => {
+    setCanShowForm(false)
     const equipment = await getEquipmentsIdByInventory()
     if (!id && inventory && equipment) {
       const values = {
@@ -295,15 +346,17 @@ export const CreateEditRentPage = (): ReactElement => {
               <Controller
                 name="client_id"
                 control={control}
-                render={({ field }) => (
+                render={({ field: { onChange, value } }) => (
                   <div className="w-full p-4">
                     <label className="block mb-2">Seleccionar Cliente:</label>
                     <Select
-                      {...field}
                       options={clients}
                       isSearchable
-                      onChange={(e) => updateSelectClientId(e)}
-                      value={selectClientID}
+                      onChange={(e) => {
+                        updateSelectClientId(e)
+                        onChange(e)
+                      }}
+                      value={value || selectClientID}
                       styles={{
                         control: (provided) => ({
                           ...provided,
@@ -429,7 +482,7 @@ export const CreateEditRentPage = (): ReactElement => {
                           onChange={(e: any) => onchangeEquipments(e)}
                           value={inventory}
                           isMulti
-                          isClearable={inventory?.some((v) => !v.isFixed)}
+                          // isClearable={inventory?.some((v) => !v.isFixed)}
                           styles={{
                             control: (provided) => ({
                               ...provided,
@@ -440,9 +493,6 @@ export const CreateEditRentPage = (): ReactElement => {
                                 borderColor: '#D1D5DB'
                               }
                             })
-                            // multiValueRemove: (base, state) => {
-                            //   return state.data.isFixed ? { ...base, display: 'none' } : base
-                            // }
                           }}
                           getOptionValue={(option) => option.value}
                         />
@@ -450,83 +500,120 @@ export const CreateEditRentPage = (): ReactElement => {
                       </div>
                     )}
                   />
-                  <div ref={parent} className="px-5">
+                  <div ref={parent} className="px-5 pb-10">
                     {inventory
                       ? inventory.map((inv, index) => {
-                          quantities[inv.value] = quantities[inv.value] ? quantities[inv.value] : 1
+                          quantities[inv.value] = quantities[inv.value] ?? 1
                           return (
                             <div key={`${inv.value}${index}`}>
                               <div className="w-full flex items-center mt-2 gap-4 bg-gray-50 p-2 rounded-lg">
                                 <div className="text-nowrap  font-semibold">
-                                  {inv.label.replace(/\(\d\)/g, '')}
+                                  {inv.label?.replace(/\(\d\)/g, '')}
                                 </div>
                                 <div className="hidden 2xl:block text-nowrap p-2 text-xs bg-blue-400 text-white rounded-full">
-                                  {inv.label.match(/\((\d+)\)/)?.[1]} en existencia
+                                  {inv.label?.match(/\((\d+)\)/)?.[1]} en existencia
                                 </div>
-                                <div className="flex items-center min-w-28 ms-auto">
+                                <div className="flex items-center min-w-28 ms-auto gap-2">
+                                  {quantities[inv.value] > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleQuantityChange(
+                                          inv.value,
+                                          1,
+                                          Number(inv.label?.match(/\((\d+)\)/)?.[1])
+                                        )
+                                      }
+                                      className="transition-all bg-gray-200 p-3 rounded-lg  hover:bg-gray-300/70 active:bg-red-200 active:scale-90 "
+                                    >
+                                      <LuDelete />
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleQuantityChange(
+                                        inv.value,
+                                        quantities[inv.value] > 1 ? quantities[inv.value] - 1 : 1,
+                                        Number(inv.label?.match(/\((\d+)\)/)?.[1])
+                                      )
+                                    }
+                                    className="transition-all bg-gray-200 p-3 rounded-lg  hover:bg-gray-300/70 active:bg-red-200 active:scale-90 "
+                                  >
+                                    <LuMinus />
+                                  </button>
                                   <input
                                     className="px-2 w-full text-center focus:bg-gray-100 outline-0 border rounded-lg p-1.5"
-                                    type="number"
+                                    type="text"
                                     value={quantities[inv.value]}
                                     onChange={(event) => {
                                       handleQuantityChange(
                                         inv.value,
-                                        event.target.value,
-                                        Number(inv.label.match(/\((\d+)\)/)?.[1])
+                                        event.target.value ?? 1,
+                                        Number(inv.label?.match(/\((\d+)\)/)?.[1])
                                       )
                                     }}
-                                    onMouseDown={() => {
+                                    disabled
+                                    min={1}
+                                    max={Number(inv.label?.match(/\((\d+)\)/)?.[1])}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
                                       handleQuantityChange(
                                         inv.value,
-                                        '',
+                                        quantities[inv.value] <
+                                          Number(inv.label.match(/\((\d+)\)/)?.[1])
+                                          ? quantities[inv.value] + 1
+                                          : 1,
                                         Number(inv.label.match(/\((\d+)\)/)?.[1])
                                       )
-                                    }}
-                                    min={1}
-                                    max={Number(inv.label.match(/\((\d+)\)/)?.[1])}
-                                  />
+                                    }
+                                    className="transition-all bg-gray-200 p-3 rounded-lg  hover:bg-gray-300/70 active:bg-green-200 active:scale-90 "
+                                  >
+                                    <LuPlus />
+                                  </button>
                                 </div>
                               </div>
-                              {/* {quantities[inv.value] > Number(inv.label.match(/\((\d+)\)/)?.[1]) ? (
-                                <span className="text-red-500">
-                                  No hay en existencia la cantidad solicitada
-                                </span>
-                              ) : null} */}
                             </div>
                           )
                         })
                       : null}
                   </div>
-                  <div className="w-full p-4 relative">
-                    <label className="">Anticipo</label>
-                    <input
-                      {...register('advance_payment')}
-                      type="number"
-                      onChange={(e) => onChangeAdvicePayment(e)}
-                      value={advicePayment ?? ''}
-                      className="ps-7 w-full focus:bg-gray-100 outline-0 border rounded-lg p-1.5"
-                      hidden
-                      min={0}
-                    />
-                    <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg hidden" />
-                  </div>
-                  <div className="w-full px-4 relative flex  gap-2">
-                    <label htmlFor="adelantado" className="w-full text-gray-400">
-                      Pago Adelantado
-                    </label>
-                    <input
-                      type="checkbox"
-                      id="adelantado"
-                      className="h-5 w-5 ring-offset-2"
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setAdvicePayment(currentCost ? currentCost : 0)
-                        } else {
-                          setAdvicePayment(0)
-                        }
-                      }}
-                    />
-                  </div>
+                  {!id && (
+                    <>
+                      <div className="w-full p-4 relative hidden">
+                        <label className="">Anticipo</label>
+                        <input
+                          {...register('advance_payment')}
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          className="w-full rounded-lg border-2 border-gray-200 py-2 px-4"
+                          value={advicePayment || ''}
+                          onChange={onChangeAdvicePayment}
+                        />
+                        <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg hidden" />
+                      </div>
+                      <div className="w-full px-4 relative flex  gap-2">
+                        <label htmlFor="adelantado" className="w-full text-gray-400">
+                          Pago Adelantado
+                        </label>
+                        <input
+                          type="checkbox"
+                          id="adelantado"
+                          className="h-5 w-5 ring-offset-2"
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setAdvicePayment(currentCost ? currentCost : 0)
+                            } else {
+                              setAdvicePayment(0)
+                            }
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
                   {typeof advicePayment === 'number' && currentCost < advicePayment && (
                     <p className="px-4 text-red-400 text-sm -mt-2 pt-3">
                       El anticipo es mayor al costo, verifica que no sea un error.
@@ -537,10 +624,9 @@ export const CreateEditRentPage = (): ReactElement => {
                     <input
                       {...register('building_address')}
                       type="text"
-                      onChange={(e) => setBuildAddress(e.target.value)}
+                      className="w-full rounded-lg border-2 border-gray-200 py-2 px-4"
                       value={buildAddress}
-                      placeholder="Calle Ficticia #123, Colonia Falsa, 12345 Ciudad, Estado."
-                      className="border p-1.5  w-full outline-none rounded-lg"
+                      onChange={(e) => setBuildAddress(e.target.value)}
                     />
                     {errors.end_date ? (
                       <p className="text-red-500 mt-2">
@@ -556,12 +642,12 @@ export const CreateEditRentPage = (): ReactElement => {
             <div className="fixed z-10 end-4 bottom-4">
               <div ref={parent} className="text-3xl flex flex-col pb-2">
                 <p className="text-lg">Total:</p>
-                {advicePayment ? (
+                {/* {advicePayment ? (
                   <>
                     <p className="text-xl">{`+$${currentCost.toFixed(2)}`}</p>
                     <p className="text-xl">{`-$${Number(advicePayment).toFixed(2)}`}</p>
                   </>
-                ) : null}
+                ) : null} */}
                 <p>${printPrices(currentCost, advicePayment)}</p>
               </div>
               <Button

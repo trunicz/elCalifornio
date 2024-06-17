@@ -7,6 +7,22 @@ import { ReactElement, useEffect, useState } from 'react'
 import { LuDollarSign, LuMinus, LuPlus } from 'react-icons/lu'
 import Select from 'react-select'
 import { useLocation } from 'wouter'
+import * as yup from 'yup'
+import { useFormik } from 'formik'
+
+const inventorySchema = yup.object().shape({
+  type: yup.string().required('El tipo de equipo es requerido'),
+  dimension: yup.string().nullable(),
+  reference: yup.string().nullable(),
+  price_week: yup
+    .number()
+    .required('El precio por semana es requerido')
+    .min(0, 'El precio no puede ser negativo'),
+  price_days: yup
+    .number()
+    .required('El precio por 1 a 3 días es requerido')
+    .min(0, 'El precio no puede ser negativo')
+})
 
 export const CreateEditInventoryPage = (): ReactElement => {
   const { getEquipmentTypes, getItemDimension, getPricesBy, createEquipment, createPrices } =
@@ -16,11 +32,12 @@ export const CreateEditInventoryPage = (): ReactElement => {
   const [dimensionValue, setDimension] = useState<any>()
   const [description, setDescription] = useState<any>()
   const [selectedValue, setValue] = useState<any>()
-  const [count, setCount] = useState<number | undefined>()
-  const [prices, setPrices] = useState<any>()
+  const [count, setCount] = useState<number | undefined>(1)
+  const [prices, setPrices] = useState<any>({})
   const [, setLocation] = useLocation()
   const [parent] = useAutoAnimate()
   const { setLoading } = useLoadingStore()
+  const [errorDimension, setErrorDimension] = useState<string | null>(null)
 
   useEffect(() => {
     setDimension(null)
@@ -40,46 +57,68 @@ export const CreateEditInventoryPage = (): ReactElement => {
     })
   }, [])
 
-  const onSubmit = (e: any): void => {
-    e.preventDefault()
-    setLoading(true)
+  const formik = useFormik({
+    initialValues: {
+      type: '',
+      dimension: '',
+      reference: '',
+      price_week: '',
+      price_days: ''
+    },
+    validationSchema: inventorySchema,
+    onSubmit: (values) => {
+      setLoading(true)
+      if (selectedValue) {
+        if (dimensions && !dimensionValue) {
+          setErrorDimension('La dimension es obligatoria')
+        }
 
-    if (selectedValue) {
-      const values = {
-        type: selectedValue.value,
-        dimension: dimensionValue ? dimensionValue.value : null,
-        reference: description
+        const formValues = {
+          type: selectedValue.value,
+          dimension: dimensionValue ? dimensionValue.value : null,
+          reference: description
+        }
+
+        createEquipment(formValues, count ? count : 0)
+          .then(async (res) => {
+            if (res && res.length > 0) {
+              const promises = res.map(async (equipment: any) => {
+                const { id } = equipment
+                if (id) {
+                  const newValues = {
+                    ...prices,
+                    equipment_id: id,
+                    type_id: selectedValue.value,
+                    price_days: values.price_days,
+                    price_week: values.price_week
+                  }
+                  try {
+                    await createPrices(newValues)
+                  } catch (error) {
+                    console.error('Error creating prices:', error)
+                  }
+                }
+              })
+              await Promise.all(promises)
+              setLoading(false)
+              setLocation('/inventory')
+            }
+          })
+          .catch((error) => {
+            setLoading(false)
+            console.error('Error creating equipment:', error)
+          })
       }
-      createEquipment(values, count ? count : 0)
-        .then((res) => {
-          if (res && res.length > 0) {
-            const promises = res.map((equipment: any) => {
-              const { id } = equipment
-              if (id) {
-                delete prices.id
-                const newValues = { ...prices, equipment_id: id, type_id: selectedValue.value }
-                return createPrices(newValues)
-              }
-              return Promise.resolve(null)
-            })
+    },
+    validateOnBlur: true,
+    validateOnChange: true
+  })
 
-            Promise.all(promises)
-              .then(() => {
-                setLoading(false)
-                setLocation('/inventory')
-              })
-              .catch((error) => {
-                setLoading(false)
-                console.error('Error creating prices:', error)
-              })
-          }
-        })
-        .catch((error) => {
-          setLoading(false)
-          console.error('Error creating equipment:', error)
-        })
+  useEffect(() => {
+    if (!formik.isValid && formik.submitCount > 0) {
+      setLoading(false)
     }
-  }
+  }, [formik.isValid, formik.submitCount])
 
   return (
     <AppLayout>
@@ -87,7 +126,7 @@ export const CreateEditInventoryPage = (): ReactElement => {
         <AppLayout.PageOptions pageTitle="Agregar Equipo" hasAddButton={false} />
         <form
           ref={parent}
-          onSubmit={(e) => onSubmit(e)}
+          onSubmit={formik.handleSubmit}
           className="grid w-full mx-auto auto-rows-max mt-4 flex-1 overflow-y-auto gap-4"
         >
           <div className="w-1/2 mx-auto">
@@ -111,10 +150,14 @@ export const CreateEditInventoryPage = (): ReactElement => {
                 }}
                 onChange={(e) => {
                   setValue(e)
+                  formik.setFieldValue('type', e?.value || '')
                 }}
                 value={selectedValue}
                 options={options}
               />
+              {formik.touched.type && formik.errors.type ? (
+                <div className="text-red-500 text-sm mt-1">{formik.errors.type}</div>
+              ) : null}
             </div>
             {dimensions && dimensions?.length > 0 ? (
               <div ref={parent} className="col-span-full">
@@ -137,10 +180,14 @@ export const CreateEditInventoryPage = (): ReactElement => {
                   }}
                   onChange={(e) => {
                     setDimension(e)
+                    formik.setFieldValue('dimension', e?.value || '')
                   }}
                   value={dimensionValue}
                   options={dimensions}
                 />
+                <div className="text-red-500 text-sm mt-1">
+                  {errorDimension && !dimensionValue ? errorDimension : null}
+                </div>
               </div>
             ) : (
               selectedValue && (
@@ -150,11 +197,18 @@ export const CreateEditInventoryPage = (): ReactElement => {
                     name="reference"
                     id="reference"
                     placeholder={'Escribe una descripción para ' + selectedValue.label}
-                    onChange={(e) => setDescription(e.target.value)}
+                    onChange={(e) => {
+                      setDescription(e.target.value)
+                      formik.handleChange(e)
+                    }}
+                    onBlur={formik.handleBlur}
                     value={description}
                     rows={3}
                     className="outline-0 border-2 px-2 rounded-lg p-1 text-lg focus:bg-gray-100"
                   ></textarea>
+                  {formik.touched.reference && formik.errors.reference ? (
+                    <div className="text-red-500 text-sm mt-1">{formik.errors.reference}</div>
+                  ) : null}
                 </div>
               )
             )}
@@ -168,27 +222,37 @@ export const CreateEditInventoryPage = (): ReactElement => {
                     <label className="text-lg">Por Semana</label>
                     <input
                       type="number"
-                      className="ps-5 w-full focus:bg-gray-100 outline-0 border-2 px-2 rounded-lg p-1 text-lg"
-                      value={prices?.price_week}
-                      onChange={(e) => {
-                        setPrices({ ...prices, price_week: e.target.value })
-                      }}
+                      className="ps-6 w-full focus:bg-gray-100 outline-0 border-2 px-2 rounded-lg p-1 text-lg"
+                      name="price_week"
+                      value={formik.values.price_week}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       min={0}
                     />
-                    <LuDollarSign className="text-gray-400 absolute bottom-3 start-1" />
+                    <LuDollarSign className="text-gray-400 absolute top-10 left-2" />
+                    {formik.touched.price_week && formik.errors.price_week ? (
+                      <div className="text-red-500 text-xs mt-1 absolute -bottom-6 left-0">
+                        {formik.errors.price_week}
+                      </div>
+                    ) : null}
                   </div>
                   <div className="grid flex-1 relative">
                     <label className="text-lg">De 1 a 3 Dias</label>
                     <input
                       type="number"
-                      className="ps-5 w-full focus:bg-gray-100 outline-0 border-2 px-2 rounded-lg p-1 text-lg"
-                      value={prices?.price_days}
-                      onChange={(e) => {
-                        setPrices({ ...prices, price_days: e.target.value })
-                      }}
+                      className="ps-6 w-full focus:bg-gray-100 outline-0 border-2 px-2 rounded-lg p-1 text-lg"
+                      name="price_days"
+                      value={formik.values.price_days}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       min={0}
                     />
-                    <LuDollarSign className="text-gray-400 absolute bottom-3 start-1" />
+                    <LuDollarSign className="text-gray-400 absolute top-10 left-2" />
+                    {formik.touched.price_days && formik.errors.price_days ? (
+                      <div className="text-red-500 text-xs mt-1 absolute -bottom-6 left-0">
+                        {formik.errors.price_days}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
                 <p className="text-lg text-center col-span-full border-b mt-8">Cantidad</p>
@@ -203,10 +267,10 @@ export const CreateEditInventoryPage = (): ReactElement => {
                     </button>
                     <input
                       className="p-2 text-lg outline-none border-2 rounded-lg text-center"
-                      type="number"
-                      min={0}
-                      onChange={(e) => setCount(parseFloat(e.target.value))}
+                      type="text"
+                      onChange={(e) => setCount(parseFloat(e.target.value) ?? 0)}
                       value={count}
+                      disabled
                       pattern="\d*"
                     />
                     <button
