@@ -86,7 +86,7 @@ export const RentPage = (): ReactElement => {
       }
       console.log(rent[0].formdata)
 
-      await createContract(rent[0].formdata, `Contrato#${rent[0].id}`).then(() => {
+      await createContract(rent[0].formdata, `Contrato_${rent[0].id}`).then(() => {
         setLoading(false)
       })
     }

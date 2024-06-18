@@ -118,21 +118,26 @@ export const useClients = (): Clients => {
   }
 
   const uploadFiles = (files: FileList, id: string): Promise<string[]> => {
-    const uploadPromises = Array.from(files).map(async (file) => {
-      const { data, error } = await supabase.storage
-        .from('clients_storage')
-        .upload(`clients/${id}/${file.name}`, file)
+    try {
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const { data, error } = await supabase.storage
+          .from('clients_storage')
+          .upload(`clients/${id}/${file.name}`, file)
 
-      if (error) {
-        console.error('Error uploading file:', error)
-        throw error
-      }
+        if (error) {
+          console.error('Error uploading file:', error)
+          throw error
+        }
 
-      console.log('File uploaded:', data)
-      return data.path
-    })
+        console.log('File uploaded:', data)
+        return data.path
+      })
 
-    return Promise.all(uploadPromises)
+      return Promise.all(uploadPromises)
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
   }
 
   const updateClient = async (

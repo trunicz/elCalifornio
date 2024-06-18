@@ -23,7 +23,8 @@ import {
   LuSkull,
   LuUpload,
   LuUserX,
-  LuX
+  LuX,
+  LuXCircle
 } from 'react-icons/lu'
 import { Link, useLocation, useParams } from 'wouter'
 import * as Yup from 'yup'
@@ -105,7 +106,7 @@ export const ClientsPage = (): ReactElement => {
                             <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
                               <LuCheckCircle2 />
                             </span>
-                            <h3>¡El cliente se elimino con éxito!</h3>
+                            <h3>¡El archivo se subió con éxito!</h3>
                             <Button
                               className="mt-4"
                               color="success"
@@ -118,6 +119,23 @@ export const ClientsPage = (): ReactElement => {
                         )
                       })
                     } catch (error) {
+                      setLoading(false)
+                      openModal(
+                        <div>
+                          <span className="animate-fade-up text-6xl mb-4 flex justify-center text-red-500">
+                            <LuXCircle />
+                          </span>
+                          <h3>¡Hubo un error en la ejecución!</h3>
+                          <Button
+                            className="mt-4"
+                            color="success"
+                            text="Aceptar"
+                            onClick={() => {
+                              seeFiles(id)
+                            }}
+                          />
+                        </div>
+                      )
                       console.error(error)
                     }
                   }
@@ -269,7 +287,7 @@ export const ClientsPage = (): ReactElement => {
                             <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
                               <LuCheckCircle2 />
                             </span>
-                            <h3>¡El cliente se elimino con éxito!</h3>
+                            <h3>¡El archivo se subió con éxito!</h3>
                             <Button
                               className="mt-4"
                               color="success"
@@ -283,6 +301,23 @@ export const ClientsPage = (): ReactElement => {
                       })
                     } catch (error) {
                       console.error(error)
+                      setLoading(false)
+                      openModal(
+                        <div>
+                          <span className="animate-fade-up text-6xl mb-4 flex justify-center text-red-500">
+                            <LuXCircle />
+                          </span>
+                          <h3>¡Hubo un error en la ejecución!</h3>
+                          <Button
+                            className="mt-4"
+                            color="success"
+                            text="Aceptar"
+                            onClick={() => {
+                              seeFiles(id)
+                            }}
+                          />
+                        </div>
+                      )
                     }
                   }
                 })

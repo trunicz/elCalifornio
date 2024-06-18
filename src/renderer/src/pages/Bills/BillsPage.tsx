@@ -193,7 +193,7 @@ const RenderBillRow = ({
                         delete formData.id
                         delete formData.rent_id
                         delete formData.created_at
-                        createBillPdf(formData, `Recibo#${folio}`)
+                        createBillPdf(formData, `Recibo_${folio}`)
                       }}
                     >
                       <LuDownloadCloud />
