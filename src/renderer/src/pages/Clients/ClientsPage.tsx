@@ -27,6 +27,7 @@ import {
 } from 'react-icons/lu'
 import { Link, useLocation, useParams } from 'wouter'
 import * as Yup from 'yup'
+import noImage from '@renderer/assets/noImage.jpeg'
 
 export const ClientsPage = (): ReactElement => {
   const [, setLocation] = useLocation()
@@ -62,7 +63,7 @@ export const ClientsPage = (): ReactElement => {
           className="h-[500px] object-cover rounded-xl"
           onError={(e: any) => {
             e.onError = null
-            e.target.src = '/src/assets/noImage.jpeg'
+            e.target.src = noImage
           }}
         />
         <Button
@@ -162,7 +163,7 @@ export const ClientsPage = (): ReactElement => {
                           src={imageURL}
                           onError={(e: any) => {
                             e.onError = null
-                            e.target.src = '/src/assets/noImage.jpeg'
+                            e.target.src = noImage
                           }}
                           alt={file.name}
                         />
