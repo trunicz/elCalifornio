@@ -12,7 +12,7 @@ interface InventoryMethods {
   createEquipment: (values: object, count: number) => Promise<object[] | null>
   deleteEquipment: (id: string | number) => Promise<void>
   updateEquipment: (id: string | number, values: object) => Promise<void>
-  getAvailableInventory: () => Promise<object[] | null>
+  getAvailableInventory: () => Promise<object | null>
   getItemDimension: (id: string | number) => Promise<object[] | null>
   getPricesBy: (id: string | number) => Promise<object[] | null>
   createPrices: (values: object) => Promise<void>
@@ -197,7 +197,7 @@ export const useInventory = (): InventoryMethods => {
       }
 
       if (!data) {
-        return [] // Si no hay datos, devolver un array vacío
+        return []
       }
 
       return data.map((item) => Number(item.id))
@@ -207,25 +207,20 @@ export const useInventory = (): InventoryMethods => {
     }
   }
 
-  const getAvailableInventory = async (): Promise<object[] | null> => {
+  const getAvailableInventory = async (): Promise<object | null> => {
     try {
       const { data, error } = await supabase.from('grouped_inventory').select('*')
+      const req = await supabase.from('equipment_type').select()
+
+      const objectToSend = {
+        equipment_types: req.data as object[],
+        equipments: data
+      }
 
       if (error) throw error
+      if (req.error) throw error
 
-      return data
-
-      // Transformar los datos en el formato deseado
-      // const transformedData = data.map((item) => ({
-      //   value: `${item}`,
-      //   label: `${item.type_name} - ${item.dimension_name ? item.dimension_name : item.reference ? item.reference : 'Sin Referencia'} (${item.count})`,
-      //   prices: {
-      //     price_days: item.price_days,
-      //     price_week: item.price_week
-      //   }
-      // }))
-
-      // return transformedData
+      return objectToSend
     } catch (error) {
       console.error(error)
       return null

@@ -50,7 +50,7 @@ export const CreateEditRentPage = (): ReactElement => {
   const [endDate, setEndDate] = useState<{ value: string; label: string }>()
   const [isEquipmentVisible, setEquipmentVisible] = useState<boolean>(false)
   const { getAllClients, getClientById, getAllLocalClients } = useClients()
-  const [inv, setInv] = useState<{ value: string; label: string }[]>()
+  const [inv, setInv] = useState<{ value: string; label: string }[]>([])
   const [showForeign, setShowForeign] = useState<boolean>(false)
   const [canShowForm, setCanShowForm] = useState<boolean>(false)
   const [advicePayment, setAdvicePayment] = useState<number | null>(null)
@@ -58,7 +58,8 @@ export const CreateEditRentPage = (): ReactElement => {
     value: string | number
     label: string
   } | null>(null)
-  const { getAvailableInventory, getItemIdByTypeAndRef } = useInventory()
+  const [equipments, setEquipments] = useState<any[]>([])
+  const { getAvailableInventory } = useInventory()
   const [endDateValue, setEndDateValue] = useState<string>()
   const { createRental, getRentalForEdit, updateRental } = useRentals()
   const [currentCost, setCurrentCost] = useState(0)
@@ -69,7 +70,6 @@ export const CreateEditRentPage = (): ReactElement => {
   const [buildAddress, setBuildAddress] = useState<any>()
   const [quantities, setQuantities] = useState({})
   const { setLoading } = useLoadingStore()
-  const [prices, setPrices] = useState<any>()
 
   const client_id = watch('client_id')
 
@@ -90,17 +90,17 @@ export const CreateEditRentPage = (): ReactElement => {
   useEffect(() => {
     setLoading(true)
     const setCost = (): void => {
-      if (inventory && prices && quantities) {
+      if (inventory && quantities && endDate) {
         const totalCost = inventory.reduce((acc, data) => {
-          const valueToSearch = data.value
-          const matchingPrice: any = prices.find((p: any) => p.id === valueToSearch)
+          const [typeId, dimensionId, reference] = data.value.split('-')
+          const matchingPrice: any = equipments.find(
+            (d: any) => d.type_id === Number(typeId) && d.dimension_id === Number(dimensionId)
+          )
 
           if (matchingPrice) {
             const currentPrices =
-              endDate?.label === '1 a 3 Dias'
-                ? matchingPrice.prices.price_days
-                : matchingPrice.prices.price_week
-            const priceForItem = currentPrices * quantities[valueToSearch]
+              endDate.label === '1 a 3 Dias' ? matchingPrice.price_days : matchingPrice.price_week
+            const priceForItem = currentPrices * quantities[`${typeId}-${dimensionId}-${reference}`]
             return acc + priceForItem
           } else {
             return acc
@@ -153,94 +153,50 @@ export const CreateEditRentPage = (): ReactElement => {
   }, [])
 
   useEffect(() => {
+    setCanShowForm(false)
     const fetchData = async (): Promise<void> => {
       try {
-        const inventoryData = await getAvailableInventory()
-
+        const inventoryData: any = await getAvailableInventory()
         if (inventoryData) {
-          const transformedData = inventoryData.map((item: any) => ({
-            value: `${item.type_name}-${item.dimension_name}-${item.reference}`,
-            label: `${item.type_name} - ${item.dimension_name ? item.dimension_name : item.reference ? item.reference : 'Sin Referencia'} (${item.count})`
-          }))
-
-          const priceData = inventoryData.map((item: any) => ({
-            id: `${item.type_name}-${item.dimension_name}-${item.reference}`,
-            prices: {
-              price_days: item.price_days,
-              price_week: item.price_week
+          setEquipments(inventoryData.equipments)
+          const equipmentsMapped = inventoryData.equipments.map((e: any) => {
+            return {
+              value: `${e.type_id}-${e.dimension_id}-${e.reference}`,
+              label: `${e.type_name} - ${e.dimension_name ? e.dimension_name : e.reference} (${e.count})`
             }
-          }))
+          })
+          setInv(equipmentsMapped)
+        }
+        if (id && clients) {
+          const rent: any = await getRentalForEdit(id)
+          if (rent) {
+            const client = clients.find((c) => c.value === rent.client_id) ?? {}
+            setBuildAddress(rent.buildAddress)
+            updateSelectClientId(client)
+            setEndDateValue(formatDate(new Date(rent.end_date)))
+            setBuildAddress(rent.building_address)
 
-          setPrices(priceData)
-          setInv(transformedData)
-
-          if (id) {
-            const rentalData: any = await getRentalForEdit(id)
-
-            if (rentalData) {
-              const rest = clients?.filter((c) => c.value === rentalData.client_id)
-
-              if (rest) {
-                setSelectClientID(rest[0])
-                setEndDateValue(formatDate(new Date(rentalData.end_date)))
-                setAdvicePayment(rentalData.advance_payment)
-                setBuildAddress(rentalData.building_address)
-
-                if (inv) {
-                  const updatedInventory = inventory ?? []
-
-                  rentalData.equipments.forEach((equipmentItem: any) => {
-                    setInv([
-                      ...inv,
-                      {
-                        value: `${equipmentItem.type_name}-${equipmentItem.dimension_name}-${equipmentItem.reference}`,
-                        label: `${equipmentItem.type_name} - ${equipmentItem.dimension_name ? equipmentItem.dimension_name : equipmentItem.reference ? equipmentItem.reference : 'Sin Referencia'} (${equipmentItem.count})`
-                      }
-                    ])
-                    console.log(inv)
-
-                    const matchingItem = transformedData.find(
-                      (invItem) =>
-                        invItem.value ===
-                        `${equipmentItem.type_name}-${equipmentItem.dimension_name}-${equipmentItem.reference}`
-                    )
-
-                    if (matchingItem) {
-                      console.log(matchingItem)
-
-                      const count = matchingItem.label.replace(')', '').split('(')
-                      setInv(
-                        inv.map((i) => {
-                          if (i === matchingItem) {
-                            return {
-                              value: matchingItem.value,
-                              label: `${count[0]} (${Number(count[1]) + equipmentItem.count})`
-                            }
-                          } else {
-                            return i
-                          }
-                        })
-                      )
-
-                      const inventoryItem = updatedInventory.find(
-                        (item) => item.value === matchingItem.value
-                      )
-
-                      if (!inventoryItem) {
-                        updatedInventory.push({ ...matchingItem })
-                      }
-                    }
-
-                    quantities[
-                      `${equipmentItem.type_name}-${equipmentItem.dimension_name}-${equipmentItem.reference}`
-                    ] = equipmentItem.count
-                  })
-                  setInventory(updatedInventory)
-                }
+            const extraEquipments = rent.equipments.map((e: any) => {
+              handleQuantityChange(
+                `${e.type_id}-${e.dimension_id}-${e.reference}`,
+                e.count,
+                e.count
+              )
+              const option = {
+                value: `${e.type_id}-${e.dimension_id}-${e.reference}`,
+                label: `Rentado: ${e.type_name} - ${e.dimension_name ? e.dimension_name : e.reference} (${e.count})`
               }
-            }
+              if (inventory) {
+                setInventory([...inventory, option])
+              } else {
+                setInventory([option])
+              }
+              return option
+            })
+            setInv([...inv, ...extraEquipments])
           }
         }
+        setLoading(false)
         setCanShowForm(true)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -254,28 +210,31 @@ export const CreateEditRentPage = (): ReactElement => {
 
   useEffect(() => {
     const updatedQuantities = {}
-    inventory?.forEach((inv) => {
-      if (quantities[inv.value]) {
-        updatedQuantities[inv.value] = quantities[inv.value]
+    inventory?.forEach((i) => {
+      if (quantities[i.value]) {
+        updatedQuantities[i.value] = quantities[i.value]
       }
     })
     setQuantities(updatedQuantities)
   }, [inventory])
 
   const getEquipmentsIdByInventory = async (): Promise<any[]> => {
-    const equipments = await Promise.all(
+    const equipments_id = await Promise.all(
       Object.keys(quantities).map(async (q: string) => {
-        const s = q.split('-')
-        const ids = await getItemIdByTypeAndRef(s[0], s[1], s[2], quantities[q])
-        return ids
+        const [typeId] = q.split('-')
+        const { equipment_id } = equipments.find((e: any) => e.type_id === Number(typeId))
+
+        return equipment_id.slice(0, quantities[q])
       })
     )
-    return equipments.flat()
+    return equipments_id.flat()
   }
 
   const onSubmit = async (data: any): Promise<void> => {
     setCanShowForm(false)
     const equipment = await getEquipmentsIdByInventory()
+    console.log(equipment)
+
     if (!id && inventory && equipment) {
       const values = {
         client_id: selectClientID?.value,
@@ -420,38 +379,31 @@ export const CreateEditRentPage = (): ReactElement => {
                 </>
               )}
               {!id ? (
-                <Controller
-                  name="end_date"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="w-full p-4">
-                      <label className="block mb-2">Tiempo de renta:</label>
-                      <Select
-                        {...field}
-                        placeholder="Tiempo de renta"
-                        options={[
-                          { value: getTimestampForThreeDays(), label: '1 a 3 Dias' },
-                          { value: getTimestampForOneWeek(), label: '1 Semana' }
-                        ]}
-                        onChange={(e) => onChangeEndDate(e)}
-                        value={endDate}
-                        isSearchable
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            borderColor: '#E5E7EB',
-                            borderRadius: '0.375rem',
-                            boxShadow: 'none',
-                            '&:hover': {
-                              borderColor: '#D1D5DB'
-                            }
-                          })
-                        }}
-                      />
-                      <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
-                    </div>
-                  )}
-                />
+                <div className="w-full p-4">
+                  <label className="block mb-2">Tiempo de renta:</label>
+                  <Select
+                    placeholder="Tiempo de renta"
+                    options={[
+                      { value: getTimestampForThreeDays(), label: '1 a 3 Dias' },
+                      { value: getTimestampForOneWeek(), label: '1 Semana' }
+                    ]}
+                    onChange={(e) => onChangeEndDate(e)}
+                    value={endDate ?? null}
+                    isSearchable
+                    styles={{
+                      control: (provided) => ({
+                        ...provided,
+                        borderColor: '#E5E7EB',
+                        borderRadius: '0.375rem',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#D1D5DB'
+                        }
+                      })
+                    }}
+                  />
+                  <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
+                </div>
               ) : (
                 <div className="w-full p-4 relative">
                   <div>Agrega mas tiempo a la renta</div>
@@ -469,37 +421,29 @@ export const CreateEditRentPage = (): ReactElement => {
               )}
               {isEquipmentVisible || id ? (
                 <>
-                  <Controller
-                    name="equipments"
-                    control={control}
-                    defaultValue={[]}
-                    render={({ field }) => (
-                      <div className="w-full p-4">
-                        <label className="block mb-2">Equipos y/o Herramientas:</label>
-                        <Select
-                          {...field}
-                          options={inv}
-                          onChange={(e: any) => onchangeEquipments(e)}
-                          value={inventory}
-                          isMulti
-                          // isClearable={inventory?.some((v) => !v.isFixed)}
-                          styles={{
-                            control: (provided) => ({
-                              ...provided,
-                              borderColor: '#E5E7EB',
-                              borderRadius: '0.375rem',
-                              boxShadow: 'none',
-                              '&:hover': {
-                                borderColor: '#D1D5DB'
-                              }
-                            })
-                          }}
-                          getOptionValue={(option) => option.value}
-                        />
-                        <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
-                      </div>
-                    )}
-                  />
+                  <div className="w-full p-4">
+                    <label className="block mb-2">Equipos y/o Herramientas:</label>
+                    <Select
+                      options={inv}
+                      onChange={(e: any) => onchangeEquipments(e)}
+                      value={inventory}
+                      isMulti
+                      // isClearable={inventory?.some((v) => !v.isFixed)}
+                      styles={{
+                        control: (provided) => ({
+                          ...provided,
+                          borderColor: '#E5E7EB',
+                          borderRadius: '0.375rem',
+                          boxShadow: 'none',
+                          '&:hover': {
+                            borderColor: '#D1D5DB'
+                          }
+                        })
+                      }}
+                      getOptionValue={(option) => option.value}
+                    />
+                    <p className="text-red-500 mt-2">{errors.equipments?.message}</p>
+                  </div>
                   <div ref={parent} className="px-5 pb-10">
                     {inventory
                       ? inventory.map((inv, index) => {
@@ -585,7 +529,6 @@ export const CreateEditRentPage = (): ReactElement => {
                       <div className="w-full p-4 relative hidden">
                         <label className="">Anticipo</label>
                         <input
-                          {...register('advance_payment')}
                           type="number"
                           step="0.01"
                           min="0"
@@ -622,7 +565,6 @@ export const CreateEditRentPage = (): ReactElement => {
                   <div className="w-full p-4">
                     <label className="block mb-2">Dirección de la obra:</label>
                     <input
-                      {...register('building_address')}
                       type="text"
                       className="w-full rounded-lg border-2 border-gray-200 py-2 px-4"
                       value={buildAddress}

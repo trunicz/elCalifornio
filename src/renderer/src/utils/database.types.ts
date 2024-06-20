@@ -370,6 +370,13 @@ export type Database = {
             foreignKeyName: "equipment_type_fkey"
             columns: ["type"]
             isOneToOne: false
+            referencedRelation: "grouped_inventory"
+            referencedColumns: ["type_id"]
+          },
+          {
+            foreignKeyName: "equipment_type_fkey"
+            columns: ["type"]
+            isOneToOne: false
             referencedRelation: "inventory_types"
             referencedColumns: ["value"]
           },
@@ -398,6 +405,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "equipment_type"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_dimension_id_type_fkey"
+            columns: ["id_type"]
+            isOneToOne: false
+            referencedRelation: "grouped_inventory"
+            referencedColumns: ["type_id"]
           },
           {
             foreignKeyName: "equipment_dimension_id_type_fkey"
@@ -495,6 +509,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "equipment_type"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipments_types_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "grouped_inventory"
+            referencedColumns: ["type_id"]
           },
           {
             foreignKeyName: "equipments_types_type_id_fkey"
@@ -604,6 +625,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "equipment_type"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prices_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "grouped_inventory"
+            referencedColumns: ["type_id"]
           },
           {
             foreignKeyName: "prices_type_id_fkey"
@@ -1050,10 +1078,13 @@ export type Database = {
       grouped_inventory: {
         Row: {
           count: number | null
+          dimension_id: number | null
           dimension_name: string | null
+          equipment_id: number[] | null
           price_days: number | null
           price_week: number | null
           reference: string | null
+          type_id: number | null
           type_name: string | null
         }
         Relationships: []
