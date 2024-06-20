@@ -176,7 +176,7 @@ export const CreateEditRentPage = (): ReactElement => {
             setEndDateValue(formatDate(new Date(rent.end_date)))
             setBuildAddress(rent.building_address)
 
-            const extraEquipments = rent.equipments.map((e: any) => {
+            rent.equipments.map((e: any) => {
               handleQuantityChange(
                 `${e.type_id}-${e.dimension_id}-${e.reference}`,
                 e.count,
@@ -191,9 +191,7 @@ export const CreateEditRentPage = (): ReactElement => {
               } else {
                 setInventory([option])
               }
-              return option
             })
-            setInv([...inv, ...extraEquipments])
           }
         }
         setLoading(false)
@@ -231,11 +229,9 @@ export const CreateEditRentPage = (): ReactElement => {
   }
 
   const onSubmit = async (data: any): Promise<void> => {
-    setCanShowForm(false)
     const equipment = await getEquipmentsIdByInventory()
-    console.log(equipment)
 
-    if (!id && inventory && equipment) {
+    if (!id) {
       const values = {
         client_id: selectClientID?.value,
         advance_payment: advicePayment ? advicePayment : 0,
@@ -253,7 +249,7 @@ export const CreateEditRentPage = (): ReactElement => {
       createRental({ ...values, client_reference_id: clientReferenceId }).then(() =>
         setLocation('/rent')
       )
-    } else if (inventory && equipment) {
+    } else {
       const values = {
         client_id: selectClientID?.value,
         advance_payment: advicePayment ? advicePayment : 0,
@@ -265,6 +261,8 @@ export const CreateEditRentPage = (): ReactElement => {
         total_cost: currentCost,
         status: 'ACTIVO'
       }
+
+      console.log(values)
 
       updateRental(`${id}`, values).then(() => {
         setLocation('/rent')
