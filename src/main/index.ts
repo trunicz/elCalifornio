@@ -6,9 +6,15 @@ import fs from 'node:fs'
 import os from 'os'
 import { PDFDocument } from 'pdf-lib'
 import axios from 'axios'
+import { autoUpdater } from 'electron-updater'
+
+autoUpdater.autoDownload = true
+autoUpdater.autoInstallOnAppQuit = true
 
 function createWindow(): void {
   // Create the browser window.
+  autoUpdater.checkForUpdates()
+
   const mainWindow = new BrowserWindow({
     width: 1240,
     height: 720,
