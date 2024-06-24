@@ -184,16 +184,20 @@ const RenderBillRow = ({
                     <button
                       className="h-full px-4 rounded-xl text-center text-xl flex justify-center items-center hover:bg-gray-100 transition-all active:bg-gray-200/75 hover:text-blue-600"
                       onClick={() => {
-                        const formData = {
-                          ...recibo.formData,
-                          numero_contrato: recibo.formData.id,
-                          ref_contrato: `Contrato #${recibo.formData.rent_id}`
+                        try {
+                          const formData = {
+                            ...recibo.formData,
+                            numero_contrato: recibo.formData.id,
+                            ref_contrato: `Contrato #${recibo.formData.rent_id}`
+                          }
+                          const folio = formData.id
+                          delete formData.id
+                          delete formData.rent_id
+                          delete formData.created_at
+                          createBillPdf(formData, `Recibo_${folio}`)
+                        } catch (error) {
+                          console.error(error)
                         }
-                        const folio = formData.id
-                        delete formData.id
-                        delete formData.rent_id
-                        delete formData.created_at
-                        createBillPdf(formData, `Recibo_${folio}`)
                       }}
                     >
                       <LuDownloadCloud />

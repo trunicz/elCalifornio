@@ -76,19 +76,24 @@ export const RentPage = (): ReactElement => {
 
   const downloadRentalContract = async (id: string | number): Promise<void> => {
     setLoading(true)
-    const rent: any = rentList?.filter((rent: any) => rent.id === id)
+    try {
+      const rent: any = rentList?.filter((rent: any) => rent.id === id)
 
-    if (rent) {
-      rent[0].formdata = {
-        ...rent[0].formdata,
-        folio: rent[0].id,
-        total_cost: convertirNumeroALetras(Number(rent[0].formdata.total_cost))
+      if (rent) {
+        rent[0].formdata = {
+          ...rent[0].formdata,
+          folio: rent[0].id,
+          total_cost: convertirNumeroALetras(Number(rent[0].formdata.total_cost))
+        }
+        console.log(rent[0].formdata)
+
+        await createContract(rent[0].formdata, `Contrato_${rent[0].id}`).then(() => {
+          setLoading(false)
+        })
       }
-      console.log(rent[0].formdata)
-
-      await createContract(rent[0].formdata, `Contrato_${rent[0].id}`).then(() => {
-        setLoading(false)
-      })
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
     }
   }
 
