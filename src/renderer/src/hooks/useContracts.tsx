@@ -6,7 +6,19 @@ interface Contracts {
 export const useContracts = (): Contracts => {
   const createContract = async (formData: object, fileName: string): Promise<void> => {
     try {
-      const filledPdfBytes = await window.api.createContract(formData)
+      const response = await fetch('https://elcalifornioapi.techdreamscope.workers.dev/contracts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ formData })
+      })
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+
+      const filledPdfBytes = await response.blob()
       const blob = new Blob([filledPdfBytes], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -23,7 +35,19 @@ export const useContracts = (): Contracts => {
 
   const createBillPdf = async (formData: object, fileName: string): Promise<void> => {
     try {
-      const filledPdfBytes = await window.api.createBill(formData)
+      const response = await fetch('https://elcalifornioapi.techdreamscope.workers.dev/bills', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ formData })
+      })
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+
+      const filledPdfBytes = await response.arrayBuffer()
       const blob = new Blob([filledPdfBytes], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
