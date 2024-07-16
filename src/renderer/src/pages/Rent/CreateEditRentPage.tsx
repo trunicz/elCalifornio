@@ -536,7 +536,7 @@ export const CreateEditRentPage = (): ReactElement => {
                         />
                         <LuDollarSign className="text-gray-400 absolute bottom-7 start-6 text-lg hidden" />
                       </div>
-                      <div className="w-full px-4 relative flex  gap-2">
+                      {/* <div className="w-full px-4 relative flex  gap-2">
                         <label htmlFor="adelantado" className="w-full text-gray-400">
                           Pago Adelantado
                         </label>
@@ -552,7 +552,7 @@ export const CreateEditRentPage = (): ReactElement => {
                             }
                           }}
                         />
-                      </div>
+                      </div> */}
                     </>
                   )}
                   {typeof advicePayment === 'number' && currentCost < advicePayment && (

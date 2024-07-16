@@ -299,11 +299,13 @@ const CreateBillModal = ({
 
   const submit = (data: any): void => {
     const { cliente, fecha_final, fecha_inicial, id } = row
-    console.log(row)
-
-    console.log(fecha_inicial)
-
     const ref_contrato = `contrato${fecha_inicial.replaceAll('/', '')}${cliente[0]}${id}`
+
+    const formatDate = (date: string): string => {
+      const [year, month, day] = date.split('-')
+
+      return Number(year) > 1000 ? `${day}/${month}/${year}` : date.replaceAll('-', '/')
+    }
 
     const bill = {
       rent_id: id,
@@ -325,7 +327,7 @@ const CreateBillModal = ({
           ? 'VIGENCIA'
           : 'ENTREGADO',
       fecha_vencimiento: fecha_final,
-      fecha_extension: data.fecha_extension.replaceAll('-', '/'),
+      fecha_extension: formatDate(data.fecha_extension),
       dia: new Date().getDate(),
       mes: new Date().getMonth() + 1,
       anio: new Date().getFullYear(),
@@ -380,7 +382,8 @@ const CreateBillModal = ({
           label: 'Cantidad',
           as: 'input',
           type: 'number',
-          placeholder: '500'
+          placeholder: '500',
+          isVisible: true
         },
         {
           name: 'fecha_extension',

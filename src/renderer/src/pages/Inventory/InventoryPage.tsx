@@ -61,15 +61,53 @@ export const InventoryPage = (): ReactElement => {
     }
     if (inventoryListView && typeof id === 'object') {
       const filteredInv = inventoryListView.filter((inv: any) => id.includes(inv.id))
+      const invItem: any = { ...filteredInv[0], cantidad: filteredInv.length }
 
       openModal(
         <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-2">
-          {filteredInv.map((item: any) => (
+          {/* {JSON.stringify(invItem)} */}
+          <div className="flex gap-2 py-1">
+            <div className="bg-gray-100 rounded-xl w-full text-lg p-4 overflow-ellipsis">
+              {Object.entries(invItem)
+                .filter(([key]: [string, any]) => !['id'].includes(key))
+                .map(([key, value]: [string, any]) => (
+                  <div key={key} className="flex gap-2 py-1">
+                    <div className="w-1/3 text-start text-wrap">
+                      {key[0].toUpperCase() + key.slice(1)}:
+                    </div>
+                    <div className="flex flex-1 justify-start text-start">{value}</div>
+                  </div>
+                ))}
+              <div>
+                <div className="text-start mt-6 bg-gray-200 p-4 rounded-lg">
+                  <hr />
+                  <div className="flex gap-2 mt-2 items-center">
+                    <p className="w-full font-bold">Eliminar</p>
+                  </div>
+                  <div className="flex pt-4">
+                    <span>Ingrese la Cantidad</span>
+                    <div className="ms-auto flex flex-col">
+                      <input className="ms-auto outline-none w-20 rounded-md border border-gray-500 px-2" />
+                      <small className="text-xs">Max: {invItem.cantidad}</small>
+                    </div>
+                  </div>
+                  <div>
+                    <Button
+                      color="danger"
+                      className="w-auto ms-auto mt-4 text-sm"
+                      text="Eliminar"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* {filteredInv.map((item: any) => (
             <div key={item.id} className="bg-gray-100 rounded-xl text-lg p-4 overflow-ellipsis">
               {Object.entries(item)
                 .filter(([key]: [string, any]) => !['id'].includes(key))
                 .map(([key, value]: [string, any], index) => (
-                  <div key={index} className="flex gap-2 py-1">
+                  <div className="flex gap-2 py-1">
                     <div className="w-1/3 text-start text-wrap">
                       {key[0].toUpperCase() + key.slice(1)}:
                     </div>
@@ -89,7 +127,7 @@ export const InventoryPage = (): ReactElement => {
                 />
               </div>
             </div>
-          ))}
+          ))} */}
         </div>
       )
     }

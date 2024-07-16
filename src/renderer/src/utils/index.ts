@@ -33,8 +33,23 @@ export function formatDate(dateString: string): ReactNode {
 }
 
 export function convertirNumeroALetras(num: number): string {
-  const unidades = ['', 'UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE']
-  const decenas = [
+  if (isNaN(num) || num === null || num === undefined) {
+    throw new Error('El número proporcionado no es válido.')
+  }
+
+  const unidades: string[] = [
+    '',
+    'UNO',
+    'DOS',
+    'TRES',
+    'CUATRO',
+    'CINCO',
+    'SEIS',
+    'SIETE',
+    'OCHO',
+    'NUEVE'
+  ]
+  const decenas: string[] = [
     '',
     'DIEZ',
     'VEINTE',
@@ -46,7 +61,7 @@ export function convertirNumeroALetras(num: number): string {
     'OCHENTA',
     'NOVENTA'
   ]
-  const centenas = [
+  const centenas: string[] = [
     '',
     'CIENTO',
     'DOSCIENTOS',
@@ -58,7 +73,7 @@ export function convertirNumeroALetras(num: number): string {
     'OCHOCIENTOS',
     'NOVECIENTOS'
   ]
-  const especiales = [
+  const especiales: string[] = [
     'DIEZ',
     'ONCE',
     'DOCE',
@@ -77,8 +92,8 @@ export function convertirNumeroALetras(num: number): string {
     } else if (num < 20) {
       return especiales[num - 10]
     } else {
-      const decena = Math.floor(num / 10)
-      const unidad = num % 10
+      const decena: number = Math.floor(num / 10)
+      const unidad: number = num % 10
       return decenas[decena] + (unidad > 0 ? ' Y ' + unidades[unidad] : '')
     }
   }
@@ -87,8 +102,8 @@ export function convertirNumeroALetras(num: number): string {
     if (num === 100) {
       return 'CIEN'
     } else {
-      const centena = Math.floor(num / 100)
-      const resto = num % 100
+      const centena: number = Math.floor(num / 100)
+      const resto: number = num % 100
       return centenas[centena] + (resto > 0 ? ' ' + convertirDecenas(resto) : '')
     }
   }
@@ -97,8 +112,8 @@ export function convertirNumeroALetras(num: number): string {
     if (num < 1000) {
       return convertirCentenas(num)
     } else {
-      const miles = Math.floor(num / 1000)
-      const resto = num % 1000
+      const miles: number = Math.floor(num / 1000)
+      const resto: number = num % 1000
       return (
         (miles === 1 ? 'MIL' : convertirCentenas(miles) + ' MIL') +
         (resto > 0 ? ' ' + convertirCentenas(resto) : '')
@@ -110,8 +125,8 @@ export function convertirNumeroALetras(num: number): string {
     if (num < 1000000) {
       return convertirMiles(num)
     } else {
-      const millones = Math.floor(num / 1000000)
-      const resto = num % 1000000
+      const millones: number = Math.floor(num / 1000000)
+      const resto: number = num % 1000000
       return (
         (millones === 1 ? 'UN MILLÓN' : convertirCentenas(millones) + ' MILLONES') +
         (resto > 0 ? ' ' + convertirMiles(resto) : '')
@@ -119,11 +134,15 @@ export function convertirNumeroALetras(num: number): string {
     }
   }
 
-  const parteEntera = Math.floor(num)
-  const parteDecimal = Math.round((num - parteEntera) * 100)
+  if (num === 0) {
+    return `$0.00 (CERO PESOS 00/100 M.N.)`
+  }
 
-  const numeroEnLetras = convertirMillones(parteEntera)
-  const decimalesEnLetras = parteDecimal < 10 ? '0' + parteDecimal : parteDecimal.toString()
+  const parteEntera: number = Math.floor(num)
+  const parteDecimal: number = Math.round((num - parteEntera) * 100)
 
-  return `$${num?.toFixed(2)} (${numeroEnLetras} PESOS ${decimalesEnLetras}/100 M.N.)`
+  const numeroEnLetras: string = convertirMillones(parteEntera)
+  const decimalesEnLetras: string = parteDecimal < 10 ? '0' + parteDecimal : parteDecimal.toString()
+
+  return `$${num.toFixed(2)} (${numeroEnLetras} PESOS ${decimalesEnLetras}/100 M.N.)`
 }
