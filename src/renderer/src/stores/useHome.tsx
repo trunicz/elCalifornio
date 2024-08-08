@@ -11,6 +11,7 @@ interface HomeStore {
     rental_count: number | null
     rentals_info: any
     timeout_count: number | null
+    timeout_count_undeleted: number | null
     user_count: number | null
   } | null
   getHomeInfo: () => Promise<void>
@@ -19,7 +20,7 @@ interface HomeStore {
 export const useHomeStore = create<HomeStore>((set) => ({
   home: null,
   getHomeInfo: async (): Promise<void> => {
-    const { data, error } = await supabase.from('home_view').select()
+    const { data, error } = await supabase.from('home_view1').select()
     if (error) throw error
     set({ home: data[0] })
   }
