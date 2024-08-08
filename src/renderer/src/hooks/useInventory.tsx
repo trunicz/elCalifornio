@@ -11,6 +11,11 @@ interface InventoryMethods {
   getEquipmentStatus: () => Promise<object[] | null>
   createEquipment: (values: object, count: number) => Promise<object[] | null>
   deleteEquipment: (id: string | number) => Promise<void>
+  deleteEquipmentByQuantity: (
+    type: string | number,
+    dimension: string | number,
+    quantity: number
+  ) => Promise<void>
   updateEquipment: (id: string | number, values: object) => Promise<void>
   getAvailableInventory: () => Promise<object | null>
   getItemDimension: (id: string | number) => Promise<object[] | null>
@@ -73,6 +78,39 @@ export const useInventory = (): InventoryMethods => {
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id)
       if (error) throw error
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const deleteEquipmentByQuantity = async (
+    type: string | number,
+    dimension: string | number,
+    quantity: number
+  ): Promise<any | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('equipment')
+        .select('id')
+        .eq('type', type)
+        .eq('dimension', dimension)
+        .eq('status', 1)
+        .is('deleted_at', null)
+        .order('id', { ascending: true })
+        .limit(quantity)
+      if (error) {
+        throw error
+      }
+      const ids = data?.map((obj: { id: any }) => obj.id)
+
+      if (!ids || ids.length === 0) {
+        return null
+      }
+
+      for (const id of ids) {
+        await deleteEquipment(id)
+      }
+      return data
     } catch (error) {
       console.error(error)
     }
@@ -239,11 +277,23 @@ export const useInventory = (): InventoryMethods => {
     return null
   }
 
+  /*const getAllInventoryView = async (): Promise<object[] | null> => {
+      try {
+        const { data, error } = await supabase.from('all_inventory1').select()
+        if (error) throw error
+        setInventory(data)
+        return data
+      } catch (error) {
+        console.error(error)
+      }
+      return null
+    }*/
+
   const getAllInventory = async (): Promise<object[] | null> => {
     try {
       const { data, error } = await supabase
         .from('equipment')
-        .select('id,type(type_name),reference,status(status_name)')
+        .select('id,type(id,type_name),reference,status(id,status_name),dimension')
         .is('deleted_at', null)
       if (error) throw error
       const filteredInventory = data.map((inv: any) => {
@@ -251,7 +301,10 @@ export const useInventory = (): InventoryMethods => {
           id: inv.id,
           tipo: inv.type.type_name,
           referencia: inv.reference ? inv.reference : 'Sin Referencia',
-          estado: inv.status.status_name
+          estado: inv.status.status_name,
+          tipo_id: inv.type.id,
+          dimension_id: inv.dimension,
+          estado_id: inv.status.id
         }
       })
       return filteredInventory
@@ -269,6 +322,7 @@ export const useInventory = (): InventoryMethods => {
     getEquipmentStatus,
     createEquipment,
     deleteEquipment,
+    deleteEquipmentByQuantity,
     updateEquipment,
     getAvailableInventory,
     getAllInventoryView,

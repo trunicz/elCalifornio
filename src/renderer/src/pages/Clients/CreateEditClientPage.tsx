@@ -16,6 +16,11 @@ const clientSchema = Yup.object().shape({
       /^(\+\d{1,3}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
       'Por favor, introduce un número de teléfono válido.'
     ),
+  rfc: Yup.string().test(
+    'empty-or-specific-length',
+    'El campo debe estar vacío o tener 12 o 13 caracteres',
+    (value) => !value || value.length === 12 || value.length === 13
+  ),
   address: Yup.string().required('La Dirección es Obligatoria'),
   city: Yup.string().required('La Ciudad es Obligatoria'),
   isForeign: Yup.boolean().required('Este Campo es Obligatorio'),
