@@ -91,6 +91,8 @@ export const ClientsPage = (): ReactElement => {
               onClick={() => {
                 const input = document.createElement('input')
                 input.type = 'file'
+                input.multiple = true
+                input.accept = '.pdf, .png, .jpg'
                 input.click()
                 input.addEventListener('change', async (e) => {
                   const target = e.target as HTMLInputElement
@@ -272,6 +274,8 @@ export const ClientsPage = (): ReactElement => {
               onClick={() => {
                 const input = document.createElement('input')
                 input.type = 'file'
+                input.multiple = true
+                input.accept = '.pdf, .png, .jpg'
                 input.click()
                 input.addEventListener('change', async (e) => {
                   const target = e.target as HTMLInputElement

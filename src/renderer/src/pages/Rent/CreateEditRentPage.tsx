@@ -160,9 +160,13 @@ export const CreateEditRentPage = (): ReactElement => {
         if (inventoryData) {
           setEquipments(inventoryData.equipments)
           const equipmentsMapped = inventoryData.equipments.map((e: any) => {
+            // CAMBIOS: No mostrar si es null.
+            const name = e.type_name
+            const dimension = e.dimension_name ? e.dimension_name : e.reference
+
             return {
               value: `${e.type_id}-${e.dimension_id}-${e.reference}`,
-              label: `${e.type_name} - ${e.dimension_name ? e.dimension_name : e.reference} (${e.count})`
+              label: `${name} - ${dimension == null ? '' : dimension + ' '}(${e.count})`
             }
           })
           setInv(equipmentsMapped)
@@ -182,6 +186,7 @@ export const CreateEditRentPage = (): ReactElement => {
                 e.count,
                 e.count
               )
+
               const option = {
                 value: `${e.type_id}-${e.dimension_id}-${e.reference}`,
                 label: `Rentado: ${e.type_name} - ${e.dimension_name ? e.dimension_name : e.reference} (${e.count})`

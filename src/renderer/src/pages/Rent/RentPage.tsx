@@ -80,14 +80,15 @@ export const RentPage = (): ReactElement => {
       const rent: any = rentList?.filter((rent: any) => rent.id === id)
 
       if (rent) {
-        rent[0].formdata = {
+        const formData1 = {
           ...rent[0].formdata,
           folio: rent[0].id,
-          total_cost: convertirNumeroALetras(Number(rent[0].formdata.total_cost))
+          total_cost: convertirNumeroALetras(Number(rent[0].formdata.total_cost) ?? 0)
         }
+
         console.log(rent[0].formdata)
 
-        await createContract(rent[0].formdata, `Contrato_${rent[0].id}`).then(() => {
+        await createContract(formData1, `Contrato_${rent[0].id}`).then(() => {
           setLoading(false)
         })
       }
@@ -301,17 +302,25 @@ const CreateBillModal = ({
     const { cliente, fecha_final, fecha_inicial, id } = row
     const ref_contrato = `contrato${fecha_inicial.replaceAll('/', '')}${cliente[0]}${id}`
 
-    const formatDate = (date: string): string => {
-      const [year, month, day] = date.split('-')
+    console.log(data)
 
+    const formatDate = (date: string): string => {
+      if (date === '') {
+        return ''
+      }
+      const [year, month, day] = date.split('-')
+      // TODO: Convertir - a /, pero el año como pasaría con formato de dos cifras o de 4 cifras.
       return Number(year) > 1000 ? `${day}/${month}/${year}` : date.replaceAll('-', '/')
     }
+
+    const subtotal = data.iva_incluido ? data.cantidad / 1.16 : data.cantidad
+    const total = data.iva_incluido ? data.cantidad : data.cantidad * 1.16
 
     const bill = {
       rent_id: id,
       cliente,
       concepto: data.concepto,
-      cantidad: convertirNumeroALetras(data.cantidad),
+      cantidad: convertirNumeroALetras(data.cantidad), // TODO: Pendiente decirle si con iva incluído o no.
       forma_pago: data.forma_pago,
       factura: data.factura,
       razon_social: data.razon_social,
@@ -319,7 +328,7 @@ const CreateBillModal = ({
         ? user?.user_metadata.name + ' ' + user?.user_metadata.last_name
         : 'ElCalifornio',
       cliente_firma: cliente,
-      sub_total: data.cantidad.toFixed(2),
+      sub_total: subtotal.toFixed(2),
       iva: (data.cantidad * 0.16).toFixed(2),
       ref_contrato,
       estatus:
@@ -327,11 +336,11 @@ const CreateBillModal = ({
           ? 'VIGENCIA'
           : 'ENTREGADO',
       fecha_vencimiento: fecha_final,
-      fecha_extension: formatDate(data.fecha_extension),
+      fecha_extension: formatDate(data.fecha_extension), // TODO: Si no has puesto la fecha, que.
       dia: new Date().getDate(),
       mes: new Date().getMonth() + 1,
       anio: new Date().getFullYear(),
-      total: (data.cantidad + data.cantidad * 0.16).toFixed(2)
+      total: total.toFixed(2)
     }
     createBill(bill).then(() => {
       closeModal().then(() => loadFunction())
@@ -390,6 +399,13 @@ const CreateBillModal = ({
           label: 'Fecha Extension/Termino',
           as: 'input',
           type: 'date'
+        },
+        {
+          name: 'iva_incluido',
+          label: 'IVA incluído',
+          as: 'input',
+          type: 'checkbox',
+          className: 'col-span-full'
         },
         {
           name: 'razon_social',

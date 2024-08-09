@@ -2,6 +2,7 @@
 import { AppLayout, Button, SearchBar, Table, useModal } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useInventory } from '@renderer/hooks/useInventory'
+import { useLoadingStore } from '@renderer/stores/useLoading'
 import { ReactElement, ReactNode, useEffect, useState } from 'react'
 import { IoWarning } from 'react-icons/io5'
 import { LuCheckCircle2, LuSettings2 } from 'react-icons/lu'
@@ -61,74 +62,21 @@ export const InventoryPage = (): ReactElement => {
     }
     if (inventoryListView && typeof id === 'object') {
       const filteredInv = inventoryListView.filter((inv: any) => id.includes(inv.id))
-      const invItem: any = { ...filteredInv[0], cantidad: filteredInv.length }
+      const quantity = inventoryListView.filter(
+        (inv: any) => id.includes(inv.id) && inv.estado_id === 1
+      ).length
+      const invItem: any = { ...filteredInv[0], cantidad: filteredInv.length, disponible: quantity }
 
       openModal(
-        <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-2">
-          {/* {JSON.stringify(invItem)} */}
-          <div className="flex gap-2 py-1">
-            <div className="bg-gray-100 rounded-xl w-full text-lg p-4 overflow-ellipsis">
-              {Object.entries(invItem)
-                .filter(([key]: [string, any]) => !['id'].includes(key))
-                .map(([key, value]: [string, any]) => (
-                  <div key={key} className="flex gap-2 py-1">
-                    <div className="w-1/3 text-start text-wrap">
-                      {key[0].toUpperCase() + key.slice(1)}:
-                    </div>
-                    <div className="flex flex-1 justify-start text-start">{value}</div>
-                  </div>
-                ))}
-              <div>
-                <div className="text-start mt-6 bg-gray-200 p-4 rounded-lg">
-                  <hr />
-                  <div className="flex gap-2 mt-2 items-center">
-                    <p className="w-full font-bold">Eliminar</p>
-                  </div>
-                  <div className="flex pt-4">
-                    <span>Ingrese la Cantidad</span>
-                    <div className="ms-auto flex flex-col">
-                      <input className="ms-auto outline-none w-20 rounded-md border border-gray-500 px-2" />
-                      <small className="text-xs">Max: {invItem.cantidad}</small>
-                    </div>
-                  </div>
-                  <div>
-                    <Button
-                      color="danger"
-                      className="w-auto ms-auto mt-4 text-sm"
-                      text="Eliminar"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* {filteredInv.map((item: any) => (
-            <div key={item.id} className="bg-gray-100 rounded-xl text-lg p-4 overflow-ellipsis">
-              {Object.entries(item)
-                .filter(([key]: [string, any]) => !['id'].includes(key))
-                .map(([key, value]: [string, any], index) => (
-                  <div className="flex gap-2 py-1">
-                    <div className="w-1/3 text-start text-wrap">
-                      {key[0].toUpperCase() + key.slice(1)}:
-                    </div>
-                    <div className="flex justify-start flex-1">
-                      {renderNestedObject(value.slice(0, 30))}
-                    </div>
-                  </div>
-                ))}
-              <div className="flex gap-2 mt-4">
-                <Button
-                  className="bg-red-500 hover:bg-red-600 text-white"
-                  color="danger"
-                  text="Eliminar"
-                  onClick={() => {
-                    deleteFunction(item.id)
-                  }}
-                />
-              </div>
-            </div>
-          ))} */}
-        </div>
+        <InventoryDeleteByQuantityComponent
+          invItem={invItem}
+          getAllInventory={getAllInventory}
+          setInventoryListView={setInventoryListView}
+          getAllInventoryView={getAllInventoryView}
+          setInventoryList={setInventoryList}
+          openModal={openModal}
+          closeModal={closeModal}
+        />
       )
     }
   }
@@ -203,7 +151,7 @@ export const InventoryPage = (): ReactElement => {
           <Table
             data={inventoryList}
             deleteFunction={deleteFunction}
-            hiddenKeys={['id', 'referencias']}
+            hiddenKeys={['id', 'referencias', 'tipo_id', 'dimension_id']}
             watchFunction={moreInfo}
             editFunction={editFunction}
             customMoreBtn={{ icon: <LuSettings2 />, title: 'Ver' }}
@@ -240,6 +188,119 @@ function renderNestedObject(obj: any): ReactNode {
           )
         }
       })}
+    </div>
+  )
+}
+
+const InventoryDeleteByQuantityComponent = ({
+  invItem,
+  getAllInventory,
+  setInventoryListView,
+  getAllInventoryView,
+  setInventoryList,
+  openModal,
+  closeModal
+}: any): ReactElement => {
+  const [inpt, setinpt] = useState<string>('')
+  const { deleteEquipmentByQuantity } = useInventory()
+  const [isButtonDisabled, setButtonDisabled] = useState<boolean>(true)
+  const { setLoading } = useLoadingStore()
+
+  const testFunc = (e: any): void => {
+    setinpt(e.target.value)
+    validateInput(e.target.value)
+  }
+
+  const validateInput = (value: string): void => {
+    const numeric = Number(value)
+    if (isNaN(numeric) || numeric <= 0 || numeric > invItem.disponible) {
+      setButtonDisabled(true)
+    } else {
+      setButtonDisabled(false)
+    }
+  }
+
+  const deleteAnyInventory = async (): Promise<void> => {
+    setLoading(true)
+    await deleteEquipmentByQuantity(invItem.tipo_id, invItem.dimension_id, Number(inpt)).then(
+      () => {
+        setLoading(false)
+        openModal(
+          <>
+            <div>
+              <span className="animate-fade-up text-6xl mb-4 flex justify-center text-green-500">
+                <LuCheckCircle2 />
+              </span>
+              <h3>¡Se elimino algunos elementos con éxito!</h3>
+              <Button
+                className="mt-4"
+                color="success"
+                text="Aceptar"
+                onClick={() => {
+                  getAllInventory().then((res) => {
+                    setInventoryListView(res)
+                    getAllInventoryView().then((res1) => {
+                      setInventoryList(res1)
+                      closeModal()
+                    })
+                  })
+                }}
+              />
+            </div>
+          </>
+        )
+      }
+    )
+  }
+
+  return (
+    <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-2">
+      {/* {JSON.stringify(invItem)} */}
+      <div className="flex gap-2 py-1">
+        <div className="bg-gray-100 rounded-xl w-full text-lg p-4 overflow-ellipsis">
+          {Object.entries(invItem)
+            .filter(
+              ([key]: [string, any]) =>
+                !['id'].includes(key) && !key.endsWith('_id') && !key.endsWith('_hide')
+            )
+            .map(([key, value]: [string, any]) => (
+              <div key={key} className="flex gap-2 py-1">
+                <div className="w-1/3 text-start text-wrap">
+                  {key[0].toUpperCase() + key.slice(1)}:
+                </div>
+                <div className="flex flex-1 justify-start text-start">{value}</div>
+              </div>
+            ))}
+          <div>
+            <div className="text-start mt-6 bg-gray-200 p-4 rounded-lg">
+              <hr />
+              <div className="flex gap-2 mt-2 items-center">
+                <p className="w-full font-bold">Eliminar</p>
+              </div>
+              <div className="flex pt-4">
+                <span>Ingrese la Cantidad</span>
+                <div className="ms-auto flex flex-col">
+                  <input
+                    value={inpt}
+                    onChange={(e) => testFunc(e)}
+                    className="ms-auto outline-none w-20 rounded-md border border-gray-500 px-2"
+                  />
+                  <span className="text-xs">Max: {invItem.disponible}</span>
+                </div>
+              </div>
+              <div>
+                <Button
+                  color="danger"
+                  className="w-auto ms-auto mt-4 text-sm"
+                  text="Eliminar"
+                  onClick={() => deleteAnyInventory()}
+                  disabled={isButtonDisabled}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

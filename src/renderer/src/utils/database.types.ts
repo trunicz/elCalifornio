@@ -1,10 +1,4 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
   public: {
@@ -1098,6 +1092,20 @@ export type Database = {
           rental_count: number | null
           rentals_info: Json | null
           timeout_count: number | null
+          user_count: number | null
+        }
+        Relationships: []
+      }
+      home_view1: {
+        Row: {
+          calls: number | null
+          client_count: number | null
+          clients: string[] | null
+          pending_payments: Json | null
+          rental_count: number | null
+          rentals_info: Json | null
+          timeout_count: number | null
+          timeout_count_undeleted: number | null
           user_count: number | null
         }
         Relationships: []

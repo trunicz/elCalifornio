@@ -146,7 +146,8 @@ export const useClients = (): Clients => {
     filesList: FileList
   ): Promise<void> => {
     try {
-      const files = Array.from(filesList)
+      // CAMBIO: Corregido que no se podría cambiar datos del cliente.
+      const files = filesList === undefined ? [] : Array.from(filesList)
 
       const urls = await Promise.all(
         files.map(async (file: any) => {

@@ -271,17 +271,30 @@ const CreateBillModal = ({
 
     console.log(recibidor)
 
+    const formatDate = (date: string): string => {
+      if (date === '') {
+        return ''
+      }
+      const [year, month, day] = date.split('-')
+      // TODO: Convertir - a /, pero el año como pasaría con formato de dos cifras o de 4 cifras.
+
+      return Number(year) > 1000 ? `${day}/${month}/${year}` : date.replaceAll('-', '/')
+    }
+
+    const subtotal = data.iva_incluido ? data.cantidad / 1.16 : data.cantidad
+    const total = data.iva_incluido ? data.cantidad : data.cantidad * 1.16
+
     const bill = {
       rent_id: id,
       cliente,
       concepto: data.concepto,
-      cantidad: convertirNumeroALetras(data.cantidad),
+      cantidad: convertirNumeroALetras(data.cantidad), // TODO: Pendiente decirle si con iva incluído o no.
       forma_pago: data.forma_pago,
       factura: data.factura,
       razon_social: data.razon_social,
       recibidor,
       cliente_firma: cliente,
-      sub_total: data.cantidad.toFixed(2),
+      sub_total: subtotal.toFixed(2),
       iva: (data.cantidad * 0.16).toFixed(2),
       ref_contrato,
       estatus:
@@ -289,11 +302,11 @@ const CreateBillModal = ({
           ? 'VIGENCIA'
           : 'ENTREGADO',
       fecha_vencimiento: fecha_final,
-      fecha_extension: data.fecha_extension.replaceAll('-', '/'),
+      fecha_extension: formatDate(data.fecha_extension),
       dia: new Date().getDate(),
       mes: new Date().getMonth() + 1,
       anio: new Date().getFullYear(),
-      total: (data.cantidad + data.cantidad * 0.16).toFixed(2)
+      total: total.toFixed(2)
     }
     createBill(bill).then(() => {
       closeModal().then(() => loadFunction())
@@ -351,6 +364,13 @@ const CreateBillModal = ({
           label: 'Fecha Extension/Termino',
           as: 'input',
           type: 'date'
+        },
+        {
+          name: 'aplicar_iva',
+          label: 'IVA incluído',
+          as: 'input',
+          type: 'checkbox',
+          className: 'col-span-full'
         },
         {
           name: 'razon_social',
