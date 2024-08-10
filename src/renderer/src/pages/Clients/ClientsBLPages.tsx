@@ -58,12 +58,12 @@ export const ClientsBLPages = (): ReactElement => {
   }
 
   const shouldShowOptions = (row: any): boolean => {
-    return row.isBanned
+    return !row.isBanned
   }
 
-  const shouldShowCanDelete = (row: any): boolean | undefined => {
-    return row.isBanned
-  }
+  //const shouldShowCanDelete = (row: any): boolean | undefined => {
+  //  return row.isBanned
+  //}
 
   return (
     <AppLayout>
@@ -91,9 +91,7 @@ export const ClientsBLPages = (): ReactElement => {
             data={clients}
             hiddenKeys={['id', 'isBanned', 'strikes']}
             // El tipo '(row: any) => boolean | undefined' no se puede asignar al tipo 'boolean | undefined'.ts(2322)
-            canSeeDelete={(r) => {
-              return r.isBanned
-            }}
+            canSeeDelete={false}
             canSeeEdit={false}
             watchFunction={restoreClient}
             customMoreBtn={{ icon: <LuReply />, title: 'Regresar' }}

@@ -130,6 +130,8 @@ export const CreateEditRentPage = (): ReactElement => {
 
   useEffect(() => {
     if (client_id !== undefined) {
+      console.log(client_id)
+
       handleSelectChange(client_id)
     }
   }, [client_id])
@@ -187,9 +189,12 @@ export const CreateEditRentPage = (): ReactElement => {
                 e.count
               )
 
+              const name = e.type_name
+              const dimension = e.dimension_name ? e.dimension_name : e.reference
+
               const option = {
                 value: `${e.type_id}-${e.dimension_id}-${e.reference}`,
-                label: `Rentado: ${e.type_name} - ${e.dimension_name ? e.dimension_name : e.reference} (${e.count})`
+                label: `Rentado: ${name} - ${dimension == null ? '' : dimension + ' '}(${e.count})`
               }
               if (inventory) {
                 setInventory([...inventory, option])
