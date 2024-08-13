@@ -12,17 +12,17 @@ export const useContracts = (): Contracts => {
   const createContract = async (formData: object, fileName: string): Promise<void> => {
     try {
       // !Modo PROD
-      // const response = await fetch('https://elcalifornioapi.techdreamscope.workers.dev/contracts', {
-      //   method: 'POST',
-      //   headers: headersList,
-      //   body: JSON.stringify({ formData })
-      // })
-
-      const response = await fetch('http://127.0.0.1:8787/contracts', {
+      const response = await fetch('https://elcalifornioapi.techdreamscope.workers.dev/contracts', {
         method: 'POST',
         headers: headersList,
         body: JSON.stringify({ formData })
       })
+
+      // const response = await fetch('http://127.0.0.1:8787/contracts', {
+      //   method: 'POST',
+      //   headers: headersList,
+      //   body: JSON.stringify({ formData })
+      // })
 
       if (!response.ok) {
         throw new Error('Network response was not ok')
@@ -46,16 +46,16 @@ export const useContracts = (): Contracts => {
   const createBillPdf = async (formData: object, fileName: string): Promise<void> => {
     try {
       // !Modo PROD
-      // const response = await fetch('https://elcalifornioapi.techdreamscope.workers.dev/bills', {
-      //   method: 'POST',
-      //   headers: headersList,
-      //   body: JSON.stringify({ formData })
-      // })
-      const response = await fetch('http://127.0.0.1:8787/bills', {
+      const response = await fetch('https://elcalifornioapi.techdreamscope.workers.dev/bills', {
         method: 'POST',
         headers: headersList,
         body: JSON.stringify({ formData })
       })
+      // const response = await fetch('http://127.0.0.1:8787/bills', {
+      //   method: 'POST',
+      //   headers: headersList,
+      //   body: JSON.stringify({ formData })
+      // })
 
       if (!response.ok) {
         throw new Error('Network response was not ok')
