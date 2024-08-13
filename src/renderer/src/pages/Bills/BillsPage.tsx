@@ -244,7 +244,7 @@ const CreateBillModal = ({
   const billSchema = Yup.object().shape({
     // cliente: Yup.string().required('Es un valor Obligatorio'),
     concepto: Yup.string(),
-    cantidad: Yup.number().positive().integer(),
+    cantidad: Yup.number().integer(),
     forma_pago: Yup.string(),
     factura: Yup.string(),
     razon_social: Yup.string(),
