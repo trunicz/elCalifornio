@@ -135,7 +135,7 @@ export function convertirNumeroALetras(num: number): string {
   }
 
   if (num === 0) {
-    return `$0.00 (CERO PESOS 00/100 M.N.)`
+    return 'CERO PESOS 00/100 M.N.'
   }
 
   const parteEntera: number = Math.floor(num)

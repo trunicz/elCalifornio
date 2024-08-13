@@ -83,10 +83,11 @@ export const RentPage = (): ReactElement => {
         const formData1 = {
           ...rent[0].formdata,
           folio: rent[0].id,
+          total_cost_number: Number(rent[0].formdata.total_cost) ?? 0,
           total_cost: convertirNumeroALetras(Number(rent[0].formdata.total_cost) ?? 0)
         }
 
-        console.log(rent[0].formdata)
+        console.log(formData1)
 
         await createContract(formData1, `Contrato_${rent[0].id}`).then(() => {
           setLoading(false)

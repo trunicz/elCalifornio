@@ -37,7 +37,7 @@ export const MainPage = (): ReactElement => {
               className="row-start-1 col-span-1 row-span-1"
               href="/rent/VENCIDO"
             >
-              {home.timeout_count_undeleted}/{home.timeout_count}
+              {home.timeout_count_undeleted}
             </Widget>
             <Widget
               color="info"

@@ -239,6 +239,8 @@ const CreateBillModal = ({
 }): ReactElement => {
   const { user } = useAuthStore()
 
+  console.log(row)
+
   const billSchema = Yup.object().shape({
     // cliente: Yup.string().required('Es un valor Obligatorio'),
     concepto: Yup.string(),
@@ -257,6 +259,7 @@ const CreateBillModal = ({
   })
 
   const submit = (data: any): void => {
+    console.log(data)
     const { cliente, fecha_final, fecha_inicial, id } = row
     console.log(row)
 
