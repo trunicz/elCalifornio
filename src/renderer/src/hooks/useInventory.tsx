@@ -89,28 +89,56 @@ export const useInventory = (): InventoryMethods => {
     quantity: number
   ): Promise<any | null> => {
     try {
-      const { data, error } = await supabase
-        .from('equipment')
-        .select('id')
-        .eq('type', type)
-        .eq('dimension', dimension)
-        .eq('status', 1)
-        .is('deleted_at', null)
-        .order('id', { ascending: true })
-        .limit(quantity)
-      if (error) {
-        throw error
-      }
-      const ids = data?.map((obj: { id: any }) => obj.id)
+      console.log(quantity, dimension ?? 0, type)
 
-      if (!ids || ids.length === 0) {
-        return null
-      }
+      if (dimension) {
+        const { data, error } = await supabase
+          .from('equipment')
+          .select('id')
+          .eq('type', type)
+          .eq('dimension', dimension)
+          .eq('status', 1)
+          .is('deleted_at', null)
+          .order('id', { ascending: true })
+          .limit(quantity)
+        if (error) {
+          throw error
+        }
+        const ids = data?.map((obj: { id: any }) => obj.id)
+        console.log(ids)
 
-      for (const id of ids) {
-        await deleteEquipment(id)
+        if (!ids || ids.length === 0) {
+          return null
+        }
+
+        for (const id of ids) {
+          await deleteEquipment(id)
+        }
+        return data
+      } else {
+        const { data, error } = await supabase
+          .from('equipment')
+          .select('id')
+          .eq('type', type)
+          .eq('status', 1)
+          .is('deleted_at', null)
+          .order('id', { ascending: true })
+          .limit(quantity)
+        if (error) {
+          throw error
+        }
+        const ids = data?.map((obj: { id: any }) => obj.id)
+        console.log(ids)
+
+        if (!ids || ids.length === 0) {
+          return null
+        }
+
+        for (const id of ids) {
+          await deleteEquipment(id)
+        }
+        return data
       }
-      return data
     } catch (error) {
       console.error(error)
     }
