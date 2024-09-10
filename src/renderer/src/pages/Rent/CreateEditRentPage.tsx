@@ -68,6 +68,7 @@ export const CreateEditRentPage = (): ReactElement => {
   const { user } = useAuthStore()
   const { id } = useParams()
   const [buildAddress, setBuildAddress] = useState<any>()
+  const [reference, setReference] = useState<any>()
   const [quantities, setQuantities] = useState({})
   const { setLoading } = useLoadingStore()
 
@@ -175,12 +176,14 @@ export const CreateEditRentPage = (): ReactElement => {
         }
         if (id && clients) {
           const rent: any = await getRentalForEdit(id)
+          console.log(rent)
           if (rent) {
             const client = clients.find((c) => c.value === rent.client_id) ?? {}
             setBuildAddress(rent.buildAddress)
             updateSelectClientId(client)
             setEndDateValue(formatDate(new Date(rent.end_date)))
             setBuildAddress(rent.building_address)
+            setReference(rent.reference)
 
             rent.equipments.map((e: any) => {
               handleQuantityChange(
@@ -246,7 +249,8 @@ export const CreateEditRentPage = (): ReactElement => {
         client_id: selectClientID?.value,
         advance_payment: advicePayment ? advicePayment : 0,
         paid: advicePayment ? advicePayment : 0,
-        building_address: data.building_address,
+        building_address: buildAddress,
+        reference,
         user_id: user?.id,
         end_date: endDate?.value,
         equipments_id: equipment,
@@ -264,8 +268,9 @@ export const CreateEditRentPage = (): ReactElement => {
         client_id: selectClientID?.value,
         advance_payment: advicePayment ? advicePayment : 0,
         paid: advicePayment ? advicePayment : 0,
-        building_address: data.building_address,
+        building_address: buildAddress,
         user_id: user?.id,
+        reference,
         end_date: endDateValue ? new Date(endDateValue).toISOString() : new Date(),
         equipments_id: equipment,
         total_cost: currentCost,
@@ -583,6 +588,15 @@ export const CreateEditRentPage = (): ReactElement => {
                         {errors.building_address ? 'Ingresa una fecha valida' : ''}
                       </p>
                     ) : null}
+                  </div>
+                  <div className="w-full p-4">
+                    <label className="block mb-2">Referencia:</label>
+                    <input
+                      type="text"
+                      className="w-full rounded-lg border-2 border-gray-200 py-2 px-4"
+                      value={reference}
+                      onChange={(e) => setReference(e.target.value)}
+                    />
                   </div>
                 </>
               ) : (

@@ -8,13 +8,13 @@ const app = new Hono()
 app.use(
   '/bills',
   cors({
-    origin: ['https://elcalifornio.pages.dev', 'http://localhost:5173']
+    origin: '*'
   })
 )
 app.use(
   '/contracts',
   cors({
-    origin: ['https://elcalifornio.pages.dev', 'http://localhost:5173']
+    origin: '*'
   })
 )
 
