@@ -44,6 +44,7 @@ export interface FormField {
   value?: string | number
   isVisible?: boolean
   className?: string
+  multiple?: boolean
 }
 export type SelectOptions = { value: any; label: string }[] | null
 
@@ -142,6 +143,7 @@ export const Form = ({
                     id={field?.name}
                     options={field?.options}
                     placeholder={field?.placeholder}
+                    multiple={field?.multiple}
                     {...register(field?.name)}
                   />
                   {errors[field?.name]?.message ? (

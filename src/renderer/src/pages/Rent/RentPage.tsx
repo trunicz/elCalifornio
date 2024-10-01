@@ -29,6 +29,7 @@ import { useLoadingStore } from '@renderer/stores/useLoading'
 import { useUpdater } from '@renderer/hooks/useUpdater'
 import { convertirNumeroALetras } from '@renderer/utils'
 import { useBills } from '@renderer/stores/useBills'
+import { useAdmin } from '@renderer/hooks/useAdmin'
 
 export const RentPage = (): ReactElement => {
   const { getAllRentals, rentals, getRow } = useRentals()
@@ -42,12 +43,42 @@ export const RentPage = (): ReactElement => {
   const { updateDueRents } = useUpdater()
   const [isLoaded, setLoaded] = useState<boolean>(false)
   const { createBill } = useBills()
+  const { getUsers } = useAdmin()
+  const [receivers, setReceivers] = useState<Array<{ value: string; label: string }>>()
 
   const loadFunction = (): void => {
-    getAllRentals().then((res) => {
+    getAllRentals().then((res: any) => {
+      const fixEquipmentPresentation = res.map((rent) => {
+        const fixEquipment = rent.equipo.map((equipment) => {
+          return equipment.equipo_info
+        })
+
+        const counts = fixEquipment.reduce((acc, item) => {
+          acc[item] = (acc[item] || 0) + 1
+          return acc
+        }, {})
+
+        const uniqueStrings = fixEquipment.filter(
+          (item, index) => fixEquipment.indexOf(item) === index
+        )
+
+        const result = uniqueStrings.map((item) => `(${counts[item]}) ${item}`)
+
+        rent.equipo = result
+        return rent
+      })
+      console.log(fixEquipmentPresentation)
+
       setRentList(res)
     })
     updateDueRents().then(() => setLoaded(true))
+    getUsers().then((res: any) => {
+      const rec = res.map((r: any) => ({
+        label: `${r.nombre.toUpperCase()} ${r.apellido.toUpperCase()}`,
+        value: `${r.nombre}`
+      }))
+      setReceivers(rec)
+    })
   }
 
   useEffect(() => {
@@ -66,6 +97,7 @@ export const RentPage = (): ReactElement => {
             closeModal={closeModal}
             createBill={createBill}
             loadFunction={loadFunction}
+            receivers={receivers}
           />
         )
       }
@@ -273,88 +305,108 @@ const CreateBillModal = ({
   closeModal,
   row,
   createBill,
-  loadFunction
+  loadFunction,
+  receivers
 }: {
   closeModal: () => Promise<void>
   row: any
   createBill: any
   loadFunction: any
+  receivers: any
 }): ReactElement => {
-  const { user } = useAuthStore()
-
   const billSchema = Yup.object().shape({
-    // cliente: Yup.string().required('Es un valor Obligatorio'),
     concepto: Yup.string(),
     cantidad: Yup.number().integer(),
     forma_pago: Yup.string(),
     factura: Yup.string(),
     razon_social: Yup.string(),
-    // recibidor: Yup.string(),
-    // cliente_firma: Yup.string(),
-    // sub_total: Yup.number(),
-    // iva: Yup.number(),
-    // ref_contrato: Yup.string(),
-    // estatus: Yup.string(),
-    // fecha_vencimiento: Yup.string(),
     fecha_extension: Yup.string()
   })
 
+  // Estado para guardar la selección de equipos
+  const [selectedEquipos, setSelectedEquipos] = useState<{ [key: string]: boolean }>({})
+
+  useEffect(() => {
+    // Inicializar el estado de los equipos
+    const initialEquiposState = row.equipo.reduce((acc: any, equipo: any) => {
+      acc[equipo.equipo] = false
+      return acc
+    }, {})
+    setSelectedEquipos(initialEquiposState)
+  }, [row.equipo])
+
+  const handleEquipoChange = (equipo: string): void => {
+    setSelectedEquipos((prevState) => ({
+      ...prevState,
+      [equipo]: !prevState[equipo]
+    }))
+  }
+
   const submit = (data: any): void => {
+    console.log(data)
     const { cliente, fecha_final, fecha_inicial, id } = row
     const ref_contrato = `contrato${fecha_inicial.replaceAll('/', '')}${cliente[0]}${id}`
-
-    console.log(data)
-
     const formatDate = (date: string): string => {
-      if (date === '') {
-        return ''
-      }
+      if (date === '') return ''
       const [year, month, day] = date.split('-')
-      // TODO: Convertir - a /, pero el año como pasaría con formato de dos cifras o de 4 cifras.
       return Number(year) > 1000 ? `${day}/${month}/${year}` : date.replaceAll('-', '/')
     }
 
-    const subtotal = data.iva_incluido ? data.cantidad / 1.16 : data.cantidad
-    const total = data.iva_incluido ? data.cantidad : data.cantidad * 1.16
+    const iva = data.aplicar_iva ? data.cantidad * 0.16 : 0
+    const total = data.aplicar_iva ? data.cantidad * 1.16 : data.cantidad
+
+    // Filtrar equipos seleccionados
+    const equiposSeleccionados = Object.keys(selectedEquipos).filter(
+      (equipo) => selectedEquipos[equipo]
+    )
+
+    console.log(equiposSeleccionados)
 
     const bill = {
       rent_id: id,
       cliente,
       concepto: data.concepto,
-      cantidad: convertirNumeroALetras(data.cantidad), // TODO: Pendiente decirle si con iva incluído o no.
+      cantidad: convertirNumeroALetras(data.cantidad),
       forma_pago: data.forma_pago,
       factura: data.factura,
       razon_social: data.razon_social,
-      recibidor: user?.user_metadata.name
-        ? user?.user_metadata.name + ' ' + user?.user_metadata.last_name
-        : 'ElCalifornio',
+      recibidor: data.recibidor,
       cliente_firma: cliente,
-      sub_total: subtotal.toFixed(2),
-      iva: (data.cantidad * 0.16).toFixed(2),
+      sub_total: data.cantidad.toFixed(2),
+      iva: iva,
       ref_contrato,
       estatus:
         data.concepto === 'RENOVACIÓN/ENTREGA' || data.concepto === 'RENOVACIÓN'
           ? 'VIGENCIA'
           : 'ENTREGADO',
       fecha_vencimiento: fecha_final,
-      fecha_extension: formatDate(data.fecha_extension), // TODO: Si no has puesto la fecha, que.
+      fecha_extension: formatDate(data.fecha_extension),
       dia: new Date().getDate(),
       mes: new Date().getMonth() + 1,
       anio: new Date().getFullYear(),
       total: total.toFixed(2)
     }
+
     createBill(bill).then(() => {
       closeModal().then(() => loadFunction())
     })
   }
+
   return (
     <Form
-      className="mx-auto overflow-y-auto auto-rows-max grid md:grid-cols-2 lg:grid-cols-2 gap-2"
+      className="mx-auto overflow-y-auto auto-rows-max grid md:grid-cols-4 lg:grid-cols-4 gap-4"
       hasRequiereMessage={false}
       formDirection="col"
       onSubmit={submit}
       validationSchema={billSchema}
       fields={[
+        {
+          name: 'recibidor',
+          label: 'Recibidor',
+          as: 'select',
+          options: [...receivers],
+          className: 'col-span-full'
+        },
         {
           name: 'concepto',
           label: 'Concepto',
@@ -392,8 +444,7 @@ const CreateBillModal = ({
           label: 'Cantidad',
           as: 'input',
           type: 'number',
-          placeholder: '500',
-          isVisible: true
+          placeholder: '500'
         },
         {
           name: 'fecha_extension',
@@ -402,21 +453,39 @@ const CreateBillModal = ({
           type: 'date'
         },
         {
-          name: 'iva_incluido',
+          name: 'aplicar_iva',
           label: 'IVA incluído',
           as: 'input',
           type: 'checkbox',
-          className: 'col-span-full'
+          className: ''
         },
         {
           name: 'razon_social',
           label: 'Razon Social',
           as: 'input',
           type: 'text',
-          className: 'col-span-full'
+          className: 'col-span-3'
         }
       ]}
     >
+      <div key="00" className="w-100 col-span-full">
+        <h2 className="text-start font-bold">Entrega parcial</h2>
+        <ul className="text-start my-4 flex flex-col">
+          {row.equipo.map((e: any, index: number) => (
+            <label key={index} className="flex gap-3">
+              <input
+                type="checkbox"
+                className="w-5"
+                id={e.equipo}
+                name={`${index}`}
+                checked={selectedEquipos[e.equipo] || false}
+                onChange={() => handleEquipoChange(e.equipo)}
+              />
+              {e.equipo}
+            </label>
+          ))}
+        </ul>
+      </div>
       <div className="flex gap-4 col-span-full">
         <Button color="danger" type="button" text="Cancelar" onClick={closeModal} />
         <Button color="success" type="submit" text="Enviar" />
@@ -424,29 +493,3 @@ const CreateBillModal = ({
     </Form>
   )
 }
-
-// interface NestedObject {
-//   [key: string]: string | NestedObject
-// }
-
-// function renderNestedObject(obj: any): ReactNode {
-//   if (obj === null || typeof obj !== 'object') return obj
-
-//   const _obj = obj as NestedObject
-
-//   return (
-//     <div className="grid auto-cols-fr overflow-hidden auto-rows-min gap-1">
-//       {Object.values(_obj).map((value, index) => {
-//         if (typeof value === 'object') {
-//           return <div key={index}>{renderNestedObject(value)}</div>
-//         } else {
-//           return (
-//             <span key={index} className="bg-gray-200 p-2 rounded-lg">
-//               {value}
-//             </span>
-//           )
-//         }
-//       })}
-//     </div>
-//   )
-// }

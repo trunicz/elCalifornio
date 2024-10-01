@@ -10,6 +10,7 @@ interface InputProps {
   value: string | number
   className?: string
   placeholder?: string
+  multiple?: boolean
   onChange?: (e: any) => void
 }
 
@@ -24,6 +25,7 @@ const Input: ForwardRefRenderFunction<
     value,
     className,
     placeholder,
+    multiple = false,
     onChange = (): void => {},
     ...props
   }: InputProps,
@@ -61,6 +63,7 @@ const Input: ForwardRefRenderFunction<
           ref={ref as MutableRefObject<HTMLSelectElement>}
           className={cn('w-full', className)}
           value={value as string}
+          multiple={multiple}
           {...props}
         >
           {options.map((option, index) => (

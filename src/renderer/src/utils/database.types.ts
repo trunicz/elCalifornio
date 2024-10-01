@@ -1,6 +1,37 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       bills: {
@@ -11,6 +42,7 @@ export type Database = {
           cliente_firma: string
           concepto: string
           created_at: string
+          deleted_at: string | null
           dia: string
           estatus: string
           factura: string
@@ -34,6 +66,7 @@ export type Database = {
           cliente_firma: string
           concepto: string
           created_at?: string
+          deleted_at?: string | null
           dia: string
           estatus: string
           factura: string
@@ -57,6 +90,7 @@ export type Database = {
           cliente_firma?: string
           concepto?: string
           created_at?: string
+          deleted_at?: string | null
           dia?: string
           estatus?: string
           factura?: string
@@ -339,6 +373,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "equipment_dimension_fkey"
+            columns: ["dimension"]
+            isOneToOne: false
+            referencedRelation: "all_inventory1"
+            referencedColumns: ["dimension_id"]
+          },
           {
             foreignKeyName: "equipment_dimension_fkey"
             columns: ["dimension"]
@@ -700,6 +741,7 @@ export type Database = {
           id: number
           items_returned: boolean | null
           paid: number
+          reference: string | null
           status: string
           total_cost: string
           updated_at: string
@@ -717,6 +759,7 @@ export type Database = {
           id?: number
           items_returned?: boolean | null
           paid?: number
+          reference?: string | null
           status: string
           total_cost: string
           updated_at?: string
@@ -734,6 +777,7 @@ export type Database = {
           id?: number
           items_returned?: boolean | null
           paid?: number
+          reference?: string | null
           status?: string
           total_cost?: string
           updated_at?: string
@@ -1022,6 +1066,20 @@ export type Database = {
         }
         Relationships: []
       }
+      all_inventory1: {
+        Row: {
+          cantidad: number | null
+          dimensión: string | null
+          dimension_id: number | null
+          disponibles: number | null
+          en_renta: number | null
+          id: number[] | null
+          referencias: string[] | null
+          tipo_herramienta: string | null
+          tipo_id: number | null
+        }
+        Relationships: []
+      }
       all_logs: {
         Row: {
           acción: string | null
@@ -1133,6 +1191,7 @@ export type Database = {
           end_date: string | null
           equipments: Json | null
           id: number | null
+          reference: string | null
         }
         Insert: {
           advance_payment?: string | null
@@ -1141,6 +1200,7 @@ export type Database = {
           end_date?: string | null
           equipments?: never
           id?: number | null
+          reference?: string | null
         }
         Update: {
           advance_payment?: string | null
@@ -1149,6 +1209,7 @@ export type Database = {
           end_date?: string | null
           equipments?: never
           id?: number | null
+          reference?: string | null
         }
         Relationships: [
           {
@@ -1166,12 +1227,26 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
-      check_equipment_dimension: {
+      check_equipment_dimension:
+        | {
+            Args: {
+              rental_id: number
+              dimension_id: number
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              rental_id: number
+              dimension_ids: number[]
+            }
+            Returns: boolean
+          }
+      convert_array_to_list: {
         Args: {
-          rental_id: number
-          dimension_id: number
+          input_array: number[]
         }
-        Returns: boolean
+        Returns: number[]
       }
       count_equipment_type: {
         Args: {

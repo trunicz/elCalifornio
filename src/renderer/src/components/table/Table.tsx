@@ -155,7 +155,7 @@ function renderNestedObject(obj: unknown): ReactNode {
           return (
             <span
               key={index}
-              className="px-2 overflow-ellipsis text-base rounded-md bg-blue-500 text-white"
+              className="px-2 overflow-ellipsis text-base border-b bg-blue-500 text-white"
             >
               {value}
             </span>

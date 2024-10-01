@@ -1,21 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppLayout, Button, Form, useModal } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
+import { useAdmin } from '@renderer/hooks/useAdmin'
 import { useContracts } from '@renderer/hooks/useContracts'
-import { useAuthStore } from '@renderer/stores/useAuth'
 import { useBills } from '@renderer/stores/useBills'
 import { cn, convertirNumeroALetras } from '@renderer/utils'
 import { Fragment, ReactElement, useEffect, useState } from 'react'
-import { LuBadgeDollarSign, LuDownloadCloud } from 'react-icons/lu'
+import { IoWarning } from 'react-icons/io5'
+import { LuBadgeDollarSign, LuDownloadCloud, LuX } from 'react-icons/lu'
 import * as Yup from 'yup'
 
 export const BillsPage = (): ReactElement => {
-  const { bills, getAllBills } = useBills()
+  const { bills, getAllBills, deleteBill } = useBills()
   const [headers, setHeaders] = useState<any[]>()
+  const [receivers, setReceivers] = useState<Array<{ value: string; label: string }>>()
   const hiddenKeys = ['id', 'equipo', 'recibos', 'iscompleted']
   const { Modal, openModal, closeModal } = useModal()
   const { createBill } = useBills()
   const { createBillPdf } = useContracts()
+  const { getUsers } = useAdmin()
+  const [modalTitle, setModalTitle] = useState<string>('Crear Recibo')
 
   useEffect(() => {
     load()
@@ -35,13 +39,20 @@ export const BillsPage = (): ReactElement => {
           : []
       )
     })
+    getUsers().then((res: any) => {
+      const rec = res.map((r: any) => ({
+        label: `${r.nombre.toUpperCase()} ${r.apellido.toUpperCase()}`,
+        value: `${r.nombre}`
+      }))
+      setReceivers(rec)
+    })
   }
 
   return (
     <AppLayout>
       <AppLayout.Content>
         <AppLayout.PageOptions pageTitle="Recibos" hasAddButton={false} />
-        <Modal title="Crear Recibo" className="w-1/2 xl:w-1/3" />
+        <Modal title={modalTitle} className="w-1/2 xl:w-1/3" />
         {bills && headers ? (
           <section className="flex flex-col gap-4 overflow-x-auto">
             <table className="min-w-full text-sm">
@@ -71,6 +82,9 @@ export const BillsPage = (): ReactElement => {
                       createBill={createBill}
                       loadFunction={load}
                       createBillPdf={createBillPdf}
+                      receivers={receivers}
+                      setModalTitle={setModalTitle}
+                      deleteBill={deleteBill}
                     />
                   ) : (
                     <tr key={rowIndex}>
@@ -100,6 +114,9 @@ const RenderBillRow = ({
   createBill,
   loadFunction,
   createBillPdf,
+  receivers,
+  setModalTitle,
+  deleteBill,
   ...props
 }: {
   row: any
@@ -110,6 +127,9 @@ const RenderBillRow = ({
   createBill: any
   loadFunction: any
   createBillPdf: any
+  receivers: any
+  setModalTitle: any
+  deleteBill: any
 }): ReactElement => {
   const [isVisible, setVisible] = useState<boolean>(false)
 
@@ -154,6 +174,7 @@ const RenderBillRow = ({
                   row={row}
                   closeModal={closeModal}
                   loadFunction={loadFunction}
+                  receivers={receivers}
                 />
               )
             }}
@@ -166,6 +187,52 @@ const RenderBillRow = ({
             <div className="p-4 bg-gray-50 flex flex-col gap-4">
               {row.recibos?.map((recibo: any, index: number) => (
                 <div key={index} className="mb-2 border p-4 bg-white rounded-xl flex">
+                  <div className="flex items-center pe-4">
+                    <button
+                      className="p-4 rounded-xl text-center text-xl flex justify-center items-center hover:bg-gray-100 transition-all active:bg-red-200/25 hover:text-red-600 h-auto"
+                      onClick={() => {
+                        setModalTitle('Eliminar Recibo')
+                        openModal(
+                          <>
+                            <div className="flex flex-col gap-4">
+                              <div className="flex-1 animate-jump flex justify-center items-center text-9xl text-amber-500">
+                                <IoWarning />
+                              </div>
+                              <div>
+                                <p>Al realizar esta acción no se podrá deshacer</p>
+                                <p>¿Quiere continuar?</p>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  className="animate-fade animate-ease-out animate-duration-200"
+                                  color="danger"
+                                  text="cancelar"
+                                  onClick={() =>
+                                    closeModal().then(() => {
+                                      setModalTitle('Crear Recibo')
+                                    })
+                                  }
+                                />
+                                <Button
+                                  className="animate-fade animate-ease-out animate-duration-200"
+                                  color="success"
+                                  text="aceptar"
+                                  onClick={() => {
+                                    deleteBill(recibo.id).then(() => {
+                                      closeModal()
+                                      loadFunction()
+                                    })
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </>
+                        )
+                      }}
+                    >
+                      <LuX />
+                    </button>
+                  </div>
                   <div>
                     <div className="flex items-center mb-1">
                       <strong className="text-gray-700 w-24">Cliente:</strong>
@@ -194,6 +261,7 @@ const RenderBillRow = ({
                           delete formData.id
                           delete formData.rent_id
                           delete formData.created_at
+                          delete formData.deleted_at
                           createBillPdf(formData, `Recibo_${folio}`)
                         } catch (error) {
                           console.error(error)
@@ -230,75 +298,81 @@ const CreateBillModal = ({
   closeModal,
   row,
   createBill,
-  loadFunction
+  loadFunction,
+  receivers
 }: {
   closeModal: () => Promise<void>
   row: any
   createBill: any
   loadFunction: any
-}): ReactElement => {
-  const { user } = useAuthStore()
-
-  console.log(row)
+  receivers: any
+}): React.ReactElement => {
+  const { restoreBillEquipment } = useBills()
 
   const billSchema = Yup.object().shape({
-    // cliente: Yup.string().required('Es un valor Obligatorio'),
     concepto: Yup.string(),
     cantidad: Yup.number().integer(),
     forma_pago: Yup.string(),
     factura: Yup.string(),
     razon_social: Yup.string(),
-    // recibidor: Yup.string(),
-    // cliente_firma: Yup.string(),
-    // sub_total: Yup.number(),
-    // iva: Yup.number(),
-    // ref_contrato: Yup.string(),
-    // estatus: Yup.string(),
-    // fecha_vencimiento: Yup.string(),
     fecha_extension: Yup.string()
   })
 
-  const submit = (data: any): void => {
-    console.log(data)
-    const { cliente, fecha_final, fecha_inicial, id } = row
-    console.log(row)
+  // Estado para guardar la selección de equipos
+  const [selectedEquipos, setSelectedEquipos] = useState<{ [key: string]: boolean }>({})
 
-    console.log(fecha_inicial)
+  useEffect(() => {
+    // Inicializar el estado de los equipos
+    const initialEquiposState = row.equipo.reduce((acc: any, equipo: any) => {
+      acc[equipo.equipment_id] = false // El ID es único para cada equipo
+      return acc
+    }, {})
+    setSelectedEquipos(initialEquiposState)
+  }, [row.equipo])
+
+  const handleEquipoChange = (equipoId: any): void => {
+    setSelectedEquipos((prevState) => ({
+      ...prevState,
+      [equipoId]: !prevState[equipoId]
+    }))
+  }
+
+  const submit = (data: any): void => {
+    const { cliente, fecha_final, fecha_inicial, id } = row
 
     const ref_contrato = `contrato${fecha_inicial.replaceAll('/', '')}${cliente[0]}${id}`
 
-    const recibidor =
-      user?.user_metadata.name && user?.user_metadata.lastname
-        ? user?.user_metadata.name + ' ' + user?.user_metadata.lastname
-        : 'ElCalifornio'
-
-    console.log(recibidor)
-
-    const formatDate = (date: string): string => {
-      if (date === '') {
-        return ''
-      }
+    const formatDate = (date: any): string => {
+      if (date === '') return ''
       const [year, month, day] = date.split('-')
-      // TODO: Convertir - a /, pero el año como pasaría con formato de dos cifras o de 4 cifras.
-
       return Number(year) > 1000 ? `${day}/${month}/${year}` : date.replaceAll('-', '/')
     }
 
-    const subtotal = data.iva_incluido ? data.cantidad / 1.16 : data.cantidad
-    const total = data.iva_incluido ? data.cantidad : data.cantidad * 1.16
+    const iva = data.aplicar_iva ? data.cantidad * 0.16 : 0
+    const total = data.aplicar_iva ? data.cantidad * 1.16 : data.cantidad
+
+    // Filtrar los equipos seleccionados
+    const equiposSeleccionados = row.equipo.filter(
+      (equipo: any) => selectedEquipos[equipo.equipment_id]
+    )
+
+    // Crear el array de objetos con cantidad, id, y equipo_info
+    const equiposFormatted = equiposSeleccionados.map((equipo: any) => {
+      return equipo.equipo_info
+    })
 
     const bill = {
       rent_id: id,
       cliente,
       concepto: data.concepto,
-      cantidad: convertirNumeroALetras(data.cantidad), // TODO: Pendiente decirle si con iva incluído o no.
+      cantidad: convertirNumeroALetras(data.cantidad),
       forma_pago: data.forma_pago,
       factura: data.factura,
       razon_social: data.razon_social,
-      recibidor,
+      recibidor: data.recibidor,
       cliente_firma: cliente,
-      sub_total: subtotal.toFixed(2),
-      iva: (data.cantidad * 0.16).toFixed(2),
+      sub_total: data.cantidad.toFixed(2),
+      iva: iva,
       ref_contrato,
       estatus:
         data.concepto === 'RENOVACIÓN/ENTREGA' || data.concepto === 'RENOVACIÓN'
@@ -309,20 +383,36 @@ const CreateBillModal = ({
       dia: new Date().getDate(),
       mes: new Date().getMonth() + 1,
       anio: new Date().getFullYear(),
-      total: total.toFixed(2)
+      total: total.toFixed(2),
+      equipos: equiposFormatted.join('\n')
     }
+
+    const selectedEquipmentToRemove = Object.keys(selectedEquipos).filter(
+      (key) => selectedEquipos[key]
+    )
+
     createBill(bill).then(() => {
-      closeModal().then(() => loadFunction())
+      restoreBillEquipment(selectedEquipmentToRemove.map((e) => Number.parseInt(e))).then(() => {
+        closeModal().then(() => loadFunction())
+      })
     })
   }
+
   return (
     <Form
-      className="mx-auto overflow-y-auto auto-rows-max grid md:grid-cols-2 lg:grid-cols-2 gap-2"
+      className="mx-auto overflow-y-auto auto-rows-max grid md:grid-cols-4 lg:grid-cols-4 gap-4"
       hasRequiereMessage={false}
       formDirection="col"
       onSubmit={submit}
       validationSchema={billSchema}
       fields={[
+        {
+          name: 'recibidor',
+          label: 'Recibidor',
+          as: 'select',
+          options: [...receivers],
+          className: 'col-span-full'
+        },
         {
           name: 'concepto',
           label: 'Concepto',
@@ -373,17 +463,36 @@ const CreateBillModal = ({
           label: 'IVA incluído',
           as: 'input',
           type: 'checkbox',
-          className: 'col-span-full'
+          className: ''
         },
         {
           name: 'razon_social',
           label: 'Razon Social',
           as: 'input',
           type: 'text',
-          className: 'col-span-full'
+          className: 'col-span-3'
         }
       ]}
     >
+      <div key="00" className="w-100 col-span-full">
+        <h2 className="text-start font-bold">Entrega parcial</h2>
+        <ul className="text-start my-4 flex flex-col">
+          {row.equipo.map((e, index) => (
+            <label key={index} className="flex gap-3">
+              <input
+                type="checkbox"
+                className="w-5"
+                id={e.equipment_id}
+                name={`${e.equipment_id}`}
+                checked={selectedEquipos[e.equipment_id] || false}
+                onChange={() => handleEquipoChange(e.equipment_id)}
+              />
+              <span className="px-1 bg-blue-500 text-white rounded-md">{e.cantidad}</span>
+              {e.equipo_info}
+            </label>
+          ))}
+        </ul>
+      </div>
       <div className="flex gap-4 col-span-full">
         <Button color="danger" type="button" text="Cancelar" onClick={closeModal} />
         <Button color="success" type="submit" text="Enviar" />
