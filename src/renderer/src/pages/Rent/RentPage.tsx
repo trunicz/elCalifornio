@@ -313,7 +313,9 @@ const CreateBillModal = ({
   createBill: any
   loadFunction: any
   receivers: any
-}): ReactElement => {
+}): React.ReactElement => {
+  const { restoreBillEquipment } = useBills()
+
   const billSchema = Yup.object().shape({
     concepto: Yup.string(),
     cantidad: Yup.number().integer(),
@@ -329,24 +331,25 @@ const CreateBillModal = ({
   useEffect(() => {
     // Inicializar el estado de los equipos
     const initialEquiposState = row.equipo.reduce((acc: any, equipo: any) => {
-      acc[equipo.equipo] = false
+      acc[equipo.equipment_id] = false // El ID es único para cada equipo
       return acc
     }, {})
     setSelectedEquipos(initialEquiposState)
   }, [row.equipo])
 
-  const handleEquipoChange = (equipo: string): void => {
+  const handleEquipoChange = (equipoId: any): void => {
     setSelectedEquipos((prevState) => ({
       ...prevState,
-      [equipo]: !prevState[equipo]
+      [equipoId]: !prevState[equipoId]
     }))
   }
 
   const submit = (data: any): void => {
-    console.log(data)
     const { cliente, fecha_final, fecha_inicial, id } = row
+
     const ref_contrato = `contrato${fecha_inicial.replaceAll('/', '')}${cliente[0]}${id}`
-    const formatDate = (date: string): string => {
+
+    const formatDate = (date: any): string => {
       if (date === '') return ''
       const [year, month, day] = date.split('-')
       return Number(year) > 1000 ? `${day}/${month}/${year}` : date.replaceAll('-', '/')
@@ -355,12 +358,15 @@ const CreateBillModal = ({
     const iva = data.aplicar_iva ? data.cantidad * 0.16 : 0
     const total = data.aplicar_iva ? data.cantidad * 1.16 : data.cantidad
 
-    // Filtrar equipos seleccionados
-    const equiposSeleccionados = Object.keys(selectedEquipos).filter(
-      (equipo) => selectedEquipos[equipo]
+    // Filtrar los equipos seleccionados
+    const equiposSeleccionados = row.equipo.filter(
+      (equipo: any) => selectedEquipos[equipo.equipment_id]
     )
 
-    console.log(equiposSeleccionados)
+    // Crear el array de objetos con cantidad, id, y equipo_info
+    const equiposFormatted = equiposSeleccionados.map((equipo: any) => {
+      return equipo.equipo_info
+    })
 
     const bill = {
       rent_id: id,
@@ -384,11 +390,18 @@ const CreateBillModal = ({
       dia: new Date().getDate(),
       mes: new Date().getMonth() + 1,
       anio: new Date().getFullYear(),
-      total: total.toFixed(2)
+      total: total.toFixed(2),
+      equipos: equiposFormatted.join('\n')
     }
 
+    const selectedEquipmentToRemove = Object.keys(selectedEquipos).filter(
+      (key) => selectedEquipos[key]
+    )
+
     createBill(bill).then(() => {
-      closeModal().then(() => loadFunction())
+      restoreBillEquipment(selectedEquipmentToRemove.map((e) => Number.parseInt(e))).then(() => {
+        closeModal().then(() => loadFunction())
+      })
     })
   }
 
@@ -471,17 +484,18 @@ const CreateBillModal = ({
       <div key="00" className="w-100 col-span-full">
         <h2 className="text-start font-bold">Entrega parcial</h2>
         <ul className="text-start my-4 flex flex-col">
-          {row.equipo.map((e: any, index: number) => (
+          {row.equipo.map((e, index) => (
             <label key={index} className="flex gap-3">
               <input
                 type="checkbox"
                 className="w-5"
-                id={e.equipo}
-                name={`${index}`}
-                checked={selectedEquipos[e.equipo] || false}
-                onChange={() => handleEquipoChange(e.equipo)}
+                id={e.equipment_id}
+                name={`${e.equipment_id}`}
+                checked={selectedEquipos[e.equipment_id] || false}
+                onChange={() => handleEquipoChange(e.equipment_id)}
               />
-              {e.equipo}
+              <span className="px-1 bg-blue-500 text-white rounded-md">{e.cantidad}</span>
+              {e.equipo_info}
             </label>
           ))}
         </ul>
