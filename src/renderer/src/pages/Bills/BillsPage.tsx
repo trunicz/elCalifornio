@@ -392,7 +392,10 @@ const CreateBillModal = ({
     )
 
     createBill(bill).then(() => {
-      restoreBillEquipment(selectedEquipmentToRemove.map((e) => Number.parseInt(e))).then(() => {
+      restoreBillEquipment(
+        id,
+        selectedEquipmentToRemove.map((e) => Number.parseInt(e))
+      ).then(() => {
         closeModal().then(() => loadFunction())
       })
     })

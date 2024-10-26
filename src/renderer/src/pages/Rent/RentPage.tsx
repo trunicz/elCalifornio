@@ -49,9 +49,13 @@ export const RentPage = (): ReactElement => {
   const loadFunction = (): void => {
     getAllRentals().then((res: any) => {
       const fixEquipmentPresentation = res.map((rent) => {
-        const fixEquipment = rent.equipo.map((equipment) => {
-          return equipment.equipo_info
-        })
+        const fixEquipment = rent.equipo
+          ? rent.equipo.map((equipment) => {
+              if (equipment) return equipment.equipo_info
+
+              return null
+            })
+          : []
 
         const counts = fixEquipment.reduce((acc, item) => {
           acc[item] = (acc[item] || 0) + 1
@@ -399,7 +403,10 @@ const CreateBillModal = ({
     )
 
     createBill(bill).then(() => {
-      restoreBillEquipment(selectedEquipmentToRemove.map((e) => Number.parseInt(e))).then(() => {
+      restoreBillEquipment(
+        id,
+        selectedEquipmentToRemove.map((e) => Number.parseInt(e))
+      ).then(() => {
         closeModal().then(() => loadFunction())
       })
     })
