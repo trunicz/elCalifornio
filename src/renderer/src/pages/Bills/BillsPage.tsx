@@ -323,7 +323,7 @@ const CreateBillModal = ({
 
   useEffect(() => {
     // Inicializar el estado de los equipos
-    const initialEquiposState = row.equipo.reduce((acc: any, equipo: any) => {
+    const initialEquiposState = row.equipo?.reduce((acc: any, equipo: any) => {
       acc[equipo.equipment_id] = false // El ID es único para cada equipo
       return acc
     }, {})
@@ -477,25 +477,27 @@ const CreateBillModal = ({
         }
       ]}
     >
-      <div key="00" className="w-100 col-span-full">
-        <h2 className="text-start font-bold">Entrega parcial</h2>
-        <ul className="text-start my-4 flex flex-col">
-          {row.equipo.map((e, index) => (
-            <label key={index} className="flex gap-3">
-              <input
-                type="checkbox"
-                className="w-5"
-                id={e.equipment_id}
-                name={`${e.equipment_id}`}
-                checked={selectedEquipos[e.equipment_id] || false}
-                onChange={() => handleEquipoChange(e.equipment_id)}
-              />
-              <span className="px-1 bg-blue-500 text-white rounded-md">{e.cantidad}</span>
-              {e.equipo_info}
-            </label>
-          ))}
-        </ul>
-      </div>
+      {row.equipo && (
+        <div key="00" className="w-100 col-span-full">
+          <h2 className="text-start font-bold">Entrega parcial</h2>
+          <ul className="text-start my-4 flex flex-col">
+            {row.equipo.map((e, index) => (
+              <label key={index} className="flex gap-3">
+                <input
+                  type="checkbox"
+                  className="w-5"
+                  id={e.equipment_id}
+                  name={`${e.equipment_id}`}
+                  checked={selectedEquipos[e.equipment_id] || false}
+                  onChange={() => handleEquipoChange(e.equipment_id)}
+                />
+                <span className="px-1 bg-blue-500 text-white rounded-md">{e.cantidad}</span>
+                {e.equipo_info}
+              </label>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="flex gap-4 col-span-full">
         <Button color="danger" type="button" text="Cancelar" onClick={closeModal} />
         <Button color="success" type="submit" text="Enviar" />
