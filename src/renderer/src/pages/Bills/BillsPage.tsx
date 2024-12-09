@@ -162,10 +162,10 @@ const RenderBillRow = ({
           <Button
             type="button"
             className={cn('border-0 p-4 rounded-xl text-green-500 hover:bg-green-500')}
-            disabled={row.estado_actual === 'COMPLETADO'}
+            disabled={true}
             icon={<LuBadgeDollarSign />}
             isIconOnly={true}
-            title={'Cobrar/Crear Recibo'}
+            title={'Opción deshabilitada temporalmente'}
             onClick={(event) => {
               event.stopPropagation()
               openModal(

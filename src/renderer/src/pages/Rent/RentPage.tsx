@@ -363,12 +363,12 @@ const CreateBillModal = ({
     const total = data.aplicar_iva ? data.cantidad * 1.16 : data.cantidad
 
     // Filtrar los equipos seleccionados
-    const equiposSeleccionados = row.equipo.filter(
+    const equiposSeleccionados = row.equipo?.filter(
       (equipo: any) => selectedEquipos[equipo.equipment_id]
     )
 
     // Crear el array de objetos con cantidad, id, y equipo_info
-    const equiposFormatted = equiposSeleccionados.map((equipo: any) => {
+    const equiposFormatted = equiposSeleccionados?.map((equipo: any) => {
       return equipo.equipo_info
     })
 
@@ -395,10 +395,10 @@ const CreateBillModal = ({
       mes: new Date().getMonth() + 1,
       anio: new Date().getFullYear(),
       total: total.toFixed(2),
-      equipos: equiposFormatted.join('\n')
+      equipos: equiposFormatted ? equiposFormatted.join('\n') : ''
     }
 
-    const selectedEquipmentToRemove = Object.keys(selectedEquipos).filter(
+    const selectedEquipmentToRemove = Object.keys(selectedEquipos ? selectedEquipos : {}).filter(
       (key) => selectedEquipos[key]
     )
 
