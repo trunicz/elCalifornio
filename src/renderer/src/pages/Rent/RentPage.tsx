@@ -269,7 +269,7 @@ export const RentPage = (): ReactElement => {
             Historial de Rentas
           </Link>
         </AppLayout.PageOptions>
-        <Modal title="Renta" className="w-auto min-w-[500px]" />
+        <Modal title="Renta" className="w-auto min-w-[500px] " />
         {isLoaded && rentList ? (
           <Table
             data={rentList}
@@ -489,9 +489,9 @@ const CreateBillModal = ({
       ]}
     >
       {selectedEquipos && (
-        <div key="00" className="w-100 col-span-full">
+        <div key="00" className="w-100 col-span-full ">
           <h2 className="text-start font-bold">Entrega parcial</h2>
-          <ul className="text-start my-4 flex flex-col">
+          <ul className="text-start my-4 flex flex-col h-[100px] overflow-y-auto">
             {row.equipo &&
               row.equipo.map((e, index) => (
                 <label key={index} className="flex gap-3">

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppLayout, Button, Form, useModal } from '@renderer/components'
+import { AppLayout, Button, Form, SearchBar, useModal } from '@renderer/components'
 import { Loading } from '@renderer/components/Loading'
 import { useAdmin } from '@renderer/hooks/useAdmin'
 import { useContracts } from '@renderer/hooks/useContracts'
@@ -8,11 +8,13 @@ import { cn, convertirNumeroALetras } from '@renderer/utils'
 import { Fragment, ReactElement, useEffect, useState } from 'react'
 import { IoWarning } from 'react-icons/io5'
 import { LuBadgeDollarSign, LuDownloadCloud, LuX } from 'react-icons/lu'
+import { useParams } from 'wouter'
 import * as Yup from 'yup'
 
 export const BillsPage = (): ReactElement => {
   const { bills, getAllBills, deleteBill } = useBills()
   const [headers, setHeaders] = useState<any[]>()
+  const [billsList, setBillsList] = useState<unknown[] | null>(null)
   const [receivers, setReceivers] = useState<Array<{ value: string; label: string }>>()
   const hiddenKeys = ['id', 'equipo', 'recibos', 'iscompleted']
   const { Modal, openModal, closeModal } = useModal()
@@ -20,6 +22,7 @@ export const BillsPage = (): ReactElement => {
   const { createBillPdf } = useContracts()
   const { getUsers } = useAdmin()
   const [modalTitle, setModalTitle] = useState<string>('Crear Recibo')
+  const { search } = useParams()
 
   useEffect(() => {
     load()
@@ -38,6 +41,7 @@ export const BillsPage = (): ReactElement => {
             )
           : []
       )
+      setBillsList(res)
     })
     getUsers().then((res: any) => {
       const rec = res.map((r: any) => ({
@@ -51,7 +55,13 @@ export const BillsPage = (): ReactElement => {
   return (
     <AppLayout>
       <AppLayout.Content>
-        <AppLayout.PageOptions pageTitle="Recibos" hasAddButton={false} />
+        <AppLayout.PageOptions pageTitle="Recibos" hasAddButton={false}>
+          <SearchBar
+            searchFunction={setBillsList}
+            data={bills}
+            initialValue={search ? search : ''}
+          />
+        </AppLayout.PageOptions>
         <Modal title={modalTitle} className="w-1/2 xl:w-1/3" />
         {bills && headers ? (
           <section className="flex flex-col gap-4 overflow-x-auto">
@@ -70,7 +80,7 @@ export const BillsPage = (): ReactElement => {
                 </tr>
               </thead>
               <tbody>
-                {bills.map((row: any, rowIndex: number) =>
+                {billsList?.map((row: any, rowIndex: number) =>
                   row ? (
                     <RenderBillRow
                       row={row}
